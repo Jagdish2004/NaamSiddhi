@@ -1,46 +1,92 @@
-<!-- Navbar -->
- <style>
-    /* Navbar Styling */
-.navbar-brand {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #ffcc00 !important; /* Highlighted brand color */
-}
-.nav-link:hover {
-  color: #ffcc00 !important; /* Highlight links on hover */
-}
- </style>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-<div class="container-fluid">
-    <a class="navbar-brand" href="#">NaamSiddhi</a>
+<style>
+  /* Navbar Styling */
+  .navbar {
+      background-color: #1a1a2e; /* Dark Blue background for navbar */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a slight shadow for depth */
+  }
+
+  .navbar-brand {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #ffcc00 !important; /* Highlighted brand color */
+      display: flex;
+      align-items: center; /* Center logo and text vertically */
+  }
+
+  .navbar img {
+      height: 50px; /* Adjust logo height */
+      width: auto; /* Maintain aspect ratio */
+      margin-right: 15px; /* Space between logo and brand name */
+      border-radius: 8px; /* Rounded corners for the logo */
+      background-color: aliceblue; /* Background for logo */
+      padding: 5px; /* Padding around the logo */
+  }
+
+  .navbar-nav .nav-link {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #ffffff; /* White text color */
+      transition: color 0.3s ease-in-out; /* Smooth transition for hover */
+  }
+
+  .navbar-nav .nav-link:hover {
+      color: #ffcc00 !important; /* Highlight link color on hover */
+      text-decoration: underline; /* Add underline effect */
+  }
+
+  .navbar-toggler {
+      border: none; /* Remove default border from toggle button */
+  }
+
+  .navbar-toggler-icon {
+      background-image: url('data:image/svg+xml;charset=UTF8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 30 30\' fill=\'%23ffcc00\'%3E%3Cpath stroke=\'rgba%28155, 155, 155, 1%29\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-miterlimit=\'10\' d=\'M4 7h22M4 15h22M4 23h22\'/%3E%3C/svg%3E'); /* Yellow toggle icon */
+  }
+
+  /* Responsive Navbar Logo and Brand */
+  @media (max-width: 768px) {
+      .navbar-brand {
+          font-size: 1.5rem;
+      }
+
+      .navbar img {
+          height: 40px;
+      }
+  }
+</style>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    <!-- Logo and Brand -->
+    <a class="navbar-brand" href="/">
+      <img src="path/to/your/logo.svg" alt="Logo">
+      नामसिद्धि
+    </a>
     <button
-    class="navbar-toggler"
-    type="button"
-    data-bs-toggle="collapse"
-    data-bs-target="#navbarNav"
-    aria-controls="navbarNav"
-    aria-expanded="false"
-    aria-label="Toggle navigation"
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
     >
-    <span class="navbar-toggler-icon"></span>
+        <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="/">Home</a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link" href="/about">About</a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link" href="/features">Features</a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link" href="/contact">Contact</a>
-        </li>
-    </ul>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/features">Features</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/contact">Contact</a>
+            </li>
+        </ul>
     </div>
-</div>
+  </div>
 </nav>
-
-    

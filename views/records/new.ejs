@@ -1,0 +1,123 @@
+<% layout('./layout/boilerplate') -%>
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white text-center">
+            <h3>Create Police Case</h3>
+        </div>
+        <div class="card-body">
+            <form action="/#" method="POST">
+                <div class="row">
+                    <!-- First Name -->
+                    <div class="col-md-6 mb-3">
+                        <label for="firstName" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name" required>
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="col-md-6 mb-3">
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter last name" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Occupation -->
+                    <div class="col-md-6 mb-3">
+                        <label for="occupation" class="form-label">Occupation</label>
+                        <input type="text" class="form-control" id="occupation" name="occupation" placeholder="Enter occupation">
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div class="col-md-6 mb-3">
+                        <label for="dob" class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" id="dob" name="dob" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Gender -->
+                    <div class="col-md-6 mb-3">
+                        <label for="gender" class="form-label">Gender</label>
+                        <select class="form-select" id="gender" name="gender" required>
+                            <option value="" disabled selected>Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+
+                    <!-- Role -->
+                    <div class="col-md-6 mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="" disabled selected>Select role</option>
+                            <option value="criminal">Criminal</option>
+                            <option value="victim">Victim</option>
+                            <option value="witness">Witness</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Mobile Number -->
+                    <div class="col-md-6 mb-3">
+                        <label for="mNumber" class="form-label">Mobile Number</label>
+                        <input type="number" class="form-control" id="mNumber" name="mNumber" placeholder="Enter mobile number" required>
+                    </div>
+
+                    <!-- Family Detail -->
+                    <div class="col-md-6 mb-3">
+                        <button type="button" class="btn btn-secondary w-100">Enter Family Details</button>
+                    </div>
+                    
+                </div>
+
+                <h4 class="mt-4">Address</h4>
+                <div class="row">
+                    <!-- Location -->
+                    <div class="col-md-6 mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="address.location" placeholder="Enter location" required>
+                    </div>
+
+                    <!-- City -->
+                    <div class="col-md-6 mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" name="address.city" placeholder="Enter city" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- District -->
+                    <div class="col-md-6 mb-3">
+                        <label for="district" class="form-label">District</label>
+                        <input type="text" class="form-control" id="district" name="address.district" placeholder="Enter district" required>
+                    </div>
+
+                    <!-- State -->
+                    <div class="col-md-6 mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" class="form-control" id="state" name="address.state" placeholder="Enter state" required>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter case description"></textarea>
+                </div>
+
+                <div class="row">
+                    <!-- Crime -->
+                    <div class="col-md-6 mb-3">
+                        <button type="button" class="btn btn-secondary w-100">Enter Case Details</button>
+                    </div>
+
+                    
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Submit Profile</button>
+            </form>
+        </div>
+    </div>
+</div>

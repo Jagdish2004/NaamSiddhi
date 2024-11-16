@@ -11,12 +11,12 @@ const profileSchema = new mongoose.Schema({
   dob: { type: Date, required: true }, 
   gender: { 
     type: String, 
-    enum: ['male', 'female'], 
+    enum: ['Male', 'Female'], 
     required: true 
   },
   role: { 
     type: String, 
-    enum: ['criminal', 'victim', 'witness'], 
+    enum: ['Criminal', 'Victim', 'Witness'], 
     required: true 
   },
 
