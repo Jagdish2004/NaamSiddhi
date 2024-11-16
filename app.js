@@ -5,15 +5,21 @@ if(process.env.NODE_ENV != "PRODUCTION"){
 
 const express = require('express');
 const app = express();
+const path = require("path");
 const mongoose = require('mongoose');
 const profileSchema =require("./models/profileSchema");
+const ejsMate = require("ejs-mate");
+const methodOverride = require("method-override");
+
+app.engine("ejs", ejsMate);
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
+app.use(express.static(path.join(__dirname, "public")));
 
 const dbURL = process.env.MONGO_URL
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`listening on port: ${port}`);
-});
-
 
 // Linking the database
 main().then(() => {
@@ -21,9 +27,14 @@ main().then(() => {
 }).catch(err => console.log(err));
 
 async function main() {
-    await mongoose.connect(process.env.MONGO_URL);
+    await mongoose.connect(dbURL);
 }
 
 app.get("/",(req,res)=>{
-    console.log(profileSchema);
-  });
+    res.render('records/index.ejs');
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`listening on port: ${port}`);
+});
