@@ -1,0 +1,168 @@
+<% layout('./layout/boilerplate') -%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Profiles</title>
+  <style>
+    /* General Styling */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Navbar */
+    nav {
+      background-color: #2c2c2c;
+      color: #fff;
+      padding: 1rem;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin-right: 1rem;
+    }
+
+    /* Container */
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    /* Title */
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+
+    /* Search Form */
+    .search-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .search-form input, 
+    .search-form select, 
+    .search-form button {
+      flex: 1 1 calc(33% - 1rem);
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .search-form button {
+      background-color: #2c2c2c;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .search-form button:hover {
+      background-color: #444;
+    }
+
+    /* Results Section */
+    .results {
+      margin-top: 2rem;
+    }
+
+    /* Single Profile Card */
+    .profile-card {
+      background: #fff;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-card img {
+      height: 100px;
+      width: 100px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+
+    .profile-details {
+      text-align: center;
+    }
+
+    .profile-details h3 {
+      margin: 0;
+      color: #2c2c2c;
+    }
+
+    .profile-details p {
+      margin: 0.3rem 0;
+      color: #555;
+    }
+
+    /* No Results Message */
+    .no-results {
+      text-align: center;
+      color: #999;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Search Profiles</h1>
+
+    <!-- Search Form -->
+    <form class="search-form" action="/search" method="GET">
+      <input type="text" name="firstName" placeholder="First Name">
+      <input type="text" name="lastName" placeholder="Last Name">
+      <input type="date" name="dob" placeholder="Date of Birth">
+      <select name="gender">
+        <option value="">Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+      <select name="role">
+        <option value="">Role</option>
+        <option value="criminal">Criminal</option>
+        <option value="victim">Victim</option>
+        <option value="witness">Witness</option>
+      </select>
+      <button type="submit">Search</button>
+    </form>
+
+    <!-- Results Section -->
+    <div class="results">
+      <% if (profiles && profiles.length > 0) { %>
+        <% profiles.forEach(profile => { %>
+          <div class="profile-card">
+            <!-- <img src="<%= profile.imageUrl || '/images/default-profile.png' %>" alt="Profile Image"> -->
+            <div class="profile-details">
+              <h3><%= profile.firstName %> <%= profile.lastName %></h3>
+              <p><strong>Role:</strong> <%= profile.role %></p>
+              <p><strong>Gender:</strong> <%= profile.gender %></p>
+              <p><strong>Date of Birth:</strong> <%= profile.dob.toLocaleDateString() %></p>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="no-results">
+          <p>No profiles found. Please adjust your search criteria.</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

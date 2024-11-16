@@ -31,7 +31,26 @@ async function main() {
 }
 
 app.get("/",(req,res)=>{
-    res.render('records/index.ejs');
+    res.render('records/search.ejs', {
+        profiles: [
+          {
+            firstName: "Rahul",
+            lastName: "Sharma",
+            dob: new Date('1990-05-15'),
+            gender: "male",
+            role: "criminal",
+            imageUrl: "/images/rahul.png",
+          },
+          {
+            firstName: "Priya",
+            lastName: "Singh",
+            dob: new Date('1995-10-10'),
+            gender: "female",
+            role: "witness",
+            imageUrl: null, // Defaults to placeholder image
+          }
+        ]
+    });
 });
 
 const port = process.env.PORT || 3000;
