@@ -1,123 +1,174 @@
 <% layout('./layout/boilerplate') -%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Police Case</title>
+  <style>
+    /* General Styling */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
 
-<div class="container mt-5">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white text-center">
-            <h3>Create Police Case</h3>
-        </div>
-        <div class="card-body">
-            <form action="/#" method="POST">
-                <div class="row">
-                    <!-- First Name -->
-                    <div class="col-md-6 mb-3">
-                        <label for="firstName" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name" required>
-                    </div>
+    /* Navbar */
+    nav {
+      background-color: #2c2c2c;
+      color: #fff;
+      padding: 1rem;
+    }
 
-                    <!-- Last Name -->
-                    <div class="col-md-6 mb-3">
-                        <label for="lastName" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter last name" required>
-                    </div>
-                </div>
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin-right: 1rem;
+    }
 
-                <div class="row">
-                    <!-- Occupation -->
-                    <div class="col-md-6 mb-3">
-                        <label for="occupation" class="form-label">Occupation</label>
-                        <input type="text" class="form-control" id="occupation" name="occupation" placeholder="Enter occupation">
-                    </div>
+    /* Container */
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
 
-                    <!-- Date of Birth -->
-                    <div class="col-md-6 mb-3">
-                        <label for="dob" class="form-label">Date of Birth</label>
-                        <input type="date" class="form-control" id="dob" name="dob" required>
-                    </div>
-                </div>
+    /* Title */
+    h1, h3, h4 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 1rem;
+    }
 
-                <div class="row">
-                    <!-- Gender -->
-                    <div class="col-md-6 mb-3">
-                        <label for="gender" class="form-label">Gender</label>
-                        <select class="form-select" id="gender" name="gender" required>
-                            <option value="" disabled selected>Select gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
-                    </div>
+    /* Form Styling */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
 
-                    <!-- Role -->
-                    <div class="col-md-6 mb-3">
-                        <label for="role" class="form-label">Role</label>
-                        <select class="form-select" id="role" name="role" required>
-                            <option value="" disabled selected>Select role</option>
-                            <option value="criminal">Criminal</option>
-                            <option value="victim">Victim</option>
-                            <option value="witness">Witness</option>
-                        </select>
-                    </div>
-                </div>
+    form .row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
 
-                <div class="row">
-                    <!-- Mobile Number -->
-                    <div class="col-md-6 mb-3">
-                        <label for="mNumber" class="form-label">Mobile Number</label>
-                        <input type="number" class="form-control" id="mNumber" name="mNumber" placeholder="Enter mobile number" required>
-                    </div>
+    form input, 
+    form select, 
+    form textarea, 
+    form button {
+      flex: 1 1 calc(50% - 1rem);
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
 
-                    <!-- Family Detail -->
-                    <div class="col-md-6 mb-3">
-                        <button type="button" class="btn btn-secondary w-100">Enter Family Details</button>
-                    </div>
-                    
-                </div>
+    form textarea {
+      resize: vertical;
+    }
 
-                <h4 class="mt-4">Address</h4>
-                <div class="row">
-                    <!-- Location -->
-                    <div class="col-md-6 mb-3">
-                        <label for="location" class="form-label">Location</label>
-                        <input type="text" class="form-control" id="location" name="address.location" placeholder="Enter location" required>
-                    </div>
+    form button {
+      background-color: #2c2c2c;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
 
-                    <!-- City -->
-                    <div class="col-md-6 mb-3">
-                        <label for="city" class="form-label">City</label>
-                        <input type="text" class="form-control" id="city" name="address.city" placeholder="Enter city" required>
-                    </div>
-                </div>
+    form button:hover {
+      background-color: #444;
+    }
 
-                <div class="row">
-                    <!-- District -->
-                    <div class="col-md-6 mb-3">
-                        <label for="district" class="form-label">District</label>
-                        <input type="text" class="form-control" id="district" name="address.district" placeholder="Enter district" required>
-                    </div>
+    .btn-secondary {
+      background-color: #6c757d;
+      border: none;
+      color: #fff;
+    }
 
-                    <!-- State -->
-                    <div class="col-md-6 mb-3">
-                        <label for="state" class="form-label">State</label>
-                        <input type="text" class="form-control" id="state" name="address.state" placeholder="Enter state" required>
-                    </div>
-                </div>
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Create Police Case</h1>
 
-                <!-- Description -->
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter case description"></textarea>
-                </div>
+    <form action="/#" method="POST">
+      <div class="row">
+        <!-- First Name -->
+        <input type="text" name="firstName" placeholder="First Name" required>
 
-                <div class="row">
-                    <!-- Crime -->
-                    <div class="col-md-6 mb-3">
-                        <button type="button" class="btn btn-secondary w-100">Enter Case Details</button>
-                    </div>
+        <!-- Last Name -->
+        <input type="text" name="lastName" placeholder="Last Name" required>
+      </div>
 
-                    
-                </div>
+      <div class="row">
+        <!-- Occupation -->
+        <input type="text" name="occupation" placeholder="Occupation">
 
-                <button type="submit" class="btn btn-primary w-100">Submit Profile</button>
-            </form>
-        </div>
-    </div>
-</div>
+        <!-- Date of Birth -->
+        <input type="date" name="dob" required>
+      </div>
+
+      <div class="row">
+        <!-- Gender -->
+        <select name="gender" required>
+          <option value="" disabled selected>Select Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+
+        <!-- Role -->
+        <select name="role" required>
+          <option value="" disabled selected>Select Role</option>
+          <option value="criminal">Criminal</option>
+          <option value="victim">Victim</option>
+          <option value="witness">Witness</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <!-- Mobile Number -->
+        <input type="number" name="mNumber" placeholder="Mobile Number" required>
+
+        <!-- Family Details Button -->
+        <button type="button" class="btn-secondary">Enter Family Details</button>
+      </div>
+
+      <h4>Address</h4>
+
+      <div class="row">
+        <!-- Location -->
+        <input type="text" name="address.location" placeholder="Location" required>
+
+        <!-- City -->
+        <input type="text" name="address.city" placeholder="City" required>
+      </div>
+
+      <div class="row">
+        <!-- District -->
+        <input type="text" name="address.district" placeholder="District" required>
+
+        <!-- State -->
+        <input type="text" name="address.state" placeholder="State" required>
+      </div>
+
+      <!-- Description -->
+      <textarea name="description" rows="4" placeholder="Enter case description"></textarea>
+
+      <div class="row">
+        <!-- Case Details Button -->
+        <button type="button" class="btn-secondary">Enter Case Details</button>
+      </div>
+
+      <button type="submit">Submit Profile</button>
+    </form>
+  </div>
+</body>
+</html>
