@@ -126,21 +126,21 @@
 
     <!-- Search Form -->
     <form class="search-form" action="/search" method="GET">
-      <input type="text" name="firstName" placeholder="First Name">
-      <input type="text" name="lastName" placeholder="Last Name">
-      <input type="date" name="dob" placeholder="Date of Birth">
+      <input type="text" name="firstName" placeholder="First Name / पहला नाम">
+      <input type="text" name="lastName" placeholder="Last Name / अंतिम नाम">
+      <input type="date" name="dob" placeholder="Date of Birth / जन्म तिथि">
       <select name="gender">
-        <option value="">Gender</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
+        <option value="">Gender / लिंग</option>
+        <option value="male">Male / पुरुष</option>
+        <option value="female">Female / महिला</option>
       </select>
       <select name="role">
-        <option value="">Role</option>
-        <option value="criminal">Criminal</option>
-        <option value="victim">Victim</option>
-        <option value="witness">Witness</option>
+        <option value="">Role / भूमिका</option>
+        <option value="criminal">Criminal / अपराधी</option>
+        <option value="victim">Victim / पीड़ित</option>
+        <option value="witness">Witness / गवाह</option>
       </select>
-      <button type="submit">Search</button>
+      <button type="submit">Search / खोजें</button>
     </form>
 
     <!-- Results Section -->
@@ -150,10 +150,19 @@
           <div class="profile-card">
             <!-- <img src="<%= profile.imageUrl || '/images/default-profile.png' %>" alt="Profile Image"> -->
             <div class="profile-details">
-              <h3><%= profile.firstName %> <%= profile.lastName %></h3>
+              <h3>
+                <%= profile.firstName.english %> <%= profile.lastName.english %>
+                (<%= profile.firstName.hindi %> <%= profile.lastName.hindi %>)
+              </h3>
               <p><strong>Role:</strong> <%= profile.role %></p>
               <p><strong>Gender:</strong> <%= profile.gender %></p>
               <p><strong>Date of Birth:</strong> <%= profile.dob.toLocaleDateString() %></p>
+              <p>
+                <strong>Address:</strong> 
+                <%= profile.address.locationHindi %>, <%= profile.address.cityHindi %>, 
+                <%= profile.address.stateHindi %>
+                (<%= profile.address.locationEnglish %>, <%= profile.address.cityEnglish %>, <%= profile.address.stateEnglish %>)
+              </p>
             </div>
           </div>
         <% }); %>
@@ -162,7 +171,7 @@
           <p>No profiles found. Please adjust your search criteria.</p>
         </div>
       <% } %>
-    </div>
+    </div>    
   </div>
 </body>
 </html>

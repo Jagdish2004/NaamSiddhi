@@ -1,6 +1,6 @@
 if(process.env.NODE_ENV != "PRODUCTION"){
-    require('dotenv').config();
-      
+  require('dotenv').config();
+    
 };
 
 const express = require('express');
@@ -25,37 +25,16 @@ const dbURL = process.env.MONGO_URL
 
 // Linking the database
 main().then(() => {
-    console.log("connected to mongoDB");
+  console.log("connected to mongoDB");
 }).catch(err => console.log(err));
 
 async function main() {
-    await mongoose.connect(dbURL);
+  await mongoose.connect(dbURL);
 }
 
-app.get("/",(req,res)=>{
-    res.render('records/new.ejs', {
-        profiles: [
-          {
-            firstName: "Rahul",
-            lastName: "Sharma",
-            dob: new Date('1990-05-15'),
-            gender: "male",
-            role: "criminal",
-            imageUrl: "/images/rahul.png",
-          },
-          {
-            firstName: "Priya",
-            lastName: "Singh",
-            dob: new Date('1995-10-10'),
-            gender: "female",
-            role: "witness",
-            imageUrl: null, // Defaults to placeholder image
-          }
-        ]
-    });
-});
-
-const port = process.env.PORT || 3001;
+app.use("/search", searchRecord);
+app.use("/newrecord", newRecord);
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
-    console.log(`listening on port: ${port}`);
+  console.log(`listening on port:${port}`);
 });

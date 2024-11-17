@@ -99,76 +99,76 @@
   <div class="container">
     <h1>Create Police Case</h1>
 
-    <form action="/#" method="POST">
+    <form action="/newrecord" method="POST">
       <div class="row">
         <!-- First Name -->
-        <input type="text" name="firstName" placeholder="First Name" required>
-
+        <input type="text" name="firstName" placeholder="First Name / पहला नाम" required>
+    
         <!-- Last Name -->
-        <input type="text" name="lastName" placeholder="Last Name" required>
+        <input type="text" name="lastName" placeholder="Last Name / अंतिम नाम" required>
       </div>
-
+    
       <div class="row">
         <!-- Occupation -->
-        <input type="text" name="occupation" placeholder="Occupation">
-
+        <input type="text" name="occupation" placeholder="Occupation / पेशा">
+    
         <!-- Date of Birth -->
-        <input type="date" name="dob" required>
+        <input type="date" name="dob" placeholder="Date of Birth / जन्म तिथि" required>
       </div>
-
+    
       <div class="row">
         <!-- Gender -->
         <select name="gender" required>
-          <option value="" disabled selected>Select Gender</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
+          <option value="" disabled selected>Select Gender / लिंग चुनें</option>
+          <option value="male">Male / पुरुष</option>
+          <option value="female">Female / महिला</option>
         </select>
-
+    
         <!-- Role -->
         <select name="role" required>
-          <option value="" disabled selected>Select Role</option>
-          <option value="criminal">Criminal</option>
-          <option value="victim">Victim</option>
-          <option value="witness">Witness</option>
+          <option value="" disabled selected>Select Role / भूमिका चुनें</option>
+          <option value="criminal">Criminal / अपराधी</option>
+          <option value="victim">Victim / पीड़ित</option>
+          <option value="witness">Witness / गवाह</option>
         </select>
       </div>
-
+    
       <div class="row">
         <!-- Mobile Number -->
-        <input type="number" name="mNumber" placeholder="Mobile Number" required>
-
+        <input type="number" name="mNumber" placeholder="Mobile Number / मोबाइल नंबर" required>
+    
         <!-- Family Details Button -->
-        <button type="button" class="btn-secondary">Enter Family Details</button>
+        <button type="button" class="btn-secondary">Enter Family Details / परिवार विवरण दर्ज करें</button>
       </div>
-
-      <h4>Address</h4>
-
+    
+      <h4>Address / पता</h4>
+    
       <div class="row">
         <!-- Location -->
-        <input type="text" name="address.location" placeholder="Location" required>
-
+        <input type="text" name="address[location]" placeholder="Location / स्थान" required>
+    
         <!-- City -->
-        <input type="text" name="address.city" placeholder="City" required>
+        <input type="text" name="address[city]" placeholder="City / शहर" required>
       </div>
-
+    
       <div class="row">
         <!-- District -->
-        <input type="text" name="address.district" placeholder="District" required>
-
+        <input type="text" name="address[district]" placeholder="District / जिला" required>
+    
         <!-- State -->
-        <input type="text" name="address.state" placeholder="State" required>
+        <input type="text" name="address[state]" placeholder="State / राज्य" required>
       </div>
-
+    
       <!-- Description -->
-      <textarea name="description" rows="4" placeholder="Enter case description"></textarea>
-
+      <textarea name="description" rows="4" placeholder="Enter case description / केस का विवरण दर्ज करें"></textarea>
+    
       <div class="row">
         <!-- Case Details Button -->
-        <button type="button" class="btn-secondary">Enter Case Details</button>
+        <button type="button" class="btn-secondary">Enter Case Details / केस विवरण दर्ज करें</button>
       </div>
-
-      <button type="submit">Submit Profile</button>
-    </form>
+    
+      <button type="submit">Submit Profile / प्रोफ़ाइल सबमिट करें</button>
+    </form>    
   </div>
 </body>
 </html>
