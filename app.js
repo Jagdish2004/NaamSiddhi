@@ -10,6 +10,8 @@ const mongoose = require('mongoose');
 const profileSchema =require("./models/profileSchema");
 const ejsMate = require("ejs-mate");
 const methodOverride = require("method-override");
+const newRecord = require('./routes/newRecord');
+const searchRecord = require('./routes/searchRecord');
 
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
@@ -31,7 +33,7 @@ async function main() {
 }
 
 app.get("/",(req,res)=>{
-    res.render('records/search.ejs', {
+    res.render('records/new.ejs', {
         profiles: [
           {
             firstName: "Rahul",
@@ -53,7 +55,7 @@ app.get("/",(req,res)=>{
     });
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
     console.log(`listening on port: ${port}`);
 });
