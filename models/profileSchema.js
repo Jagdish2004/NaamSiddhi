@@ -1,50 +1,34 @@
 const mongoose = require('mongoose');
+const AutoIncrementFactory = require('mongoose-sequence');
+const autoIncrement = AutoIncrementFactory(mongoose);
 
 const profileSchema = new mongoose.Schema({
-  id: { type: Number, required: true, unique: true },
-  soundexCode: { type: String, required: true },
-  firstName: { type: String, required: true },
-  
-  lastName: { type: String, required: true },
-
-  
-  occupation: { type: String }, 
-  dob: { type: Date, required: true }, 
-  gender: { 
-    type: String, 
-    enum: ['Male', 'Female'], 
-    required: true 
-  },
-  role: { 
-    type: String, 
-    enum: ['Criminal', 'Victim', 'Witness'], 
-    required: true 
-  },
-
- 
-  mNumber: { type: Number, required: true }, // Mobile number
-
- 
+  firstNameHindi: String,
+  firstNameEnglish: String,
+  lastNameHindi: String,
+  lastNameEnglish: String,
+  occupationHindi: String,
+  occupationEnglish: String,
+  dob: Date,
+  gender: String,
+  role: String,
+  mNumber: String,
   address: {
-    location: { type: String, required: true }, 
-    city: { type: String, required: true }, 
-    district: { type: String, required: true },
-    state: { type: String, required: true }, 
+    locationHindi: String,
+    locationEnglish: String,
+    cityHindi: String,
+    cityEnglish: String,
+    districtHindi: String,
+    districtEnglish: String,
+    stateHindi: String,
+    stateEnglish: String
   },
-
-  // Additional details
-  description: { type: String }, // Optional description
-  crime: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Crime' 
-  }, 
-  familyDetail: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Family' 
-  }, 
+  descriptionHindi: String,
+  descriptionEnglish: String,
+  id: { type: Number, unique: true }  // The id field with unique index
 });
 
+// Apply the auto-increment plugin to the `id` field
+profileSchema.plugin(autoIncrement, { inc_field: 'id' });
 
-const Profile = mongoose.model('Profile', profileSchema);
-
-module.exports = Profile;
+module.exports = mongoose.model('Profile', profileSchema);
