@@ -31,7 +31,7 @@ async function main() {
 }
 
 app.get("/",(req,res)=>{
-    res.render('records/new.ejs', {
+    res.render('records/search.ejs', {
         profiles: [
           {
             firstName: "Rahul",
