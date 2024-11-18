@@ -3,6 +3,10 @@ const AutoIncrementFactory = require('mongoose-sequence');
 const autoIncrement = AutoIncrementFactory(mongoose);
 
 const profileSchema = new mongoose.Schema({
+  soundexCode: {
+    firstName: String,
+    lastName: String,
+  },
   firstNameHindi: String,
   firstNameEnglish: String,
   lastNameHindi: String,

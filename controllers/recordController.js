@@ -1,4 +1,5 @@
 const Profile = require('../models/profileSchema'); // Assuming your model file is at this path
+const {getSoundex} = require('../soundex');
 
 module.exports.createRecord = (req, res) => {
   res.render('records/new.ejs');
@@ -11,9 +12,16 @@ module.exports.saveRecord = async (req, res) => {
         firstName, lastName, occupation, dob, gender, role, mNumber,
         address, description
       } = req.body;
+
+      const firstNameSoundex = getSoundex(firstName, false, false); // Generate Soundex code for first name
+      const lastNameSoundex = getSoundex(lastName, false, false);
   
       // Create a new profile (id will be automatically generated)
       const profile = new Profile({
+        soundexCode: {
+          firstName: firstNameSoundex, // Store Soundex code for first name in the nested object
+          lastName: lastNameSoundex,   // Store Soundex code for last name in the nested object
+        },
         firstNameHindi: firstName,
         firstNameEnglish: firstName,
         lastNameHindi: lastName,
