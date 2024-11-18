@@ -5,7 +5,7 @@ require('dotenv').config();
 
 // Initialize Google Translate client
 const translate = new Translate({
-  key: process.env.GOOGLE_TRANSLATE_API, // Replace with your API key
+  key: process.env.GOOGLE_TRANSLATE_API,
 });
 
 module.exports.createRecord = (req, res) => {
@@ -30,7 +30,7 @@ module.exports.saveRecord = async (req, res) => {
           return translatedText;
         } catch (error) {
           console.error('Error translating text:', error);
-          return text; // Return original text if translation fails
+          return text;
         }
       };
 
