@@ -120,12 +120,14 @@
     }
   </style>
 </head>
+
+
 <body>
   <div class="container">
     <h1>Search Profiles</h1>
 
     <!-- Search Form -->
-    <form class="search-form" action="/search" method="GET">
+    <form class="search-form" action="/search" method="POST">
       <input type="text" name="firstName" placeholder="First Name / पहला नाम">
       <input type="text" name="lastName" placeholder="Last Name / अंतिम नाम">
       <input type="date" name="dob" placeholder="Date of Birth / जन्म तिथि">
@@ -143,35 +145,41 @@
       <button type="submit">Search / खोजें</button>
     </form>
 
+
     <!-- Results Section -->
-    <div class="results">
-      <% if (profiles && profiles.length > 0) { %>
-        <% profiles.forEach(profile => { %>
-          <div class="profile-card">
-            <!-- <img src="<%= profile.imageUrl || '/images/default-profile.png' %>" alt="Profile Image"> -->
-            <div class="profile-details">
-              <h3>
-                <%= profile.firstName.english %> <%= profile.lastName.english %>
-                (<%= profile.firstName.hindi %> <%= profile.lastName.hindi %>)
-              </h3>
-              <p><strong>Role:</strong> <%= profile.role %></p>
-              <p><strong>Gender:</strong> <%= profile.gender %></p>
-              <p><strong>Date of Birth:</strong> <%= profile.dob.toLocaleDateString() %></p>
-              <p>
-                <strong>Address:</strong> 
-                <%= profile.address.locationHindi %>, <%= profile.address.cityHindi %>, 
-                <%= profile.address.stateHindi %>
-                (<%= profile.address.locationEnglish %>, <%= profile.address.cityEnglish %>, <%= profile.address.stateEnglish %>)
-              </p>
-            </div>
-          </div>
-        <% }); %>
-      <% } else { %>
-        <div class="no-results">
-          <p>No profiles found. Please adjust your search criteria.</p>
+<!-- Results Section -->
+<div class="results">
+  <% if (profiles && profiles.length > 0) { %>
+    <% profiles.forEach(profile => { %>
+      <div class="profile-card">
+        <div class="profile-details">
+          <h3>
+            <%= profile.firstNameEnglish %> <%= profile.lastNameEnglish %>
+            (<%= profile.firstNameHindi %> <%= profile.lastNameHindi %>)
+          </h3>
+          <p><strong>Role:</strong> <%= profile.role %></p>
+          <p><strong>Gender:</strong> <%= profile.gender %></p>
+          <p><strong>Date of Birth:</strong> <%= new Date(profile.dob).toLocaleDateString() %></p>
+          <p><strong>Mobile Number:</strong> <%= profile.mNumber %></p>
+          <p>
+            <strong>Address:</strong> 
+            <%= profile.address.locationHindi %>, <%= profile.address.cityHindi %>, <%= profile.address.districtHindi %>, <%= profile.address.stateHindi %>
+            (<%= profile.address.locationEnglish %>, <%= profile.address.cityEnglish %>, <%= profile.address.districtEnglish %>, <%= profile.address.stateEnglish %>)
+          </p>
+          <p><strong>Occupation:</strong> <%= profile.occupationEnglish %> (<%= profile.occupationHindi %>)</p>
+          <p><strong>Description:</strong> <%= profile.descriptionEnglish %> (<%= profile.descriptionHindi %>)</p>
+          <p><strong>ID:</strong> <%= profile.id %></p>
         </div>
-      <% } %>
-    </div>    
+      </div>
+    <% }); %>
+  <% } else { %>
+    <div class="no-results">
+      <p>No profiles found. Please adjust your search criteria.</p>
+    </div>
+  <% } %>
+</div>
+
+    
   </div>
 </body>
 </html>
