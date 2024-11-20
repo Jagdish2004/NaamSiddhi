@@ -5,12 +5,13 @@ require('dotenv').config();
 
 // Initialize Google Translate client
 const translate = new Translate({
-  key: process.env.GOOGLE_TRANSLATE_API, // Replace with your API key
+  key: process.env.GOOGLE_TRANSLATE_API,
 });
 
 module.exports.createRecord = (req, res) => {
   res.render('records/new.ejs');
 };
+
 
 module.exports.saveRecord = async (req, res) => {
     console.log(req.body);
@@ -30,17 +31,35 @@ module.exports.saveRecord = async (req, res) => {
           return translatedText;
         } catch (error) {
           console.error('Error translating text:', error);
-          return text; // Return original text if translation fails
+          return text;
         }
       };
+      const transliterateToHindi = async (text) => {
+        try {
+          // Transliteration using Google Translate API by keeping the source language as `en` and target as `hi`
+          const [transliteratedText] = await translate.translate(text, {
+            to: 'hi', // Target Hindi script
+            from: 'en', // Source English script
+            format: 'text', // Ensure it's treated as text, not translated
+            model: 'nmt', // Neural Machine Translation
+          });
+      
+          // Return the transliterated text
+          return transliteratedText;
+        } catch (error) {
+          console.error('Error during transliteration:', error.message);
+          return text; // Return original text if transliteration fails
+        }
+      };
+      
 
       // Translate the required fields
-      const firstNameHindi = await translateText(firstName);
-      const lastNameHindi = await translateText(lastName);
+      const firstNameHindi = await transliterateToHindi(firstName);
+      const lastNameHindi = await transliterateToHindi(lastName);
       const occupationHindi = await translateText(occupation);
-      const locationHindi = await translateText(address.location);
-      const cityHindi = await translateText(address.city);
-      const districtHindi = await translateText(address.district);
+      const locationHindi = await transliterateToHindi(address.location);
+      const cityHindi = await transliterateToHindi(address.city);
+      const districtHindi = await transliterateToHindi(address.district);
       const stateHindi = await translateText(address.state);
       const descriptionHindi = await translateText(description);
 
