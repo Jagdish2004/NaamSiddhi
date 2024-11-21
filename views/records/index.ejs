@@ -1,2 +1,129 @@
 <% layout('./layout/boilerplate') -%>
-<h1>hello</h1>
+
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-7xl mx-auto">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-nasa text-blue-400 mb-4">नामसिद्धि Dashboard</h1>
+            <p class="text-gray-400">Advanced Police Records Management System</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <a href="/newrecord" class="glass-effect p-6 rounded-lg hover:border-blue-400/50 transition-all group">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3 rounded-full bg-blue-500/20 group-hover:bg-blue-500/30 transition-all">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-nasa text-blue-400">New Record</h3>
+                        <p class="text-sm text-gray-400">Create a new case record</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/search" class="glass-effect p-6 rounded-lg hover:border-blue-400/50 transition-all group">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3 rounded-full bg-blue-500/20 group-hover:bg-blue-500/30 transition-all">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-nasa text-blue-400">Search</h3>
+                        <p class="text-sm text-gray-400">Find existing records</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/analytics" class="glass-effect p-6 rounded-lg hover:border-blue-400/50 transition-all group">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3 rounded-full bg-blue-500/20 group-hover:bg-blue-500/30 transition-all">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-nasa text-blue-400">Analytics</h3>
+                        <p class="text-sm text-gray-400">View insights and statistics</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Recent Records -->
+        <div class="space-y-6">
+            <h2 class="text-2xl font-nasa text-blue-400 mb-6">Recent Records</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left border-b border-blue-400/20">
+                            <th class="pb-3 font-nasa text-blue-400">ID</th>
+                            <th class="pb-3 font-nasa text-blue-400">Name</th>
+                            <th class="pb-3 font-nasa text-blue-400">Role</th>
+                            <th class="pb-3 font-nasa text-blue-400">Location</th>
+                            <th class="pb-3 font-nasa text-blue-400">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-300">
+                        <% if (recentRecords && recentRecords.length > 0) { %>
+                            <% recentRecords.forEach(record => { %>
+                                <tr class="border-b border-blue-400/10 hover:bg-blue-400/5">
+                                    <td class="py-3">#<%= record.id %></td>
+                                    <td class="py-3">
+                                        <%= record.firstNameEnglish %> <%= record.lastNameEnglish %>
+                                        <span class="text-sm text-gray-500">
+                                            (<%= record.firstNameHindi %> <%= record.lastNameHindi %>)
+                                        </span>
+                                    </td>
+                                    <td class="py-3"><%= record.role %></td>
+                                    <td class="py-3"><%= record.address.cityEnglish %></td>
+                                    <td class="py-3">
+                                        <div class="flex space-x-2">
+                                            <a href="/record/<%= record.id %>" 
+                                               class="text-blue-400 hover:text-blue-300 transition-colors">
+                                                View
+                                            </a>
+                                            <a href="/record/<%= record.id %>/edit" 
+                                               class="text-blue-400 hover:text-blue-300 transition-colors">
+                                                Edit
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" class="py-4 text-center text-gray-500">
+                                    No records found
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-12">
+            <div class="glass-effect p-6 rounded-lg">
+                <h4 class="text-sm text-gray-400 mb-2">Total Records</h4>
+                <p class="text-2xl font-nasa text-blue-400"><%= stats?.totalRecords || 0 %></p>
+            </div>
+            <div class="glass-effect p-6 rounded-lg">
+                <h4 class="text-sm text-gray-400 mb-2">Criminal Records</h4>
+                <p class="text-2xl font-nasa text-blue-400"><%= stats?.criminalRecords || 0 %></p>
+            </div>
+            <div class="glass-effect p-6 rounded-lg">
+                <h4 class="text-sm text-gray-400 mb-2">Cases This Month</h4>
+                <p class="text-2xl font-nasa text-blue-400"><%= stats?.monthlyRecords || 0 %></p>
+            </div>
+            <div class="glass-effect p-6 rounded-lg">
+                <h4 class="text-sm text-gray-400 mb-2">Active Cases</h4>
+                <p class="text-2xl font-nasa text-blue-400"><%= stats?.activeCases || 0 %></p>
+            </div>
+        </div>
+    </div>
+</div>

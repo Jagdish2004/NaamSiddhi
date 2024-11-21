@@ -1,0 +1,86 @@
+<% layout('./layout/boilerplate') -%>
+
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto">
+        <h1 class="text-4xl font-nasa text-center text-blue-400 mb-12">Settings</h1>
+
+        <!-- Profile Settings -->
+        <div class="space-y-8">
+            <!-- User Profile -->
+            <div class="glass-effect p-6 rounded-lg">
+                <h2 class="text-xl font-nasa text-blue-400 mb-6">User Profile</h2>
+                <form class="space-y-4" action="/settings/profile" method="POST">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-400 mb-2">Name</label>
+                            <input type="text" class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">Email</label>
+                            <input type="email" class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                        </div>
+                    </div>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-nasa px-4 py-2 rounded-md transition-all">
+                        Update Profile
+                    </button>
+                </form>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="glass-effect p-6 rounded-lg">
+                <h2 class="text-xl font-nasa text-blue-400 mb-6">Security</h2>
+                <form class="space-y-4" action="/settings/password" method="POST">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-400 mb-2">Current Password</label>
+                            <input type="password" class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">New Password</label>
+                            <input type="password" class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-2">Confirm New Password</label>
+                            <input type="password" class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                        </div>
+                    </div>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-nasa px-4 py-2 rounded-md transition-all">
+                        Change Password
+                    </button>
+                </form>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="glass-effect p-6 rounded-lg">
+                <h2 class="text-xl font-nasa text-blue-400 mb-6">Notifications</h2>
+                <form action="/settings/notifications" method="POST">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-gray-100">Email Notifications</h3>
+                                <p class="text-gray-400 text-sm">Receive email updates about new records</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-gray-100">Desktop Notifications</h3>
+                                <p class="text-gray-400 text-sm">Show desktop notifications</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                            </label>
+                        </div>
+                    </div>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-nasa px-4 py-2 rounded-md transition-all">
+                        Update Notifications
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 

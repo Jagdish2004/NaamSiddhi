@@ -8,4 +8,7 @@ router.get('/', recordController.createRecord);
 // Handle the POST request to save the record
 router.post('/', recordController.saveRecord);
 
+// Handle the POST request to submit the record
+router.post('/submit', recordController.submitRecord);
+
 module.exports = router;

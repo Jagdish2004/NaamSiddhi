@@ -1,0 +1,232 @@
+<% layout('./layout/boilerplate') -%>
+
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto">
+        <!-- Header with Actions -->
+        <div class="flex justify-between items-start mb-8">
+            <h1 class="text-3xl font-nasa text-blue-400">Profile #<%= record.id %></h1>
+            <div class="flex space-x-4">
+                <a href="/record/<%= record.id %>/edit" 
+                   class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
+                    Edit Record
+                </a>
+                <form action="/record/<%= record.id %>?_method=DELETE" method="POST" class="inline">
+                    <button type="submit" 
+                            class="bg-red-500/20 hover:bg-red-500/30 text-red-400 font-nasa px-4 py-2 rounded-md transition-all"
+                            onclick="return confirm('Are you sure you want to delete this record?')">
+                        Delete Record
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Status Badge -->
+        <div class="mb-8">
+            <span class="px-3 py-1 rounded-full text-sm font-nasa
+                <%= record.status === 'active' ? 'bg-green-500/20 text-green-400' : 
+                   record.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 
+                   'bg-red-500/20 text-red-400' %>">
+                <%= record.status.charAt(0).toUpperCase() + record.status.slice(1) %>
+            </span>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="space-y-6 mb-8">
+            <h2 class="text-xl font-nasa text-blue-400/80">Personal Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <p class="text-gray-400">Name:</p>
+                    <p class="text-white">
+                        <%= record.firstNameEnglish %> <%= record.lastNameEnglish %>
+                        <span class="text-sm text-gray-500">
+                            (<%= record.firstNameHindi %> <%= record.lastNameHindi %>)
+                        </span>
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Occupation:</p>
+                    <p class="text-white">
+                        <%= record.occupationEnglish %>
+                        <span class="text-sm text-gray-500">(<%= record.occupationHindi %>)</span>
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Date of Birth:</p>
+                    <p class="text-white"><%= new Date(record.dob).toLocaleDateString() %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Gender:</p>
+                    <p class="text-white"><%= record.gender %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Mobile Number:</p>
+                    <p class="text-white"><%= record.mNumber %></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appearance Details -->
+        <div class="space-y-6 mb-8">
+            <h2 class="text-xl font-nasa text-blue-400/80">Appearance Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Physical Measurements -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-nasa text-blue-400/60">Physical Characteristics</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <p class="text-gray-400">Height:</p>
+                            <p class="text-white"><%= record.appearance.height %> cm</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-gray-400">Weight:</p>
+                            <p class="text-white"><%= record.appearance.weight %> kg</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-gray-400">Complexion:</p>
+                        <p class="text-white"><%= record.appearance.complexion %></p>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-gray-400">Build:</p>
+                        <p class="text-white"><%= record.appearance.build %></p>
+                    </div>
+                </div>
+
+                <!-- Distinguishing Features -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-nasa text-blue-400/60">Distinguishing Features</h3>
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <p class="text-gray-400">Facial Features:</p>
+                            <p class="text-white">
+                                <%= record.appearance.facialFeatures.english %>
+                                <span class="text-sm text-gray-500">(<%= record.appearance.facialFeatures.hindi %>)</span>
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-gray-400">Scars/Marks:</p>
+                            <p class="text-white">
+                                <%= record.appearance.scars.english %>
+                                <span class="text-sm text-gray-500">(<%= record.appearance.scars.hindi %>)</span>
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-gray-400">Tattoos:</p>
+                            <p class="text-white">
+                                <%= record.appearance.tattoos.english %>
+                                <span class="text-sm text-gray-500">(<%= record.appearance.tattoos.hindi %>)</span>
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-gray-400">Other Features:</p>
+                            <p class="text-white">
+                                <%= record.appearance.otherFeatures.english %>
+                                <span class="text-sm text-gray-500">(<%= record.appearance.otherFeatures.hindi %>)</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Address Information -->
+        <div class="space-y-6 mb-8">
+            <h2 class="text-xl font-nasa text-blue-400/80">Address Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <p class="text-gray-400">Location:</p>
+                    <p class="text-white">
+                        <%= record.address.locationEnglish %>
+                        <span class="text-sm text-gray-500">(<%= record.address.locationHindi %>)</span>
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">City:</p>
+                    <p class="text-white">
+                        <%= record.address.cityEnglish %>
+                        <span class="text-sm text-gray-500">(<%= record.address.cityHindi %>)</span>
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">District:</p>
+                    <p class="text-white">
+                        <%= record.address.districtEnglish %>
+                        <span class="text-sm text-gray-500">(<%= record.address.districtHindi %>)</span>
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">State:</p>
+                    <p class="text-white">
+                        <%= record.address.stateEnglish %>
+                        <span class="text-sm text-gray-500">(<%= record.address.stateHindi %>)</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Case Details Section -->
+        <% if (record.caseDetails && record.caseDetails.length > 0) { %>
+            <div class="space-y-6 mb-8">
+                <h2 class="text-xl font-nasa text-blue-400/80">Case Details</h2>
+                <div class="space-y-4">
+                    <% record.caseDetails.forEach(caseDetail => { %>
+                        <div class="glass-effect p-4 rounded-lg">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <p class="text-gray-400">Case Number:</p>
+                                    <p class="text-white"><%= caseDetail.caseNumber %></p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-gray-400">Section:</p>
+                                    <p class="text-white"><%= caseDetail.section %></p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-gray-400">Role:</p>
+                                    <p class="text-white"><%= caseDetail.role %></p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-gray-400">Details:</p>
+                                <p class="text-white"><%= caseDetail.details.english %></p>
+                                <p class="text-sm text-gray-500"><%= caseDetail.details.hindi %></p>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- Family Details Section -->
+        <% if (record.familyDetails && record.familyDetails.length > 0) { %>
+            <div class="space-y-6">
+                <h2 class="text-xl font-nasa text-blue-400/80">Family Details</h2>
+                <div class="space-y-4">
+                    <% record.familyDetails.forEach(member => { %>
+                        <div class="glass-effect p-4 rounded-lg">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="space-y-2">
+                                    <p class="text-gray-400">Name:</p>
+                                    <p class="text-white">
+                                        <%= member.name.english %>
+                                        <span class="text-sm text-gray-500">(<%= member.name.hindi %>)</span>
+                                    </p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-gray-400">Relation:</p>
+                                    <p class="text-white">
+                                        <%= member.relation.english %>
+                                        <span class="text-sm text-gray-500">(<%= member.relation.hindi %>)</span>
+                                    </p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-gray-400">Contact:</p>
+                                    <p class="text-white"><%= member.contact %></p>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div> 

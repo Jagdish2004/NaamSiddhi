@@ -1,174 +1,322 @@
 <% layout('./layout/boilerplate') -%>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Police Case</title>
-  <style>
-    /* General Styling */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      margin: 0;
-      padding: 0;
-    }
 
-    /* Navbar */
-    nav {
-      background-color: #2c2c2c;
-      color: #fff;
-      padding: 1rem;
-    }
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto">
+        <h1 class="text-3xl font-nasa text-center mb-8 text-blue-400">Create Police Case</h1>
 
-    nav a {
-      color: #fff;
-      text-decoration: none;
-      margin-right: 1rem;
-    }
+        <form action="/newrecord" method="POST" class="space-y-8">
+            <!-- Personal Information Section -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-nasa text-blue-400/80">Personal Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Name Fields -->
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="firstName" 
+                               placeholder="First Name / पहला नाम" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="lastName" 
+                               placeholder="Last Name / अंतिम नाम" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
 
-    /* Container */
-    .container {
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 1.5rem;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-    }
+                    <!-- Occupation & DOB -->
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="occupation" 
+                               placeholder="Occupation / पेशा"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="space-y-2">
+                        <input type="date" 
+                               name="dob" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
 
-    /* Title */
-    h1, h3, h4 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 1rem;
-    }
+                    <!-- Gender & Role -->
+                    <div class="space-y-2">
+                        <select name="gender" 
+                                required
+                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <option value="" disabled selected>Select Gender / लिंग चुनें</option>
+                            <option value="male">Male / पुरुष</option>
+                            <option value="female">Female / महिला</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-    /* Form Styling */
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
+            <!-- Address Section -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-nasa text-blue-400/80">Address Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="address[location]" 
+                               placeholder="Location / स्थान" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="address[city]" 
+                               placeholder="City / शहर" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="address[district]" 
+                               placeholder="District / जिला" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="address[state]" 
+                               placeholder="State / राज्य" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                </div>
+            </div>
 
-    form .row {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
+            <!-- Family Details Section -->
+            <div class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-nasa text-blue-400/80">Family Details</h2>
+                    <button type="button" 
+                            id="toggleFamilyDetails"
+                            class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all flex items-center">
+                        <svg class="w-4 h-4 mr-2 transform transition-transform" id="familyIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Add Family Details
+                    </button>
+                </div>
+                <div id="familyDetailsContainer" class="hidden space-y-4">
+                    <div id="familyMembers" class="space-y-4">
+                        <!-- Family member entries will be added here -->
+                    </div>
+                    <button type="button" 
+                            onclick="addFamilyMember()"
+                            class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
+                        + Add Another Family Member
+                    </button>
+                </div>
+            </div>
 
-    form input, 
-    form select, 
-    form textarea, 
-    form button {
-      flex: 1 1 calc(50% - 1rem);
-      padding: 0.5rem;
-      font-size: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
+            <!-- Case Details Section -->
+            <div class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-nasa text-blue-400/80">Case Details</h2>
+                    <button type="button" 
+                            id="toggleCaseDetails"
+                            class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all flex items-center">
+                        <svg class="w-4 h-4 mr-2 transform transition-transform" id="caseIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Add Case Details
+                    </button>
+                </div>
+                <div id="caseDetailsContainer" class="hidden space-y-4">
+                    <div id="caseEntries" class="space-y-4">
+                        <!-- Case entries will be added here -->
+                    </div>
+                    <button type="button" 
+                            onclick="addCaseEntry()"
+                            class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
+                        + Add Another Case Entry
+                    </button>
+                </div>
+            </div>
 
-    form textarea {
-      resize: vertical;
-    }
+        <!-- Replace the Description Section with this Appearance Section -->
+<div class="space-y-6">
+  <h2 class="text-xl font-nasa text-blue-400/80">Appearance Details / उपस्थिति विवरण</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Physical Characteristics -->
+      <div class="space-y-4">
+          <h3 class="text-lg font-nasa text-blue-400/60">Physical Characteristics / शारीरिक विशेषताएं</h3>
+          <div class="space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                  <input type="number" 
+                         name="appearance[height]" 
+                         placeholder="Height (cm) / ऊंचाई"
+                         class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                  
+                  <input type="number" 
+                         name="appearance[weight]" 
+                         placeholder="Weight (kg) / वजन"
+                         class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+              </div>
+              
+              <select name="appearance[complexion]"
+                      class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                  <option value="" disabled selected>Complexion / रंग</option>
+                  <option value="fair">Fair / गोरा</option>
+                  <option value="medium">Medium / साँवला</option>
+                  <option value="dark">Dark / काला</option>
+              </select>
 
-    form button {
-      background-color: #2c2c2c;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    form button:hover {
-      background-color: #444;
-    }
-
-    .btn-secondary {
-      background-color: #6c757d;
-      border: none;
-      color: #fff;
-    }
-
-    .btn-secondary:hover {
-      background-color: #5a6268;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Create Police Case</h1>
-
-    <form action="/newrecord" method="POST">
-      <div class="row">
-        <!-- First Name -->
-        <input type="text" name="firstName" placeholder="First Name / पहला नाम" required>
-    
-        <!-- Last Name -->
-        <input type="text" name="lastName" placeholder="Last Name / अंतिम नाम" required>
+              <select name="appearance[build]"
+                      class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                  <option value="" disabled selected>Build / शारीरिक बनावट</option>
+                  <option value="slim">Slim / पतला</option>
+                  <option value="average">Average / सामान्य</option>
+                  <option value="athletic">Athletic / एथलेटिक</option>
+                  <option value="heavy">Heavy / भारी</option>
+              </select>
+          </div>
       </div>
-    
-      <div class="row">
-        <!-- Occupation -->
-        <input type="text" name="occupation" placeholder="Occupation / पेशा">
-    
-        <!-- Date of Birth -->
-        <input type="date" name="dob" placeholder="Date of Birth / जन्म तिथि" required>
+
+      <!-- Distinguishing Features -->
+      <div class="space-y-4">
+          <h3 class="text-lg font-nasa text-blue-400/60">Distinguishing Features / विशेष ���हचान</h3>
+          <div class="space-y-4">
+              <input type="text" 
+                     name="appearance[facialFeatures]" 
+                     placeholder="Facial Features / चेहरे की विशेषताएं"
+                     class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+
+              <input type="text" 
+                     name="appearance[scars]" 
+                     placeholder="Scars/Marks / निशान"
+                     class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+
+              <input type="text" 
+                     name="appearance[tattoos]" 
+                     placeholder="Tattoos / टैटू"
+                     class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+
+              <textarea name="appearance[otherFeatures]" 
+                        placeholder="Other Distinguishing Features / अन्य विशेष पहचान"
+                        rows="2"
+                        class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"></textarea>
+          </div>
       </div>
-    
-      <div class="row">
-        <!-- Gender -->
-        <select name="gender" required>
-          <option value="" disabled selected>Select Gender / लिंग चुनें</option>
-          <option value="male">Male / पुरुष</option>
-          <option value="female">Female / महिला</option>
-        </select>
-    
-        <!-- Role -->
-        <select name="role" required>
-          <option value="" disabled selected>Select Role / भूमिका चुनें</option>
-          <option value="criminal">Criminal / अपराधी</option>
-          <option value="victim">Victim / पीड़ित</option>
-          <option value="witness">Witness / गवाह</option>
-        </select>
-      </div>
-    
-      <div class="row">
-        <!-- Mobile Number -->
-        <input type="number" name="mNumber" placeholder="Mobile Number / मोबाइल नंबर" required>
-    
-        <!-- Family Details Button -->
-        <button type="button" class="btn-secondary">Enter Family Details / परिवार विवरण दर्ज करें</button>
-      </div>
-    
-      <h4>Address / पता</h4>
-    
-      <div class="row">
-        <!-- Location -->
-        <input type="text" name="address[location]" placeholder="Location / स्थान" required>
-    
-        <!-- City -->
-        <input type="text" name="address[city]" placeholder="City / शहर" required>
-      </div>
-    
-      <div class="row">
-        <!-- District -->
-        <input type="text" name="address[district]" placeholder="District / जिला" required>
-    
-        <!-- State -->
-        <input type="text" name="address[state]" placeholder="State / राज्य" required>
-      </div>
-    
-      <!-- Description -->
-      <textarea name="description" rows="4" placeholder="Enter case description / केस का विवरण दर्ज करें"></textarea>
-    
-      <div class="row">
-        <!-- Case Details Button -->
-        <button type="button" class="btn-secondary">Enter Case Details / केस विवरण दर्ज करें</button>
-      </div>
-    
-      <button type="submit">Submit Profile / प्रोफ़ाइल सबमिट करें</button>
-    </form>    
   </div>
-</body>
-</html>
+</div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-center pt-6">
+                <button type="submit" 
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-nasa px-8 py-3 rounded-md transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20">
+                    Submit Profile / प्रोफ़ाइल सबमिट करें
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/js/suggestions.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        setupSuggestions('firstName', 'names');
+        setupSuggestions('lastName', 'names');
+        setupSuggestions('address[city]', 'locations');
+        setupSuggestions('address[district]', 'locations');
+        setupSuggestions('address[state]', 'locations');
+    });
+
+    // Toggle sections
+    document.getElementById('toggleFamilyDetails').addEventListener('click', function() {
+        const container = document.getElementById('familyDetailsContainer');
+        const icon = document.getElementById('familyIcon');
+        container.classList.toggle('hidden');
+        icon.style.transform = container.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(45deg)';
+        if (!container.classList.contains('hidden') && container.children.length === 1) {
+            addFamilyMember();
+        }
+    });
+
+    document.getElementById('toggleCaseDetails').addEventListener('click', function() {
+        const container = document.getElementById('caseDetailsContainer');
+        const icon = document.getElementById('caseIcon');
+        container.classList.toggle('hidden');
+        icon.style.transform = container.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(45deg)';
+        if (!container.classList.contains('hidden') && container.children.length === 1) {
+            addCaseEntry();
+        }
+    });
+
+    // Add family member entry
+    function addFamilyMember() {
+        const container = document.getElementById('familyMembers');
+        const memberDiv = document.createElement('div');
+        memberDiv.className = 'grid grid-cols-1 md:grid-cols-3 gap-4 p-4 glass-effect rounded-lg';
+        memberDiv.innerHTML = `
+            <input type="text" 
+                   name="familyDetails[name][]" 
+                   placeholder="Name / नाम"
+                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+            <input type="text" 
+                   name="familyDetails[relation][]" 
+                   placeholder="Relation / रिश्ता"
+                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+            <div class="flex items-center space-x-2">
+                <input type="text" 
+                       name="familyDetails[contact][]" 
+                       placeholder="Contact / संपर्क"
+                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                <button type="button" 
+                        onclick="this.parentElement.parentElement.remove()"
+                        class="bg-red-500/20 hover:bg-red-500/30 text-red-400 p-2 rounded-md transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                </button>
+            </div>
+        `;
+        container.appendChild(memberDiv);
+    }
+
+    // Add case entry
+    function addCaseEntry() {
+        const container = document.getElementById('caseEntries');
+        const entryDiv = document.createElement('div');
+        entryDiv.className = 'grid grid-cols-1 md:grid-cols-2 gap-4 p-4 glass-effect rounded-lg';
+        entryDiv.innerHTML = `
+            <div class="space-y-2">
+                <input type="text" 
+                       name="caseDetails[caseNumber][]" 
+                       placeholder="Case Number / केस नंबर"
+                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                <input type="text" 
+                       name="caseDetails[section][]" 
+                       placeholder="Section / धारा"
+                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                <select name="caseDetails[role][]" 
+                        required
+                        class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    <option value="" disabled selected>Select Role / भूमिका चुनें</option>
+                    <option value="criminal">Criminal / अपराधी</option>
+                    <option value="victim">Victim / पीड़ित</option>
+                    <option value="witness">Witness / गवाह</option>
+                </select>
+            </div>
+            <div class="space-y-2">
+                <textarea name="caseDetails[details][]" 
+                          placeholder="Case Details / केस विवरण"
+                          class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                          rows="4"></textarea>
+                <div class="flex justify-end">
+                    <button type="button" 
+                            onclick="this.parentElement.parentElement.parentElement.remove()"
+                            class="bg-red-500/20 hover:bg-red-500/30 text-red-400 p-2 rounded-md transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(entryDiv);
+    }
+</script>

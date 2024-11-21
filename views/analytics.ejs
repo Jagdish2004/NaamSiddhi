@@ -1,0 +1,199 @@
+<% layout('./layout/boilerplate') -%>
+
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-7xl mx-auto">
+        <h1 class="text-4xl font-nasa text-center text-blue-400 mb-12">Analytics Dashboard</h1>
+
+        <!-- Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <div class="glass-effect p-6 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-sm text-gray-400">Total Records</h4>
+                    <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <p class="text-3xl font-nasa text-blue-400 mt-2"><%= stats.total %></p>
+            </div>
+
+            <div class="glass-effect p-6 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-sm text-gray-400">Criminal Records</h4>
+                    <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <p class="text-3xl font-nasa text-red-400 mt-2"><%= stats.criminal %></p>
+            </div>
+
+            <div class="glass-effect p-6 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-sm text-gray-400">Victim Records</h4>
+                    <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                    </svg>
+                </div>
+                <p class="text-3xl font-nasa text-yellow-400 mt-2"><%= stats.victim %></p>
+            </div>
+
+            <div class="glass-effect p-6 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-sm text-gray-400">Witness Records</h4>
+                    <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                </div>
+                <p class="text-3xl font-nasa text-green-400 mt-2"><%= stats.witness %></p>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <!-- Monthly Trend -->
+            <div class="glass-effect p-6 rounded-lg">
+                <h3 class="text-xl font-nasa text-blue-400 mb-6">Monthly Trend</h3>
+                <canvas id="monthlyChart"></canvas>
+            </div>
+
+            <!-- Location Distribution -->
+            <div class="glass-effect p-6 rounded-lg">
+                <h3 class="text-xl font-nasa text-blue-400 mb-6">Top Locations</h3>
+                <canvas id="locationChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Demographics Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Gender Distribution -->
+            <div class="glass-effect p-6 rounded-lg">
+                <h3 class="text-xl font-nasa text-blue-400 mb-6">Gender Distribution</h3>
+                <canvas id="genderChart"></canvas>
+            </div>
+
+            <!-- Age Distribution -->
+            <div class="glass-effect p-6 rounded-lg">
+                <h3 class="text-xl font-nasa text-blue-400 mb-6">Age Distribution</h3>
+                <canvas id="ageChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Chart configurations and data
+    const monthlyData = <%- JSON.stringify(stats.monthly) %>;
+    const locationData = <%- JSON.stringify(stats.location) %>;
+    const genderData = <%- JSON.stringify(stats.gender) %>;
+    const ageData = <%- JSON.stringify(stats.age) %>;
+
+    // Monthly Trend Chart
+    new Chart(document.getElementById('monthlyChart'), {
+        type: 'line',
+        data: {
+            labels: monthlyData.map(d => `${d._id.month}/${d._id.year}`),
+            datasets: [{
+                label: 'Records',
+                data: monthlyData.map(d => d.count),
+                borderColor: '#60A5FA',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#9CA3AF'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: { color: '#9CA3AF' }
+                },
+                x: {
+                    ticks: { color: '#9CA3AF' }
+                }
+            }
+        }
+    });
+
+    // Location Chart
+    new Chart(document.getElementById('locationChart'), {
+        type: 'bar',
+        data: {
+            labels: locationData.map(d => d._id),
+            datasets: [{
+                label: 'Records',
+                data: locationData.map(d => d.count),
+                backgroundColor: '#60A5FA'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#9CA3AF'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: { color: '#9CA3AF' }
+                },
+                x: {
+                    ticks: { color: '#9CA3AF' }
+                }
+            }
+        }
+    });
+
+    // Gender Chart
+    new Chart(document.getElementById('genderChart'), {
+        type: 'doughnut',
+        data: {
+            labels: genderData.map(d => d._id),
+            datasets: [{
+                data: genderData.map(d => d.count),
+                backgroundColor: ['#60A5FA', '#F472B6']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#9CA3AF'
+                    }
+                }
+            }
+        }
+    });
+
+    // Age Chart
+    new Chart(document.getElementById('ageChart'), {
+        type: 'pie',
+        data: {
+            labels: ageData.map(d => d._id),
+            datasets: [{
+                data: ageData.map(d => d.count),
+                backgroundColor: ['#60A5FA', '#34D399', '#F472B6', '#FBBF24', '#6366F1']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#9CA3AF'
+                    }
+                }
+            }
+        }
+    });
+</script> 

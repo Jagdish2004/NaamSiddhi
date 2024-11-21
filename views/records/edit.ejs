@@ -1,0 +1,140 @@
+<% layout('./layout/boilerplate') -%>
+
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto">
+        <div class="flex justify-between items-start mb-8">
+            <h1 class="text-3xl font-nasa text-blue-400">Edit Record #<%= record.id %></h1>
+            <a href="/record/<%= record.id %>" 
+               class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
+                Back to Record
+            </a>
+        </div>
+
+        <form action="/record/<%= record.id %>?_method=PUT" method="POST" class="space-y-8">
+            <!-- Personal Information Section -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-nasa text-blue-400/80">Personal Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Name Fields -->
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="firstName" 
+                               value="<%= record.firstNameEnglish %>"
+                               placeholder="First Name / पहला नाम" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="lastName" 
+                               value="<%= record.lastNameEnglish %>"
+                               placeholder="Last Name / अंतिम नाम" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+
+                    <!-- Occupation & DOB -->
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="occupation" 
+                               value="<%= record.occupationEnglish %>"
+                               placeholder="Occupation / पेशा"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="space-y-2">
+                        <input type="date" 
+                               name="dob" 
+                               value="<%= record.dob.toISOString().split('T')[0] %>"
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+
+                    <!-- Gender & Role -->
+                    <div class="space-y-2">
+                        <select name="gender" 
+                                required
+                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <option value="male" <%= record.gender === 'male' ? 'selected' : '' %>>Male / पुरुष</option>
+                            <option value="female" <%= record.gender === 'female' ? 'selected' : '' %>>Female / महिला</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <select name="role" 
+                                required
+                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <option value="criminal" <%= record.role === 'criminal' ? 'selected' : '' %>>Criminal / अपराधी</option>
+                            <option value="victim" <%= record.role === 'victim' ? 'selected' : '' %>>Victim / पीड़ित</option>
+                            <option value="witness" <%= record.role === 'witness' ? 'selected' : '' %>>Witness / गवाह</option>
+                        </select>
+                    </div>
+
+                    <!-- Mobile Number -->
+                    <div class="space-y-2">
+                        <input type="number" 
+                               name="mNumber" 
+                               value="<%= record.mNumber %>"
+                               placeholder="Mobile Number / मोबाइल नंबर" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address Section -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-nasa text-blue-400/80">Address Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="address[location]" 
+                               value="<%= record.address.locationEnglish %>"
+                               placeholder="Location / स्थान" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="address[city]" 
+                               value="<%= record.address.cityEnglish %>"
+                               placeholder="City / शहर" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="address[district]" 
+                               value="<%= record.address.districtEnglish %>"
+                               placeholder="District / जिला" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="space-y-2">
+                        <input type="text" 
+                               name="address[state]" 
+                               value="<%= record.address.stateEnglish %>"
+                               placeholder="State / राज्य" 
+                               required
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description Section -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-nasa text-blue-400/80">Case Description</h2>
+                <textarea name="description" 
+                          rows="4" 
+                          placeholder="Enter case description / केस का विवरण दर्ज करें"
+                          class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"><%= record.descriptionEnglish %></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-center pt-6">
+                <button type="submit" 
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-nasa px-8 py-3 rounded-md transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20">
+                    Update Record / रिकॉर्ड अपडेट करें
+                </button>
+            </div>
+        </form>
+    </div>
+</div> 

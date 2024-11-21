@@ -1,0 +1,207 @@
+<% layout('./layout/boilerplate') -%>
+
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto">
+        <div class="flex justify-between items-start mb-8">
+            <h1 class="text-3xl font-nasa text-blue-400">Preview Record</h1>
+            <div class="flex space-x-4">
+                <button onclick="history.back()" 
+                        class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
+                    Edit Details
+                </button>
+                <form action="/newrecord/submit" method="POST" id="submitForm">
+                    <!-- Hidden inputs will be added here via JavaScript -->
+                    <button type="submit" 
+                            class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all">
+                        Confirm & Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="space-y-6 mb-8">
+            <h2 class="text-xl font-nasa text-blue-400/80">Personal Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <p class="text-gray-400">Name:</p>
+                    <p class="text-white">
+                        <%= formData.firstName %> <%= formData.lastName %>
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Occupation:</p>
+                    <p class="text-white"><%= formData.occupation %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Date of Birth:</p>
+                    <p class="text-white"><%= new Date(formData.dob).toLocaleDateString() %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Gender:</p>
+                    <p class="text-white"><%= formData.gender %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Role:</p>
+                    <p class="text-white"><%= formData.role %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Mobile Number:</p>
+                    <p class="text-white"><%= formData.mNumber %></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Address Information -->
+        <div class="space-y-6 mb-8">
+            <h2 class="text-xl font-nasa text-blue-400/80">Address Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <p class="text-gray-400">Location:</p>
+                    <p class="text-white"><%= formData.address.location %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">City:</p>
+                    <p class="text-white"><%= formData.address.city %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">District:</p>
+                    <p class="text-white"><%= formData.address.district %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">State:</p>
+                    <p class="text-white"><%= formData.address.state %></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appearance Details -->
+        <div class="space-y-6 mb-8">
+            <h2 class="text-xl font-nasa text-blue-400/80">Appearance Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <p class="text-gray-400">Height:</p>
+                    <p class="text-white"><%= formData.appearance.height %> cm</p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Weight:</p>
+                    <p class="text-white"><%= formData.appearance.weight %> kg</p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Complexion:</p>
+                    <p class="text-white"><%= formData.appearance.complexion %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Build:</p>
+                    <p class="text-white"><%= formData.appearance.build %></p>
+                </div>
+            </div>
+            <div class="space-y-4 mt-4">
+                <div class="space-y-2">
+                    <p class="text-gray-400">Facial Features:</p>
+                    <p class="text-white"><%= formData.appearance.facialFeatures %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Scars/Marks:</p>
+                    <p class="text-white"><%= formData.appearance.scars %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Tattoos:</p>
+                    <p class="text-white"><%= formData.appearance.tattoos %></p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-400">Other Features:</p>
+                    <p class="text-white"><%= formData.appearance.otherFeatures %></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Family Details -->
+        <% if (formData.familyDetails && formData.familyDetails.name) { %>
+            <div class="space-y-6 mb-8">
+                <h2 class="text-xl font-nasa text-blue-400/80">Family Details</h2>
+                <div class="space-y-4">
+                    <% formData.familyDetails.name.forEach((name, index) => { %>
+                        <div class="glass-effect p-4 rounded-lg">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="space-y-2">
+                                    <p class="text-gray-400">Name:</p>
+                                    <p class="text-white"><%= name %></p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-gray-400">Relation:</p>
+                                    <p class="text-white"><%= formData.familyDetails.relation[index] %></p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-gray-400">Contact:</p>
+                                    <p class="text-white"><%= formData.familyDetails.contact[index] %></p>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- Case Details -->
+        <% if (formData.caseDetails && formData.caseDetails.caseNumber) { %>
+            <div class="space-y-6 mb-8">
+                <h2 class="text-xl font-nasa text-blue-400/80">Case Details</h2>
+                <div class="space-y-4">
+                    <% formData.caseDetails.caseNumber.forEach((number, index) => { %>
+                        <div class="glass-effect p-4 rounded-lg">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <p class="text-gray-400">Case Number:</p>
+                                    <p class="text-white"><%= number %></p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-gray-400">Section:</p>
+                                    <p class="text-white"><%= formData.caseDetails.section[index] %></p>
+                                </div>
+                                <div class="space-y-2 col-span-2">
+                                    <p class="text-gray-400">Details:</p>
+                                    <p class="text-white"><%= formData.caseDetails.details[index] %></p>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+    // Transfer form data to hidden form
+    document.addEventListener('DOMContentLoaded', () => {
+        const formData = <%- JSON.stringify(formData) %>;
+        const form = document.getElementById('submitForm');
+        
+        // Function to create hidden input
+        function createHiddenInput(name, value) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            return input;
+        }
+
+        // Add all form data as hidden inputs
+        Object.entries(formData).forEach(([key, value]) => {
+            if (typeof value === 'object') {
+                Object.entries(value).forEach(([subKey, subValue]) => {
+                    if (Array.isArray(subValue)) {
+                        subValue.forEach((item, index) => {
+                            form.appendChild(createHiddenInput(`${key}[${subKey}][]`, item));
+                        });
+                    } else {
+                        form.appendChild(createHiddenInput(`${key}[${subKey}]`, subValue));
+                    }
+                });
+            } else {
+                form.appendChild(createHiddenInput(key, value));
+            }
+        });
+    });
+</script> 

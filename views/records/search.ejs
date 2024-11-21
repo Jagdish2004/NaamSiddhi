@@ -1,185 +1,151 @@
 <% layout('./layout/boilerplate') -%>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Search Profiles</title>
-  <style>
-    /* General Styling */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      margin: 0;
-      padding: 0;
-    }
 
-    /* Navbar */
-    nav {
-      background-color: #2c2c2c;
-      color: #fff;
-      padding: 1rem;
-    }
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto">
+        <h1 class="text-3xl font-nasa text-center mb-8 text-blue-400">Advanced Search</h1>
 
-    nav a {
-      color: #fff;
-      text-decoration: none;
-      margin-right: 1rem;
-    }
+        <!-- Search Form -->
+        <form class="space-y-6" action="/search" method="POST">
+            <!-- Basic Information -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-nasa text-blue-400/80">Basic Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" name="firstName" 
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                           placeholder="First Name / पहला नाम">
+                    <input type="text" name="lastName"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                           placeholder="Last Name / अंतिम नाम">
+                    <input type="date" name="dob"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
+                    <select name="gender"
+                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
+                        <option value="">Gender / लिंग</option>
+                        <option value="male">Male / पुरुष</option>
+                        <option value="female">Female / महिला</option>
+                    </select>
+                    <input type="text" name="occupation"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                           placeholder="Occupation / पेशा">
+                    <input type="text" name="mNumber"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                           placeholder="Mobile Number / मोबाइल नंबर">
+                </div>
+            </div>
 
-    /* Container */
-    .container {
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 1.5rem;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-    }
+            <!-- Physical Characteristics -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-nasa text-blue-400/80">Physical Characteristics</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="number" name="appearance[height]"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                           placeholder="Height (cm) / ऊंचाई">
+                    <input type="number" name="appearance[weight]"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                           placeholder="Weight (kg) / वजन">
+                    <select name="appearance[complexion]"
+                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
+                        <option value="">Complexion / रंग</option>
+                        <option value="fair">Fair / गोरा</option>
+                        <option value="medium">Medium / साँवला</option>
+                        <option value="dark">Dark / काला</option>
+                    </select>
+                    <select name="appearance[build]"
+                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
+                        <option value="">Build / शारीरिक बनावट</option>
+                        <option value="slim">Slim / पतला</option>
+                        <option value="average">Average / सामान्य</option>
+                        <option value="athletic">Athletic / एथलेटिक</option>
+                        <option value="heavy">Heavy / भारी</option>
+                    </select>
+                </div>
+            </div>
 
-    /* Title */
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 1rem;
-    }
+            <!-- Address Information -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-nasa text-blue-400/80">Address Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" name="address[location]"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                           placeholder="Location / स्थान">
+                    <input type="text" name="address[city]"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                           placeholder="City / शहर">
+                    <input type="text" name="address[district]"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                           placeholder="District / जिला">
+                    <input type="text" name="address[state]"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                           placeholder="State / राज्य">
+                </div>
+            </div>
 
-    /* Search Form */
-    .search-form {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
+            <div class="flex justify-center mt-6">
+                <button type="submit" 
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-nasa px-8 py-3 rounded-md transition-all transform hover:scale-105">
+                    Search / खोजें
+                </button>
+            </div>
+        </form>
 
-    .search-form input, 
-    .search-form select, 
-    .search-form button {
-      flex: 1 1 calc(33% - 1rem);
-      padding: 0.5rem;
-      font-size: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-
-    .search-form button {
-      background-color: #2c2c2c;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .search-form button:hover {
-      background-color: #444;
-    }
-
-    /* Results Section */
-    .results {
-      margin-top: 2rem;
-    }
-
-    /* Single Profile Card */
-    .profile-card {
-      background: #fff;
-      padding: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 2rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .profile-card img {
-      height: 100px;
-      width: 100px;
-      border-radius: 50%;
-      margin-bottom: 1rem;
-    }
-
-    .profile-details {
-      text-align: center;
-    }
-
-    .profile-details h3 {
-      margin: 0;
-      color: #2c2c2c;
-    }
-
-    .profile-details p {
-      margin: 0.3rem 0;
-      color: #555;
-    }
-
-    /* No Results Message */
-    .no-results {
-      text-align: center;
-      color: #999;
-      font-size: 1.2rem;
-    }
-  </style>
-</head>
-
-
-<body>
-  <div class="container">
-    <h1>Search Profiles</h1>
-
-    <!-- Search Form -->
-    <form class="search-form" action="/search" method="POST">
-      <input type="text" name="firstName" placeholder="First Name / पहला नाम">
-      <input type="text" name="lastName" placeholder="Last Name / अंतिम नाम">
-      <input type="date" name="dob" placeholder="Date of Birth / जन्म तिथि">
-      <select name="gender">
-        <option value="">Gender / लिंग</option>
-        <option value="male">Male / पुरुष</option>
-        <option value="female">Female / महिला</option>
-      </select>
-      <select name="role">
-        <option value="">Role / भूमिका</option>
-        <option value="criminal">Criminal / अपराधी</option>
-        <option value="victim">Victim / पीड़ित</option>
-        <option value="witness">Witness / गवाह</option>
-      </select>
-      <button type="submit">Search / खोजें</button>
-    </form>
-
-
-    <!-- Results Section -->
-<!-- Results Section -->
-<div class="results">
-  <% if (profiles && profiles.length > 0) { %>
-    <% profiles.forEach(profile => { %>
-      <div class="profile-card">
-        <div class="profile-details">
-          <h3>
-            <%= profile.firstNameEnglish %> <%= profile.lastNameEnglish %>
-            (<%= profile.firstNameHindi %> <%= profile.lastNameHindi %>)
-          </h3>
-          <p><strong>Role:</strong> <%= profile.role %></p>
-          <p><strong>Gender:</strong> <%= profile.gender %></p>
-          <p><strong>Date of Birth:</strong> <%= new Date(profile.dob).toLocaleDateString() %></p>
-          <p><strong>Mobile Number:</strong> <%= profile.mNumber %></p>
-          <p>
-            <strong>Address:</strong> 
-            <%= profile.address.locationHindi %>, <%= profile.address.cityHindi %>, <%= profile.address.districtHindi %>, <%= profile.address.stateHindi %>
-            (<%= profile.address.locationEnglish %>, <%= profile.address.cityEnglish %>, <%= profile.address.districtEnglish %>, <%= profile.address.stateEnglish %>)
-          </p>
-          <p><strong>Occupation:</strong> <%= profile.occupationEnglish %> (<%= profile.occupationHindi %>)</p>
-          <p><strong>Description:</strong> <%= profile.descriptionEnglish %> (<%= profile.descriptionHindi %>)</p>
-          <p><strong>ID:</strong> <%= profile.id %></p>
-        </div>
-      </div>
-    <% }); %>
-  <% } else { %>
-    <div class="no-results">
-      <p>No profiles found. Please adjust your search criteria.</p>
+        <!-- Results Section -->
+        <% if (profiles && profiles.length > 0) { %>
+            <div class="mt-12 space-y-6">
+                <% profiles.forEach(profile => { %>
+                    <div class="glass-effect rounded-lg p-6 hover:border-blue-400/50 transition-all">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-nasa text-blue-400">
+                                <%= profile.firstNameEnglish %> <%= profile.lastNameEnglish %>
+                                <span class="text-sm text-gray-400">(<%= profile.firstNameHindi %> <%= profile.lastNameHindi %>)</span>
+                            </h3>
+                            <span class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm">
+                                <%= profile.matchPercentage %>% Match
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div class="space-y-2">
+                                <p><span class="text-gray-400">Role:</span> <%= profile.role %></p>
+                                <p><span class="text-gray-400">Gender:</span> <%= profile.gender %></p>
+                                <p><span class="text-gray-400">DOB:</span> <%= new Date(profile.dob).toLocaleDateString() %></p>
+                            </div>
+                            <div class="space-y-2">
+                                <p><span class="text-gray-400">Mobile:</span> <%= profile.mNumber %></p>
+                                <p><span class="text-gray-400">ID:</span> <%= profile.id %></p>
+                            </div>
+                        </div>
+                        <!-- Add Action Buttons -->
+                        <div class="flex justify-end mt-4 space-x-3">
+                            <a href="/record/<%= profile.id %>" 
+                               class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                View Details
+                            </a>
+                            <a href="/record/<%= profile.id %>/edit"
+                               class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                                Edit
+                            </a>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else if (profiles) { %>
+            <div class="mt-8 text-center text-gray-400">
+                No profiles found. Please adjust your search criteria.
+            </div>
+        <% } %>
     </div>
-  <% } %>
 </div>
 
-    
-  </div>
-</body>
-</html>
+<script src="/js/suggestions.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        setupSuggestions('firstName', 'names');
+        setupSuggestions('lastName', 'names');
+    });
+</script>
