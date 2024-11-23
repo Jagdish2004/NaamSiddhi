@@ -11,6 +11,10 @@ module.exports.resultRecord = async (req, res) => {
         const searchCriteria = req.body;
         const query = {};
 
+        // Extract firstName and lastName from searchCriteria
+        const firstName = searchCriteria.firstName || '';
+        const lastName = searchCriteria.lastName || '';
+
         // Validate and clean search criteria
         const cleanSearchCriteria = {
             ...searchCriteria,
@@ -82,8 +86,23 @@ module.exports.resultRecord = async (req, res) => {
             }
         }
 
-        // Find all profiles and calculate match percentages
-        const profiles = await Profile.find({});
+        // Generate Soundex codes only if names are provided
+        let profiles = [];
+        if (firstName || lastName) {
+            const firstNameSoundex = firstName ? getSoundex(firstName, false, false) : null;
+            const lastNameSoundex = lastName ? getSoundex(lastName, false, false) : null;
+            
+            // Build query based on available Soundex codes
+            const soundexQuery = {};
+            if (firstNameSoundex) soundexQuery['soundexCode.firstName'] = firstNameSoundex;
+            if (lastNameSoundex) soundexQuery['soundexCode.lastName'] = lastNameSoundex;
+            
+            profiles = await Profile.find(soundexQuery);
+        } else {
+            // If no names provided, use other search criteria
+            profiles = await Profile.find(query);
+        }
+
         const profilesWithMatches = profiles.map(profile => {
             let totalScore = 0;
 

@@ -8,8 +8,12 @@ module.exports.getAnalytics = async (req, res) => {
         const victimRecords = await Profile.countDocuments({ role: 'victim' });
         const witnessRecords = await Profile.countDocuments({ role: 'witness' });
         
-        // Get monthly statistics
-        const currentDate = new Date();
+        // Get monthly statistics with proper month names
+        const monthNames = [
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ];
+
         const monthlyStats = await Profile.aggregate([
             {
                 $group: {
@@ -23,6 +27,17 @@ module.exports.getAnalytics = async (req, res) => {
             { $sort: { "_id.year": -1, "_id.month": -1 } },
             { $limit: 12 }
         ]);
+
+        // Format monthly stats with proper labels
+        const formattedMonthlyStats = monthlyStats.map(stat => ({
+            ...stat,
+            monthLabel: `${monthNames[stat._id.month - 1]} ${stat._id.year}`,
+            count: stat.count,
+            axisLabels: {
+                x: 'Timeline (Months)',
+                y: 'Number of Records'
+            }
+        }));
 
         // Get location-based statistics
         const locationStats = await Profile.aggregate([
@@ -84,15 +99,55 @@ module.exports.getAnalytics = async (req, res) => {
                 criminal: criminalRecords,
                 victim: victimRecords,
                 witness: witnessRecords,
-                monthly: monthlyStats,
+                monthly: formattedMonthlyStats,
                 location: locationStats,
                 gender: genderStats,
-                age: ageStats
+                age: ageStats,
+                chartLabels: {
+                    monthly: {
+                        xAxis: 'Timeline (Months)',
+                        yAxis: 'Number of Records'
+                    }
+                }
             }
         });
     } catch (error) {
         console.error('Error getting analytics:', error);
         req.flash('error', 'Error loading analytics');
         res.redirect('/');
+    }
+};
+
+module.exports.getSuggestions = async (req, res) => {
+    try {
+        const query = req.query.query;
+        
+        if (!query || query.length < 1) {
+            return res.json([]);
+        }
+
+        // Search in multiple fields with case-insensitive matching
+        const suggestions = await Profile.find({
+            $or: [
+                { nameEnglish: { $regex: query, $options: 'i' } },
+                { nameHindi: { $regex: query, $options: 'i' } },
+                { 'address.cityEnglish': { $regex: query, $options: 'i' } }
+            ]
+        })
+        .select('nameEnglish nameHindi address.cityEnglish')
+        .limit(5)
+        .exec();
+
+        // Format suggestions for display
+        const formattedSuggestions = suggestions.map(profile => ({
+            name: profile.nameEnglish,
+            nameHindi: profile.nameHindi,
+            city: profile.address?.cityEnglish
+        }));
+
+        res.json(formattedSuggestions);
+    } catch (error) {
+        console.error('Error fetching suggestions:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 }; 
