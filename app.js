@@ -17,6 +17,10 @@ const searchRecord = require('./routes/searchRecord');
 const dashboardRoute = require('./routes/dashboard');
 const recordRoutes = require('./routes/recordRoutes');
 const suggestionRoutes = require('./routes/suggestionRoutes');
+
+
+
+
 const analyticsRoutes = require('./routes/analytics');
 const settingsRoutes = require('./routes/settings');
 
@@ -27,6 +31,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(suggestionRoutes);
 
 // Configure session
 app.use(session({

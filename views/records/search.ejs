@@ -10,9 +10,19 @@
             <div class="space-y-4">
                 <h2 class="text-xl font-nasa text-blue-400/80">Basic Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" name="firstName" 
-                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-                           placeholder="First Name / पहला नाम">
+                    <!-- <input id="firstName" type="text" name="firstName" 
+       class="..." placeholder="First Name / पहला नाम">
+<input id="lastName" type="text" name="lastName" 
+       class="..." placeholder="Last Name / अंतिम नाम"> -->
+    <div class="relative">
+        <input type="text" name="firstName" id="nameInput"
+            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+            placeholder="First Name / पहला नाम" oninput="fetchSuggestions()">
+    
+        <ul id="suggestionsList"
+            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md mt-1 absolute max-h-60 overflow-y-auto"
+            style="display: none;"></ul>
+    </div>
                     <input type="text" name="lastName"
                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
                            placeholder="Last Name / अंतिम नाम">
@@ -142,10 +152,45 @@
     </div>
 </div>
 
-<script src="/js/suggestions.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        setupSuggestions('firstName', 'names');
-        setupSuggestions('lastName', 'names');
-    });
+    async function fetchSuggestions() {
+      const input = document.getElementById('nameInput').value;
+      const suggestionsList = document.getElementById('suggestionsList');
+
+      // If input is empty, hide the suggestions list and clear its content
+      if (input.trim() === '') {
+        suggestionsList.innerHTML = '';
+        suggestionsList.style.display = 'none';  // Hide the list
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/suggestions?query=${input}`);
+        const suggestions = await response.json();
+
+        // If suggestions are found, display them
+        if (suggestions.length > 0) {
+          suggestionsList.innerHTML = '';  // Clear previous suggestions
+          suggestionsList.style.display = 'block';  // Show the list
+
+          suggestions.forEach(suggestion => {
+            const li = document.createElement('li');
+            li.textContent = `${suggestion.firstNameEnglish} / ${suggestion.firstNameHindi}`;
+            li.classList.add('px-4', 'py-2', 'cursor-pointer', 'hover:bg-blue-400', 'transition-all');
+            li.addEventListener('click', () => {
+              document.getElementById('nameInput').value = suggestion.firstNameEnglish;
+              suggestionsList.innerHTML = '';  // Clear suggestions on selection
+              suggestionsList.style.display = 'none';  // Hide the list
+            });
+            suggestionsList.appendChild(li);
+          });
+        } else {
+          suggestionsList.innerHTML = '';  // Clear the list if no suggestions
+          suggestionsList.style.display = 'none';  // Hide the list
+        }
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+        suggestionsList.style.display = 'none';  // Hide the list if there's an error
+      }
+    }
 </script>
