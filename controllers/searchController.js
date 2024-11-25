@@ -11,7 +11,7 @@ module.exports.resultRecord = async (req, res) => {
         const searchCriteria = req.body;
         const query = {};
 
-        // Validate and clean search criteria
+        // Clean search criteria to filter out empty or invalid values
         const cleanSearchCriteria = {
             ...searchCriteria,
             appearance: searchCriteria.appearance ? Object.fromEntries(
@@ -22,30 +22,23 @@ module.exports.resultRecord = async (req, res) => {
             ) : {}
         };
 
-        // Count provided parameters and calculate weights
+        // Count provided parameters
         let providedParams = 0;
-        let totalWeight = 0;
-
-        // Define parameter groups and their weights
         const parameterGroups = {
             name: {
                 fields: ['firstName', 'lastName'],
-                weight: 30,
                 provided: 0
             },
             physical: {
                 fields: ['appearance.height', 'appearance.weight', 'appearance.complexion', 'appearance.build'],
-                weight: 25,
                 provided: 0
             },
             address: {
                 fields: ['address.location', 'address.city', 'address.district', 'address.state'],
-                weight: 20,
                 provided: 0
             },
             basic: {
                 fields: ['gender', 'dob', 'occupation', 'mNumber'],
-                weight: 25,
                 provided: 0
             }
         };
@@ -74,36 +67,38 @@ module.exports.resultRecord = async (req, res) => {
             }
         });
 
-        // Calculate adjusted weights
-        for (const group of Object.values(parameterGroups)) {
-            if (group.provided > 0) {
-                const groupWeight = (group.weight * group.provided) / group.fields.length;
-                totalWeight += groupWeight;
-            }
-        }
-
         // Find all profiles and calculate match percentages
         const profiles = await Profile.find({});
         const profilesWithMatches = profiles.map(profile => {
             let totalScore = 0;
+            let totalFields = 0;
 
             // Calculate name match if provided
             if (parameterGroups.name.provided > 0) {
                 let nameScore = 0;
+                let nameFields = 0;
+
                 if (cleanSearchCriteria.firstName) {
+                    nameFields++;
                     nameScore += calculateMatchPercentage(
                         cleanSearchCriteria.firstName.toLowerCase(),
                         (profile.firstNameEnglish || '').toLowerCase()
                     );
                 }
+
                 if (cleanSearchCriteria.lastName) {
+                    nameFields++;
                     nameScore += calculateMatchPercentage(
                         cleanSearchCriteria.lastName.toLowerCase(),
                         (profile.lastNameEnglish || '').toLowerCase()
                     );
                 }
-                nameScore = nameScore / parameterGroups.name.provided;
-                totalScore += (nameScore * parameterGroups.name.weight) / totalWeight;
+
+                if (nameFields > 0) {
+                    nameScore = nameScore / nameFields;
+                    totalScore += nameScore;
+                    totalFields++;
+                }
             }
 
             // Calculate physical characteristics match if provided
@@ -135,7 +130,8 @@ module.exports.resultRecord = async (req, res) => {
 
                 if (physicalFields > 0) {
                     physicalScore = physicalScore / physicalFields;
-                    totalScore += (physicalScore * parameterGroups.physical.weight) / totalWeight;
+                    totalScore += physicalScore;
+                    totalFields++;
                 }
             }
 
@@ -157,7 +153,8 @@ module.exports.resultRecord = async (req, res) => {
 
                 if (addressFields > 0) {
                     addressScore = addressScore / addressFields;
-                    totalScore += (addressScore * parameterGroups.address.weight) / totalWeight;
+                    totalScore += addressScore;
+                    totalFields++;
                 }
             }
 
@@ -191,25 +188,33 @@ module.exports.resultRecord = async (req, res) => {
 
                 if (basicFields > 0) {
                     basicScore = basicScore / basicFields;
-                    totalScore += (basicScore * parameterGroups.basic.weight) / totalWeight;
+                    totalScore += basicScore;
+                    totalFields++;
                 }
             }
 
+            // Calculate the final match percentage as the average of all fields
+            let finalMatchPercentage = 0;
+            if (totalFields > 0) {
+                finalMatchPercentage = totalScore / totalFields;
+            }
+
+            // Ensure match percentage is within the 0-100% range
+            finalMatchPercentage = Math.min(finalMatchPercentage, 100).toFixed(2);
+
             return {
                 ...profile.toObject(),
-                matchPercentage: totalScore.toFixed(2),
-                providedParams,
-                totalParams: Object.values(parameterGroups).reduce((acc, group) => acc + group.fields.length, 0)
+                matchPercentage: finalMatchPercentage
             };
         });
 
-        // Filter and sort results
+        // Filter and sort results based on match percentage (e.g., only show profiles with 50% or higher match)
         const minMatchPercentage = 30;
         const sortedProfiles = profilesWithMatches
             .filter(profile => profile.matchPercentage >= minMatchPercentage)
             .sort((a, b) => b.matchPercentage - a.matchPercentage);
 
-        res.render('records/search.ejs', { 
+        res.render('records/search.ejs', {
             profiles: sortedProfiles,
             searchParams: {
                 provided: providedParams,
