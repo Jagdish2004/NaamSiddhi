@@ -11,7 +11,7 @@ module.exports.resultRecord = async (req, res) => {
         const searchCriteria = req.body;
         const query = {};
 
-        // Extract firstName and lastName from searchCriteria
+      
         const firstName = searchCriteria.firstName || '';
         const lastName = searchCriteria.lastName || '';
 
@@ -71,23 +71,23 @@ module.exports.resultRecord = async (req, res) => {
             }
         });
 
-        // Generate Soundex codes only if names are provided
-        let profiles = [];
-        if (firstName || lastName) {
-            const firstNameSoundex = firstName ? getSoundex(firstName, false, false) : null;
-            const lastNameSoundex = lastName ? getSoundex(lastName, false, false) : null;
-            
-            // Build query based on available Soundex codes
-            const soundexQuery = {};
-            if (firstNameSoundex) soundexQuery['soundexCode.firstName'] = firstNameSoundex;
-            if (lastNameSoundex) soundexQuery['soundexCode.lastName'] = lastNameSoundex;
-            
-            profiles = await Profile.find(soundexQuery);
-        } else {
-            // If no names provided, use other search criteria
-            profiles = await Profile.find(query);
+        // Find all profiles and calculate match percentages
+       // Generate Soundex codes only if names are provided
+       let profiles = [];
+       if (firstName || lastName) {
+           const firstNameSoundex = firstName ? getSoundex(firstName, false, false) : null;
+           const lastNameSoundex = lastName ? getSoundex(lastName, false, false) : null;
+           
+           // Build query based on available Soundex codes
+           const soundexQuery = {};
+           if (firstNameSoundex) soundexQuery['soundexCode.firstName'] = firstNameSoundex;
+           if (lastNameSoundex) soundexQuery['soundexCode.lastName'] = lastNameSoundex;
+           
+           profiles = await Profile.find(soundexQuery);
+       } else {
+           // If no names provided, use other search criteria
+           profiles = await Profile.find(query);
         }
-
         const profilesWithMatches = profiles.map(profile => {
             let totalScore = 0;
             let totalFields = 0;
@@ -154,95 +154,26 @@ module.exports.resultRecord = async (req, res) => {
                 }
             }
 
-            // Calculate address match if provided
-            if (parameterGroups.address.provided > 0 && cleanSearchCriteria.address) {
-                let addressScore = 0;
-                let addressFields = 0;
-
-                const addressFieldsList = ['location', 'city', 'district', 'state'];
-                addressFieldsList.forEach(field => {
-                    if (cleanSearchCriteria.address[field] && profile.address?.[`${field}English`]) {
-                        addressFields++;
-                        addressScore += calculateMatchPercentage(
-                            cleanSearchCriteria.address[field].toLowerCase(),
-                            profile.address[`${field}English`].toLowerCase()
-                        );
-                    }
-                });
-
-                if (addressFields > 0) {
-                    addressScore = addressScore / addressFields;
-                    totalScore += addressScore;
-                    totalFields++;
-                }
-            }
-
-            // Calculate basic info match if provided
-            if (parameterGroups.basic.provided > 0) {
-                let basicScore = 0;
-                let basicFields = 0;
-
-                if (cleanSearchCriteria.gender && profile.gender) {
-                    basicFields++;
-                    basicScore += profile.gender === cleanSearchCriteria.gender ? 100 : 0;
-                }
-
-                if (cleanSearchCriteria.dob && profile.dob) {
-                    basicFields++;
-                    basicScore += profile.dob.toISOString().split('T')[0] === cleanSearchCriteria.dob ? 100 : 0;
-                }
-
-                if (cleanSearchCriteria.occupation && profile.occupationEnglish) {
-                    basicFields++;
-                    basicScore += calculateMatchPercentage(
-                        cleanSearchCriteria.occupation.toLowerCase(),
-                        profile.occupationEnglish.toLowerCase()
-                    );
-                }
-
-                if (cleanSearchCriteria.mNumber && profile.mNumber) {
-                    basicFields++;
-                    basicScore += profile.mNumber === cleanSearchCriteria.mNumber ? 100 : 0;
-                }
-
-                if (basicFields > 0) {
-                    basicScore = basicScore / basicFields;
-                    totalScore += basicScore;
-                    totalFields++;
-                }
-            }
-
-            // Calculate the final match percentage as the average of all fields
-            let finalMatchPercentage = 0;
-            if (totalFields > 0) {
-                finalMatchPercentage = totalScore / totalFields;
-            }
-
-            // Ensure match percentage is within the 0-100% range
-            finalMatchPercentage = Math.min(finalMatchPercentage, 100).toFixed(2);
+            // Calculate final match percentage
+            const matchPercentage = totalFields > 0 ? totalScore / totalFields : 0;
 
             return {
                 ...profile.toObject(),
-                matchPercentage: finalMatchPercentage
+                matchPercentage
             };
         });
 
-        // Filter and sort results based on match percentage (e.g., only show profiles with 50% or higher match)
-        const minMatchPercentage = 30;
-        const sortedProfiles = profilesWithMatches
-            .filter(profile => profile.matchPercentage >= minMatchPercentage)
-            .sort((a, b) => b.matchPercentage - a.matchPercentage);
+        // Sort by match percentage
+        profilesWithMatches.sort((a, b) => b.matchPercentage - a.matchPercentage);
 
-        res.render('records/search.ejs', {
-            profiles: sortedProfiles,
-            searchParams: {
-                provided: providedParams,
-                total: Object.values(parameterGroups).reduce((acc, group) => acc + group.fields.length, 0)
-            }
+        res.render('records/results.ejs', { 
+            profiles: profilesWithMatches,
+            searchCriteria: cleanSearchCriteria,
+            parameterGroups
         });
     } catch (error) {
-        console.error('Error searching profiles:', error);
-        req.flash('error', 'An error occurred while searching profiles');
+        console.error('Search error:', error);
+        req.flash('error', 'Search failed');
         res.redirect('/search');
     }
 };

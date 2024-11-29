@@ -14,18 +14,25 @@
        class="..." placeholder="First Name / पहला नाम">
 <input id="lastName" type="text" name="lastName" 
        class="..." placeholder="Last Name / अंतिम नाम"> -->
-    <div class="relative">
-        <input type="text" name="firstName" id="nameInput"
+       <div class="relative">
+        <input type="text" name="firstName" id="firstNameInput"
             class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-            placeholder="First Name / पहला नाम" oninput="fetchSuggestions()">
-    
-        <ul id="suggestionsList"
+            placeholder="First Name / पहला नाम" oninput="fetchSuggestions('firstName')">
+        
+        <ul id="firstNameSuggestionsList"
             class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md mt-1 absolute max-h-60 overflow-y-auto"
             style="display: none;"></ul>
     </div>
-                    <input type="text" name="lastName"
-                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-                           placeholder="Last Name / अंतिम नाम">
+    
+    <div class="relative">
+        <input type="text" name="lastName" id="lastNameInput"
+            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+            placeholder="Last Name / अंतिम नाम" oninput="fetchSuggestions('lastName')">
+        
+        <ul id="lastNameSuggestionsList"
+            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md mt-1 absolute max-h-60 overflow-y-auto"
+            style="display: none;"></ul>
+    </div>
                     <input type="date" name="dob"
                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
                     <select name="gender"
@@ -153,44 +160,56 @@
 </div>
 
 <script>
-    async function fetchSuggestions() {
-      const input = document.getElementById('nameInput').value;
-      const suggestionsList = document.getElementById('suggestionsList');
+    async function fetchSuggestions(type) {
+        const input = document.getElementById(`${type}Input`).value;
+        const suggestionsList = document.getElementById(`${type}SuggestionsList`);
 
-      // If input is empty, hide the suggestions list and clear its content
-      if (input.trim() === '') {
-        suggestionsList.innerHTML = '';
-        suggestionsList.style.display = 'none';  // Hide the list
-        return;
-      }
-
-      try {
-        const response = await fetch(`/api/suggestions?query=${input}`);
-        const suggestions = await response.json();
-
-        // If suggestions are found, display them
-        if (suggestions.length > 0) {
-          suggestionsList.innerHTML = '';  // Clear previous suggestions
-          suggestionsList.style.display = 'block';  // Show the list
-
-          suggestions.forEach(suggestion => {
-            const li = document.createElement('li');
-            li.textContent = `${suggestion.firstNameEnglish} / ${suggestion.firstNameHindi}`;
-            li.classList.add('px-4', 'py-2', 'cursor-pointer', 'hover:bg-blue-400', 'transition-all');
-            li.addEventListener('click', () => {
-              document.getElementById('nameInput').value = suggestion.firstNameEnglish;
-              suggestionsList.innerHTML = '';  // Clear suggestions on selection
-              suggestionsList.style.display = 'none';  // Hide the list
-            });
-            suggestionsList.appendChild(li);
-          });
-        } else {
-          suggestionsList.innerHTML = '';  // Clear the list if no suggestions
-          suggestionsList.style.display = 'none';  // Hide the list
+        // If input is empty, hide the suggestions list and clear its content
+        if (input.trim() === '') {
+            suggestionsList.innerHTML = '';
+            suggestionsList.style.display = 'none';  // Hide the list
+            return;
         }
-      } catch (error) {
-        console.error('Error fetching suggestions:', error);
-        suggestionsList.style.display = 'none';  // Hide the list if there's an error
-      }
+
+        try {
+            const response = await fetch(`/api/suggestions?type=${type}&query=${input}`);
+            const suggestions = await response.json();
+
+            // If suggestions are found, display them
+            if (suggestions.length > 0) {
+                suggestionsList.innerHTML = '';  // Clear previous suggestions
+                suggestionsList.style.display = 'block';  // Show the list
+
+                suggestions.forEach(suggestion => {
+                    const li = document.createElement('li');
+                    
+                    // Display the first name if the type is 'firstName', else display the last name
+                    if (type === 'firstName') {
+                        li.textContent = `${suggestion.firstNameEnglish} / ${suggestion.firstNameHindi}`;
+                    } else if (type === 'lastName') {
+                        li.textContent = `${suggestion.lastNameEnglish} / ${suggestion.lastNameHindi}`;
+                    }
+
+                    li.classList.add('px-4', 'py-2', 'cursor-pointer', 'hover:bg-blue-400', 'transition-all');
+                    li.addEventListener('click', () => {
+                        if (type === 'firstName') {
+                            document.getElementById(`${type}Input`).value = suggestion.firstNameEnglish;
+                        } else if (type === 'lastName') {
+                            document.getElementById(`${type}Input`).value = suggestion.lastNameEnglish;
+                        }
+                        
+                        suggestionsList.innerHTML = '';  // Clear suggestions on selection
+                        suggestionsList.style.display = 'none';  // Hide the list
+                    });
+                    suggestionsList.appendChild(li);
+                });
+            } else {
+                suggestionsList.innerHTML = '';  // Clear the list if no suggestions
+                suggestionsList.style.display = 'none';  // Hide the list
+            }
+        } catch (error) {
+            console.error('Error fetching suggestions:', error);
+            suggestionsList.style.display = 'none';  // Hide the list if there's an error
+        }
     }
 </script>
