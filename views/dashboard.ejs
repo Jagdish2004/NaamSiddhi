@@ -1,31 +1,22 @@
-<!-- Total Records Card -->
-<a href="/total-records" class="card-link">
-    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-        <h3 class="text-xl font-semibold mb-2">Total Records</h3>
-        <p class="text-3xl font-bold"><%= totalRecords %></p>
+<div class="container mx-auto px-4 py-8">
+    <!-- Navigation/Action Buttons -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Dashboard</h1>
+        <div class="space-x-4">
+            <a href="/cases/new" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create Case</a>
+            <a href="/newrecord" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Create Profile</a>
+        </div>
     </div>
-</a>
 
-<!-- Active Cases Card -->
-<a href="/active-cases" class="card-link">
-    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-        <h3 class="text-xl font-semibold mb-2">Active Cases</h3>
-        <p class="text-3xl font-bold"><%= activeCases %></p>
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Your existing cards -->
+        <a href="/total-records" class="card-link">
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                <h3 class="text-xl font-semibold mb-2">Total Records</h3>
+                <p class="text-3xl font-bold"><%= totalRecords %></p>
+            </div>
+        </a>
+        <!-- Other cards -->
     </div>
-</a>
-
-<!-- Monthly Cases Card -->
-<a href="/monthly-cases" class="card-link">
-    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-        <h3 class="text-xl font-semibold mb-2">Cases This Month</h3>
-        <p class="text-3xl font-bold"><%= monthlyRecords %></p>
-    </div>
-</a>
-
-<!-- Criminal Records Card -->
-<a href="/criminal-records" class="card-link">
-    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-        <h3 class="text-xl font-semibold mb-2">Criminal Records</h3>
-        <p class="text-3xl font-bold"><%= criminalRecords %></p>
-    </div>
-</a> 
+</div> 

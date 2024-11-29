@@ -1,0 +1,32 @@
+<% layout('./layout/boilerplate') -%>
+
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto text-center">
+        <div class="mb-8">
+            <svg class="w-24 h-24 text-blue-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+
+        <h1 class="text-3xl font-nasa text-blue-400 mb-4">
+            404 - Page Not Found
+        </h1>
+
+        <p class="text-gray-300 mb-8">
+            The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+        </p>
+
+        <div class="space-x-4">
+            <button onclick="history.back()" 
+                    class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-6 py-3 rounded-md transition-all">
+                Go Back
+            </button>
+
+            <a href="/" 
+               class="inline-block bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-6 py-3 rounded-md transition-all">
+                Home Page
+            </a>
+        </div>
+    </div>
+</div> 

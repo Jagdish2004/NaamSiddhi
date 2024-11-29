@@ -11,4 +11,7 @@ router.post('/', recordController.saveRecord);
 // Handle the POST request to submit the record
 router.post('/submit', recordController.submitRecord);
 
+// New route for creating profile from case form
+router.post('/case/:caseId', recordController.createProfileForCase);
+
 module.exports = router;

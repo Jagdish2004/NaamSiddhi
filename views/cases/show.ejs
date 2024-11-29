@@ -1,0 +1,127 @@
+<%- include('../partials/header') %>
+
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-nasa text-blue-400">Case Details: <%= caseData.caseNumber %></h1>
+            <div class="space-x-4">
+                <a href="/" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">Back to Dashboard</a>
+                <% if (caseData.status !== 'closed') { %>
+                    <button class="bg-red-500/20 hover:bg-red-500/30 text-red-400 font-nasa px-4 py-2 rounded-md transition-all">Close Case</button>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Case Information -->
+            <div class="lg:col-span-2">
+                <!-- Status Badge -->
+                <div class="mb-6">
+                    <span class="px-3 py-1 rounded-full text-sm font-nasa
+                        <%= caseData.status === 'active' ? 'bg-green-500/20 text-green-400' : 
+                            caseData.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 
+                            'bg-red-500/20 text-red-400' %>">
+                        <%= caseData.status.charAt(0).toUpperCase() + caseData.status.slice(1) %>
+                    </span>
+                </div>
+
+                <!-- Case Description -->
+                <div class="glass-effect p-6 rounded-lg mb-6">
+                    <h2 class="text-xl font-nasa text-blue-400 mb-4">Case Description</h2>
+                    <p class="text-gray-300"><%= caseData.description.english %></p>
+                    <p class="text-gray-400 mt-2"><%= caseData.description.hindi %></p>
+                </div>
+
+                <!-- Connected Profiles -->
+                <div class="glass-effect p-6 rounded-lg mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-nasa text-blue-400">Connected Profiles</h2>
+                        <button onclick="showProfileModal()" 
+                                class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
+                            + Add Profile
+                        </button>
+                    </div>
+                    <div class="divide-y divide-blue-400/20">
+                        <% caseData.profiles.forEach(profile => { %>
+                            <div class="py-4">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h3 class="font-medium text-white">
+                                            <%= profile.profile.firstNameEnglish %> <%= profile.profile.lastNameEnglish %>
+                                        </h3>
+                                        <p class="text-sm text-gray-400">Role: <%= profile.role %></p>
+                                    </div>
+                                    <a href="/record/<%= profile.profile._id %>" 
+                                       class="text-blue-400 hover:text-blue-300 transition-colors">
+                                        View Profile
+                                    </a>
+                                </div>
+                            </div>
+                        <% }) %>
+                        <% if (caseData.profiles.length === 0) { %>
+                            <p class="text-gray-400 py-4">No profiles connected to this case</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Information -->
+            <div class="lg:col-span-1">
+                <!-- Reporter Details -->
+                <div class="glass-effect p-6 rounded-lg mb-6">
+                    <h2 class="text-xl font-nasa text-blue-400 mb-4">Reporter Details</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm text-gray-400">Name</label>
+                            <p class="text-white"><%= caseData.reporter.name.english %></p>
+                            <p class="text-gray-400"><%= caseData.reporter.name.hindi %></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400">Contact</label>
+                            <p class="text-white"><%= caseData.reporter.contact %></p>
+                        </div>
+                        <% if (caseData.reporter.email) { %>
+                            <div>
+                                <label class="block text-sm text-gray-400">Email</label>
+                                <p class="text-white"><%= caseData.reporter.email %></p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Location Details -->
+                <div class="glass-effect p-6 rounded-lg mb-6">
+                    <h2 class="text-xl font-nasa text-blue-400 mb-4">Incident Location</h2>
+                    <div class="space-y-2">
+                        <p class="text-white"><%= caseData.location.address.english %></p>
+                        <p class="text-gray-400"><%= caseData.location.address.hindi %></p>
+                        <p class="text-white"><%= caseData.location.city.english %></p>
+                        <p class="text-white"><%= caseData.location.district.english %></p>
+                        <p class="text-white"><%= caseData.location.state.english %></p>
+                    </div>
+                </div>
+
+                <!-- Case Timeline -->
+                <div class="glass-effect p-6 rounded-lg">
+                    <h2 class="text-xl font-nasa text-blue-400 mb-4">Case Timeline</h2>
+                    <div class="space-y-4">
+                        <% caseData.timeline.forEach(entry => { %>
+                            <div class="flex items-start space-x-3">
+                                <div class="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
+                                <div>
+                                    <p class="text-sm text-gray-400">
+                                        <%= new Date(entry.date).toLocaleDateString() %>
+                                    </p>
+                                    <p class="text-white"><%= entry.description.english %></p>
+                                    <p class="text-gray-400 text-sm"><%= entry.description.hindi %></p>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %> 

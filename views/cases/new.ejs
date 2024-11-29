@@ -1,0 +1,469 @@
+<%- include('../partials/header') %>
+
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-nasa text-blue-400">Create New Case</h1>
+            <a href="/" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
+                Back to Dashboard
+            </a>
+        </div>
+
+        <form action="/cases" method="POST" class="space-y-8">
+            <!-- Reporter Details Section (Moved to top) -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-nasa text-blue-400/80">Reporter Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-400 mb-2">Reporter Name</label>
+                        <input type="text" name="reporterName" 
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-2">Contact Number</label>
+                        <input type="tel" name="reporterContact"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-2">Email</label>
+                        <input type="email" name="reporterEmail"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-2">ID Type</label>
+                        <select name="reporterIdType"
+                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <option value="aadhar">Aadhar Card</option>
+                            <option value="pan">PAN Card</option>
+                            <option value="voter">Voter ID</option>
+                            <option value="driving">Driving License</option>
+                            <option value="passport">Passport</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-2">ID Number</label>
+                        <input type="text" name="reporterIdNumber"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-400 mb-2">Address</label>
+                        <input type="text" name="reporterAddress"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-2">City</label>
+                        <input type="text" name="reporterCity"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-2">District</label>
+                        <input type="text" name="reporterDistrict"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-2">State</label>
+                        <input type="text" name="reporterState"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Case Information Section -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-nasa text-blue-400/80">Case Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="caseType" class="block text-gray-400 mb-2">Case Type</label>
+                        <select id="caseType" name="caseType" 
+                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                                required>
+                            <option value="">Select Case Type</option>
+                            <option value="criminal">Criminal Case</option>
+                            <option value="civil">Civil Case</option>
+                            <option value="domestic">Domestic Violence</option>
+                            <option value="cybercrime">Cybercrime</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="priority" class="block text-gray-400 mb-2">Priority Level</label>
+                        <select id="priority" name="priority" 
+                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                                required>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incident Details Section -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-nasa text-blue-400/80">Incident Details</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="incidentDate" class="block text-gray-400 mb-2">Date of Incident</label>
+                        <input type="date" id="incidentDate" name="incidentDate" 
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               required>
+                    </div>
+                    <div>
+                        <label for="description" class="block text-gray-400 mb-2">Incident Description</label>
+                        <textarea id="description" name="description" rows="4" 
+                                  class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                                  placeholder="Provide detailed description of the incident..." 
+                                  required></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location Details -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-nasa text-blue-400/80">Incident Location</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label for="location" class="block text-gray-400 mb-2">Location Address</label>
+                        <input type="text" id="location" name="location" 
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               required>
+                    </div>
+                    <div>
+                        <label for="city" class="block text-gray-400 mb-2">City</label>
+                        <input type="text" id="city" name="city" 
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               required>
+                    </div>
+                    <div>
+                        <label for="district" class="block text-gray-400 mb-2">District</label>
+                        <input type="text" id="district" name="district" 
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               required>
+                    </div>
+                    <div>
+                        <label for="state" class="block text-gray-400 mb-2">State</label>
+                        <input type="text" id="state" name="state" 
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connected Profiles Section (Moved to bottom) -->
+            <div class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-nasa text-blue-400/80">Connected Profiles</h2>
+                    <button type="button" 
+                            onclick="showProfileModal()"
+                            class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all">
+                        + Add Profile
+                    </button>
+                </div>
+                <div id="connectedProfiles" class="space-y-4">
+                    <!-- Connected profiles will be displayed here -->
+                    <div class="text-gray-400 text-center py-4" id="noProfilesMessage">
+                        No profiles connected to this case yet
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-center pt-6">
+                <button type="submit" 
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-nasa px-8 py-3 rounded-md transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20">
+                    Create Case
+                </button>
+            </div>
+
+            <!-- Hidden input for connected profiles -->
+            <input type="hidden" name="connectedProfiles" id="connectedProfilesInput" value="[]">
+        </form>
+    </div>
+</div>
+
+<!-- Profile Selection Modal -->
+<div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="glass-effect rounded-lg p-8 max-w-2xl w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-nasa text-blue-400">Add Profile to Case</h3>
+                <button onclick="hideProfileModal()" class="text-gray-400 hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Existing Profile Option -->
+                <a href="/search" 
+                   class="glass-effect p-6 rounded-lg text-center hover:bg-blue-400/10 transition-all group cursor-pointer">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-blue-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <h4 class="text-lg font-nasa text-blue-400 mb-2">Search Existing Profile</h4>
+                    <p class="text-sm text-gray-400">Search and link an existing profile</p>
+                </a>
+
+                <!-- New Profile Option -->
+                <a href="/newrecord" 
+                   class="glass-effect p-6 rounded-lg text-center hover:bg-green-400/10 transition-all group cursor-pointer">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-green-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h4 class="text-lg font-nasa text-green-400 mb-2">Create New Profile</h4>
+                    <p class="text-sm text-gray-400">Create a new profile</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let connectedProfiles = [];
+
+function showProfileModal() {
+    document.getElementById('profileModal').classList.remove('hidden');
+    addSearchBox();
+    loadProfiles();
+}
+
+function hideProfileModal() {
+    document.getElementById('profileModal').classList.add('hidden');
+    document.getElementById('profileOptionsView').classList.remove('hidden');
+    document.getElementById('existingProfilesView').classList.add('hidden');
+}
+
+async function loadProfiles() {
+    try {
+        const response = await fetch('/api/profiles');
+        if (!response.ok) throw new Error('Failed to fetch profiles');
+        const data = await response.json();
+        displayProfiles(data.profiles);
+    } catch (error) {
+        console.error('Error loading profiles:', error);
+        showNotification('Failed to load profiles', 'error');
+    }
+}
+
+function displayProfiles(profiles) {
+    const resultsDiv = document.getElementById('profileResults');
+    resultsDiv.innerHTML = profiles.map(profile => `
+        <div class="glass-effect p-4 rounded-lg mb-2">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-white">${profile.firstNameEnglish} ${profile.lastNameEnglish}</p>
+                    <p class="text-sm text-gray-400">ID: #${profile.id}</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <select id="role-${profile._id}" 
+                            class="bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-1 text-gray-100 text-sm">
+                        <option value="accused">Accused</option>
+                        <option value="victim">Victim</option>
+                        <option value="witness">Witness</option>
+                        <option value="complainant">Complainant</option>
+                    </select>
+                    <button onclick="addProfile('${profile._id}', '${profile.firstNameEnglish}', '${profile.lastNameEnglish}')"
+                            class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
+                        Add
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function addProfile(id, firstName, lastName) {
+    const roleSelect = document.getElementById(`role-${id}`);
+    const role = roleSelect.value;
+    
+    if (!connectedProfiles.find(p => p.id === id)) {
+        connectedProfiles.push({ id, firstName, lastName, role });
+        updateConnectedProfilesDisplay();
+        document.getElementById('connectedProfilesInput').value = JSON.stringify(connectedProfiles);
+    }
+    hideProfileModal();
+}
+
+function removeProfile(id) {
+    connectedProfiles = connectedProfiles.filter(p => p.id !== id);
+    updateConnectedProfilesDisplay();
+    document.getElementById('connectedProfilesInput').value = JSON.stringify(connectedProfiles);
+}
+
+function updateConnectedProfilesDisplay() {
+    const container = document.getElementById('connectedProfiles');
+    const noProfilesMessage = document.getElementById('noProfilesMessage');
+    
+    if (connectedProfiles.length === 0) {
+        noProfilesMessage.classList.remove('hidden');
+        container.innerHTML = '';
+        return;
+    }
+    
+    noProfilesMessage.classList.add('hidden');
+    container.innerHTML = connectedProfiles.map(profile => `
+        <div class="glass-effect p-4 rounded-lg flex justify-between items-center">
+            <div>
+                <p class="text-white">${profile.firstName} ${profile.lastName}</p>
+                <p class="text-sm text-gray-400">Role: ${profile.role}</p>
+            </div>
+            <div class="flex items-center space-x-2">
+                <select onchange="updateProfileRole('${profile.id}', this.value)"
+                        class="bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-1 text-gray-100 text-sm">
+                    <option value="accused" ${profile.role === 'accused' ? 'selected' : ''}>Accused</option>
+                    <option value="victim" ${profile.role === 'victim' ? 'selected' : ''}>Victim</option>
+                    <option value="witness" ${profile.role === 'witness' ? 'selected' : ''}>Witness</option>
+                    <option value="complainant" ${profile.role === 'complainant' ? 'selected' : ''}>Complainant</option>
+                </select>
+                <button onclick="removeProfile('${profile.id}')"
+                        class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1 rounded-md transition-all">
+                    Remove
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Add function to update profile role
+function updateProfileRole(profileId, newRole) {
+    const profile = connectedProfiles.find(p => p.id === profileId);
+    if (profile) {
+        profile.role = newRole;
+        document.getElementById('connectedProfilesInput').value = JSON.stringify(connectedProfiles);
+    }
+}
+
+// Profile search functionality
+document.getElementById('profileSearch').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const profileResults = document.getElementById('profileResults').children;
+    
+    Array.from(profileResults).forEach(profile => {
+        const name = profile.querySelector('p').textContent.toLowerCase();
+        profile.style.display = name.includes(searchTerm) ? 'block' : 'none';
+    });
+});
+
+// Function to handle profile creation return
+function handleProfileReturn() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const profileAdded = urlParams.get('profileAdded');
+    
+    if (profileAdded) {
+        // Fetch the newly created profile details
+        fetch(`/api/profiles/${profileAdded}`)
+            .then(response => response.json())
+            .then(profile => {
+                // Add the profile to the connected profiles list
+                addProfile(
+                    profile._id,
+                    profile.firstNameEnglish,
+                    profile.lastNameEnglish,
+                    profile.role
+                );
+                
+                // Clean up the URL
+                window.history.replaceState({}, document.title, '/cases/new');
+            })
+            .catch(error => console.error('Error fetching profile:', error));
+    }
+}
+
+// Call this when the page loads
+document.addEventListener('DOMContentLoaded', handleProfileReturn);
+
+// Modify the "Create New Profile" link in the modal
+document.querySelector('[href="/newrecord"]').href = `/newrecord?returnTo=case&caseId=${currentCaseId}`;
+
+// Add these functions to your existing JavaScript
+function showExistingProfiles() {
+    document.getElementById('profileOptionsView').classList.add('hidden');
+    document.getElementById('existingProfilesView').classList.remove('hidden');
+    loadProfiles(); // Load existing profiles
+}
+
+function showCreateNewProfile() {
+    hideProfileModal();
+    // Redirect to new profile creation page with return URL
+    window.location.href = `/newrecord?returnTo=case&caseId=${currentCaseId}`;
+}
+
+function backToOptions() {
+    document.getElementById('profileOptionsView').classList.remove('hidden');
+    document.getElementById('existingProfilesView').classList.add('hidden');
+}
+
+// Add current case ID to URLs
+document.addEventListener('DOMContentLoaded', function() {
+    const caseId = new URLSearchParams(window.location.search).get('caseId') || '';
+    
+    // Update the href attributes with case context
+    const searchLink = document.querySelector('#profileModal a[href="/search"]');
+    const newProfileLink = document.querySelector('#profileModal a[href="/newrecord"]');
+    
+    if (searchLink) {
+        searchLink.href = `/search?returnTo=case&caseId=${caseId}`;
+    }
+    
+    if (newProfileLink) {
+        newProfileLink.href = `/newrecord?returnTo=case&caseId=${caseId}`;
+    }
+});
+
+function addSearchBox() {
+    const searchBox = document.createElement('div');
+    searchBox.className = 'mb-4';
+    searchBox.innerHTML = `
+        <input type="text" 
+               id="profileSearchInput"
+               placeholder="Search profiles..."
+               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+    `;
+    document.getElementById('profileResults').parentNode.insertBefore(searchBox, document.getElementById('profileResults'));
+
+    // Add search functionality
+    document.getElementById('profileSearchInput').addEventListener('input', async function(e) {
+        const searchTerm = e.target.value.trim();
+        if (searchTerm.length >= 2) {
+            try {
+                const response = await fetch(`/api/profiles/search?q=${encodeURIComponent(searchTerm)}`);
+                if (!response.ok) throw new Error('Search failed');
+                const data = await response.json();
+                displayProfiles(data.profiles);
+            } catch (error) {
+                console.error('Search error:', error);
+            }
+        } else if (searchTerm.length === 0) {
+            loadProfiles(); // Load all profiles when search is cleared
+        }
+    });
+}
+
+// Update form submission
+document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Validate that at least one profile is connected
+    if (connectedProfiles.length === 0) {
+        showNotification('Please connect at least one profile to the case', 'error');
+        return;
+    }
+
+    // Add connected profiles to form data
+    const formData = new FormData(this);
+    formData.append('connectedProfiles', JSON.stringify(connectedProfiles));
+
+    // Submit the form
+    this.submit();
+});
+</script>
+
+<%- include('../partials/footer') %> 

@@ -1,1 +1,71 @@
- 
+<% layout('../layout/boilerplate') -%>
+
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-nasa text-blue-400">Criminal Records</h1>
+            <div class="space-x-4">
+                <a href="/cases/new" 
+                   class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all">
+                    + New Case
+                </a>
+                <a href="/" 
+                   class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Records Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="text-left border-b border-blue-400/20">
+                        <th class="pb-3 font-nasa text-blue-400">ID</th>
+                        <th class="pb-3 font-nasa text-blue-400">Name</th>
+                        <th class="pb-3 font-nasa text-blue-400">Cases</th>
+                        <th class="pb-3 font-nasa text-blue-400">Status</th>
+                        <th class="pb-3 font-nasa text-blue-400">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-300">
+                    <% records.forEach(record => { %>
+                        <tr class="border-b border-blue-400/10 hover:bg-blue-400/5">
+                            <td class="py-4">#<%= record.id %></td>
+                            <td class="py-4">
+                                <%= record.firstNameEnglish %> <%= record.lastNameEnglish %>
+                                <span class="text-sm text-gray-500">
+                                    (<%= record.firstNameHindi %> <%= record.lastNameHindi %>)
+                                </span>
+                            </td>
+                            <td class="py-4">
+                                <% record.cases.forEach(case_ => { %>
+                                    <a href="/cases/<%= case_.case %>" 
+                                       class="text-blue-400 hover:text-blue-300 mr-2">
+                                        #<%= case_.case %>
+                                    </a>
+                                <% }) %>
+                            </td>
+                            <td class="py-4">
+                                <span class="px-2 py-1 rounded-full text-xs
+                                    <%= record.status === 'active' ? 'bg-green-500/20 text-green-400' : 
+                                        record.status === 'wanted' ? 'bg-red-500/20 text-red-400' : 
+                                        'bg-gray-500/20 text-gray-400' %>">
+                                    <%= record.status %>
+                                </span>
+                            </td>
+                            <td class="py-4">
+                                <div class="flex space-x-2">
+                                    <a href="/record/<%= record.id %>" 
+                                       class="text-blue-400 hover:text-blue-300">View</a>
+                                    <a href="/record/<%= record.id %>/edit" 
+                                       class="text-blue-400 hover:text-blue-300">Edit</a>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div> 

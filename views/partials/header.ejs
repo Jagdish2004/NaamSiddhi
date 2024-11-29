@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        space: {
+                            dark: '#0B0D17',
+                            blue: '#1B3964',
+                            light: '#2C3E50'
+                        }
+                    },
+                    fontFamily: {
+                        'nasa': ['Orbitron', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background: linear-gradient(to bottom, #0B0D17, #1B3964);
+            min-height: 100vh;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="text-gray-100">
+    <nav class="glass-effect fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <span class="font-nasa text-2xl text-blue-400">नामसिद्धि</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/cases/new" 
+                       class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all">
+                        + New Case
+                    </a>
+                    <a href="/newrecord" 
+                       class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
+                        + New Record
+                    </a>
+                    <a href="/cases/search" 
+                       class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
+                        🔍 Search Cases
+                    </a>
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="/" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">Dashboard</a>
+                        <a href="/analytics" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">Analytics</a>
+                    </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button type="button" class="text-gray-400 hover:text-white">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="/cases/new" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">+ New Case</a>
+                <a href="/newrecord" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">+ New Record</a>
+                <a href="/cases/search" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Search Cases</a>
+                <a href="/" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Dashboard</a>
+                <a href="/analytics" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Analytics</a>
+            </div>
+        </div>
+    </nav>
+</body>
+</html> 
