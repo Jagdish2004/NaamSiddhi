@@ -1,23 +1,30 @@
 const express = require('express');
 const router = express.Router();
-const { getNameSuggestions, getLocationSuggestions } = require('../utils/suggestions');
+const Profile = require('../models/profileSchema'); 
 
-// Get name suggestions
-router.get('/names', async (req, res) => {
-    const { q } = req.query;
-    if (!q || q.length < 2) return res.json([]);
-    
-    const suggestions = await getNameSuggestions(q);
-    res.json(suggestions);
-});
+router.get('/api/suggestions', async (req, res) => {
+    try {
+      const { query } = req.query;
+  
+      if (!query) {
+        return res.status(400).json({ error: 'Query parameter is required' });
+      }
+  
+      const regex = new RegExp(query, 'i'); // Case-insensitive regex for matching
+      const results = await Profile.find({
+        $or: [
+          { 'firstNameEnglish': regex },
+          { 'firstNameHindi': regex }
+        ]
+      })
+        .limit(10)
+        .select('firstNameEnglish firstNameHindi');
+  
+      res.json(results);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 
-// Get location suggestions
-router.get('/locations', async (req, res) => {
-    const { q } = req.query;
-    if (!q || q.length < 2) return res.json([]);
-    
-    const suggestions = await getLocationSuggestions(q);
-    res.json(suggestions);
-});
-
-module.exports = router; 
+module.exports = router;
