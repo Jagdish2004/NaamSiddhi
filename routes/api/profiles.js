@@ -132,4 +132,27 @@ router.post('/profiles/search', async (req, res) => {
     }
 });
 
+// Add this route
+router.get('/suggestions', async (req, res) => {
+    try {
+        const { type, query } = req.query;
+        if (!query || query.length < 2) {
+            return res.json([]);
+        }
+
+        let searchField = type === 'firstName' ? 'firstNameEnglish' : 'lastNameEnglish';
+        let searchQuery = {};
+        searchQuery[searchField] = new RegExp('^' + query, 'i');
+
+        const suggestions = await Profile.find(searchQuery)
+            .select('firstNameEnglish firstNameHindi lastNameEnglish lastNameHindi')
+            .limit(5);
+
+        res.json(suggestions);
+    } catch (error) {
+        console.error('Error getting suggestions:', error);
+        res.status(500).json({ error: 'Failed to get suggestions' });
+    }
+});
+
 module.exports = router; 

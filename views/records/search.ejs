@@ -160,56 +160,78 @@
 </div>
 
 <script>
+    // Function to handle clicks outside suggestion lists
+    document.addEventListener('click', function(e) {
+        // Check if click is outside both input fields and suggestion lists
+        const firstNameContainer = document.getElementById('firstNameInput').parentElement;
+        const lastNameContainer = document.getElementById('lastNameInput').parentElement;
+        
+        if (!firstNameContainer.contains(e.target) && !lastNameContainer.contains(e.target)) {
+            // Hide both suggestion lists
+            document.getElementById('firstNameSuggestionsList').style.display = 'none';
+            document.getElementById('lastNameSuggestionsList').style.display = 'none';
+        }
+    });
+
+    // Prevent suggestion list from closing when clicking inside it
+    document.querySelectorAll('.suggestions-list').forEach(list => {
+        list.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+
+    // Update input event listeners
+    document.getElementById('firstNameInput').addEventListener('focus', function() {
+        // Hide the other suggestion list
+        document.getElementById('lastNameSuggestionsList').style.display = 'none';
+    });
+
+    document.getElementById('lastNameInput').addEventListener('focus', function() {
+        // Hide the other suggestion list
+        document.getElementById('firstNameSuggestionsList').style.display = 'none';
+    });
+
+    // Update fetchSuggestions function
     async function fetchSuggestions(type) {
         const input = document.getElementById(`${type}Input`).value;
         const suggestionsList = document.getElementById(`${type}SuggestionsList`);
+        const otherType = type === 'firstName' ? 'lastName' : 'firstName';
+        const otherSuggestionsList = document.getElementById(`${otherType}SuggestionsList`);
 
-        // If input is empty, hide the suggestions list and clear its content
-        if (input.trim() === '') {
-            suggestionsList.innerHTML = '';
-            suggestionsList.style.display = 'none';  // Hide the list
+        // Hide the other suggestion list
+        otherSuggestionsList.style.display = 'none';
+
+        if (input.trim().length < 2) {
+            suggestionsList.style.display = 'none';
             return;
         }
 
         try {
-            const response = await fetch(`/api/suggestions?type=${type}&query=${input}`);
+            const response = await fetch(`/api/suggestions?type=${type}&query=${encodeURIComponent(input)}`);
+            if (!response.ok) throw new Error('Failed to fetch suggestions');
+            
             const suggestions = await response.json();
-
-            // If suggestions are found, display them
+            
             if (suggestions.length > 0) {
-                suggestionsList.innerHTML = '';  // Clear previous suggestions
-                suggestionsList.style.display = 'block';  // Show the list
-
-                suggestions.forEach(suggestion => {
-                    const li = document.createElement('li');
-                    
-                    // Display the first name if the type is 'firstName', else display the last name
-                    if (type === 'firstName') {
-                        li.textContent = `${suggestion.firstNameEnglish} / ${suggestion.firstNameHindi}`;
-                    } else if (type === 'lastName') {
-                        li.textContent = `${suggestion.lastNameEnglish} / ${suggestion.lastNameHindi}`;
-                    }
-
-                    li.classList.add('px-4', 'py-2', 'cursor-pointer', 'hover:bg-blue-400', 'transition-all');
-                    li.addEventListener('click', () => {
-                        if (type === 'firstName') {
-                            document.getElementById(`${type}Input`).value = suggestion.firstNameEnglish;
-                        } else if (type === 'lastName') {
-                            document.getElementById(`${type}Input`).value = suggestion.lastNameEnglish;
-                        }
-                        
-                        suggestionsList.innerHTML = '';  // Clear suggestions on selection
-                        suggestionsList.style.display = 'none';  // Hide the list
-                    });
-                    suggestionsList.appendChild(li);
-                });
+                suggestionsList.innerHTML = suggestions.map(suggestion => `
+                    <li class="px-4 py-2 cursor-pointer hover:bg-blue-400/10 transition-all"
+                        onclick="selectSuggestion('${type}', '${suggestion[type === 'firstName' ? 'firstNameEnglish' : 'lastNameEnglish']}')">
+                        ${suggestion[type === 'firstName' ? 'firstNameEnglish' : 'lastNameEnglish']} / 
+                        ${suggestion[type === 'firstName' ? 'firstNameHindi' : 'lastNameHindi']}
+                    </li>
+                `).join('');
+                suggestionsList.style.display = 'block';
             } else {
-                suggestionsList.innerHTML = '';  // Clear the list if no suggestions
-                suggestionsList.style.display = 'none';  // Hide the list
+                suggestionsList.style.display = 'none';
             }
         } catch (error) {
             console.error('Error fetching suggestions:', error);
-            suggestionsList.style.display = 'none';  // Hide the list if there's an error
+            suggestionsList.style.display = 'none';
         }
+    }
+
+    function selectSuggestion(type, value) {
+        document.getElementById(`${type}Input`).value = value;
+        document.getElementById(`${type}SuggestionsList`).style.display = 'none';
     }
 </script>

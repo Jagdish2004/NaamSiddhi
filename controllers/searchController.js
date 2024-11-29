@@ -3,6 +3,7 @@ const { getSoundex } = require('../utils/soundex');
 const { calculateMatchPercentage } = require('../utils/levenshtein');
 
 module.exports.searchRecord = (req, res) => {
+
     res.render('records/search.ejs', { profiles: null });
 };
 
@@ -10,8 +11,6 @@ module.exports.resultRecord = async (req, res) => {
     try {
         const searchCriteria = req.body;
         const query = {};
-
-      
         const firstName = searchCriteria.firstName || '';
         const lastName = searchCriteria.lastName || '';
 
@@ -87,7 +86,7 @@ module.exports.resultRecord = async (req, res) => {
        } else {
            // If no names provided, use other search criteria
            profiles = await Profile.find(query);
-        }
+        }
         const profilesWithMatches = profiles.map(profile => {
             let totalScore = 0;
             let totalFields = 0;
@@ -154,26 +153,117 @@ module.exports.resultRecord = async (req, res) => {
                 }
             }
 
-            // Calculate final match percentage
-            const matchPercentage = totalFields > 0 ? totalScore / totalFields : 0;
+            // Calculate address match if provided
+            if (parameterGroups.address.provided > 0 && cleanSearchCriteria.address) {
+                let addressScore = 0;
+                let addressFields = 0;
+
+                const addressFieldsList = ['location', 'city', 'district', 'state'];
+                addressFieldsList.forEach(field => {
+                    if (cleanSearchCriteria.address[field] && profile.address?.[`${field}English`]) {
+                        addressFields++;
+                        addressScore += calculateMatchPercentage(
+                            cleanSearchCriteria.address[field].toLowerCase(),
+                            profile.address[`${field}English`].toLowerCase()
+                        );
+                    }
+                });
+
+                if (addressFields > 0) {
+                    addressScore = addressScore / addressFields;
+                    totalScore += addressScore;
+                    totalFields++;
+                }
+            }
+
+            // Calculate basic info match if provided
+            if (parameterGroups.basic.provided > 0) {
+                let basicScore = 0;
+                let basicFields = 0;
+
+                if (cleanSearchCriteria.gender && profile.gender) {
+                    basicFields++;
+                    basicScore += profile.gender === cleanSearchCriteria.gender ? 100 : 0;
+                }
+
+                if (cleanSearchCriteria.dob && profile.dob) {
+                    basicFields++;
+                    basicScore += profile.dob.toISOString().split('T')[0] === cleanSearchCriteria.dob ? 100 : 0;
+                }
+
+                if (cleanSearchCriteria.occupation && profile.occupationEnglish) {
+                    basicFields++;
+                    basicScore += calculateMatchPercentage(
+                        cleanSearchCriteria.occupation.toLowerCase(),
+                        profile.occupationEnglish.toLowerCase()
+                    );
+                }
+
+                if (cleanSearchCriteria.mNumber && profile.mNumber) {
+                    basicFields++;
+                    basicScore += profile.mNumber === cleanSearchCriteria.mNumber ? 100 : 0;
+                }
+
+                if (basicFields > 0) {
+                    basicScore = basicScore / basicFields;
+                    totalScore += basicScore;
+                    totalFields++;
+                }
+            }
+
+            // Calculate the final match percentage as the average of all fields
+            let finalMatchPercentage = 0;
+            if (totalFields > 0) {
+                finalMatchPercentage = totalScore / totalFields;
+            }
+
+            // Ensure match percentage is within the 0-100% range
+            finalMatchPercentage = Math.min(finalMatchPercentage, 100).toFixed(2);
 
             return {
                 ...profile.toObject(),
-                matchPercentage
+                matchPercentage: finalMatchPercentage
             };
         });
 
-        // Sort by match percentage
-        profilesWithMatches.sort((a, b) => b.matchPercentage - a.matchPercentage);
+        // Filter and sort results based on match percentage (e.g., only show profiles with 50% or higher match)
+        const minMatchPercentage = 30;
+        const sortedProfiles = profilesWithMatches
+            .filter(profile => profile.matchPercentage >= minMatchPercentage)
+            .sort((a, b) => b.matchPercentage - a.matchPercentage);
 
-        res.render('records/results.ejs', { 
-            profiles: profilesWithMatches,
-            searchCriteria: cleanSearchCriteria,
-            parameterGroups
+        res.render('records/search.ejs', {
+            profiles: sortedProfiles,
+            searchParams: {
+                provided: providedParams,
+                total: Object.values(parameterGroups).reduce((acc, group) => acc + group.fields.length, 0)
+            }
         });
     } catch (error) {
-        console.error('Search error:', error);
-        req.flash('error', 'Search failed');
+        console.error('Error searching profiles:', error);
+        req.flash('error', 'An error occurred while searching profiles');
         res.redirect('/search');
+    }
+};
+
+module.exports.getSuggestions = async (req, res) => {
+    try {
+        const { type, query } = req.query;
+        if (!query || query.length < 2) {
+            return res.json([]);
+        }
+
+        let searchField = type === 'firstName' ? 'firstNameEnglish' : 'lastNameEnglish';
+        let searchQuery = {};
+        searchQuery[searchField] = new RegExp('^' + query, 'i');
+
+        const suggestions = await Profile.find(searchQuery)
+            .select('firstNameEnglish firstNameHindi lastNameEnglish lastNameHindi')
+            .limit(5);
+
+        res.json(suggestions);
+    } catch (error) {
+        console.error('Error getting suggestions:', error);
+        res.status(500).json({ error: 'Failed to get suggestions' });
     }
 };
