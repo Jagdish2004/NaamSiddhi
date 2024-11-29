@@ -3,6 +3,7 @@ const { getSoundex } = require('../utils/soundex');
 const { calculateMatchPercentage } = require('../utils/levenshtein');
 
 module.exports.searchRecord = (req, res) => {
+
     res.render('records/search.ejs', { profiles: null });
 };
 
@@ -10,6 +11,8 @@ module.exports.resultRecord = async (req, res) => {
     try {
         const searchCriteria = req.body;
         const query = {};
+        const firstName = searchCriteria.firstName || '';
+        const lastName = searchCriteria.lastName || '';
 
         // Clean search criteria to filter out empty or invalid values
         const cleanSearchCriteria = {
@@ -68,7 +71,22 @@ module.exports.resultRecord = async (req, res) => {
         });
 
         // Find all profiles and calculate match percentages
-        const profiles = await Profile.find({});
+       // Generate Soundex codes only if names are provided
+       let profiles = [];
+       if (firstName || lastName) {
+           const firstNameSoundex = firstName ? getSoundex(firstName, false, false) : null;
+           const lastNameSoundex = lastName ? getSoundex(lastName, false, false) : null;
+           
+           // Build query based on available Soundex codes
+           const soundexQuery = {};
+           if (firstNameSoundex) soundexQuery['soundexCode.firstName'] = firstNameSoundex;
+           if (lastNameSoundex) soundexQuery['soundexCode.lastName'] = lastNameSoundex;
+           
+           profiles = await Profile.find(soundexQuery);
+       } else {
+           // If no names provided, use other search criteria
+           profiles = await Profile.find(query);
+        }
         const profilesWithMatches = profiles.map(profile => {
             let totalScore = 0;
             let totalFields = 0;
