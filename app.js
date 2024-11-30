@@ -82,6 +82,30 @@ app.use((req, res, next) => {
     next();
 });
 
+// Add middleware to set path for all routes (Move this BEFORE routes)
+app.use((req, res, next) => {
+    res.locals.path = req.path;
+    next();
+});
+
+// API Routes
+app.use('/api/cases', apiCaseRoutes);
+app.use('/api/profiles', apiProfileRoutes);
+
+// Web Routes
+app.use("/", dashboardRoute);
+app.use("/search", searchRecord);
+app.use("/newrecord", newRecord);
+app.use("/record", recordRoutes);
+app.use('/cases', caseRoutes);
+app.use('/analytics', analyticsRoutes);
+app.use('/api/suggestions', suggestionRoutes);
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).render('404');
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err);
@@ -105,24 +129,6 @@ const dbURL = process.env.MONGO_URL;
 mongoose.connect(dbURL)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
-
-// API Routes
-app.use('/api/cases', apiCaseRoutes);
-app.use('/api/profiles', apiProfileRoutes);
-
-// Web Routes
-app.use("/", dashboardRoute);
-app.use("/search", searchRecord);
-app.use("/newrecord", newRecord);
-app.use("/record", recordRoutes);
-app.use('/cases', caseRoutes);
-app.use('/analytics', analyticsRoutes);
-app.use('/api/suggestions', suggestionRoutes);
-
-// 404 handler
-app.use((req, res) => {
-    res.status(404).render('404');
-});
 
 // Server startup
 const startServer = (port) => {
