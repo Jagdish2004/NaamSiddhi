@@ -197,6 +197,16 @@ router.post('/:profileId/cases', async (req, res) => {
             addedAt: new Date()
         });
 
+        // Add timeline entry to case
+        case_.timeline.push({
+            action: 'PROFILE_ADDED',
+            description: {
+                english: `Profile ${profile.firstNameEnglish} ${profile.lastNameEnglish} added as ${role}`,
+                hindi: `प्रोफ़ाइल ${profile.firstNameHindi || profile.firstNameEnglish} ${profile.lastNameHindi || profile.lastNameEnglish} को ${role} के रूप में जोड़ा गया`
+            },
+            date: new Date()
+        });
+
         // Save both documents
         await Promise.all([
             profile.save(),
@@ -226,19 +236,77 @@ router.delete('/:profileId/cases/:caseId', async (req, res) => {
     try {
         const { profileId, caseId } = req.params;
 
+        // Validate ObjectIds
+        if (!mongoose.Types.ObjectId.isValid(profileId) || !mongoose.Types.ObjectId.isValid(caseId)) {
+            return res.status(400).json({ error: 'Invalid profile or case ID' });
+        }
+
+        // Get both documents first
+        const profile = await Profile.findById(profileId);
+        const case_ = await Case.findById(caseId);
+
+        if (!profile || !case_) {
+            return res.status(404).json({ error: 'Profile or Case not found' });
+        }
+
+        // Remove case from profile
+        profile.cases = profile.cases.filter(c => c.case.toString() !== caseId);
+
+        // Remove profile from case
+        case_.profiles = case_.profiles.filter(p => p.profile.toString() !== profileId);
+
+        // Add timeline entry to case
+        case_.timeline.push({
+            action: 'PROFILE_REMOVED',
+            description: {
+                english: `Profile ${profile.firstNameEnglish} ${profile.lastNameEnglish} was unlinked from case`,
+                hindi: `प्रोफ़ाइल ${profile.firstNameHindi || profile.firstNameEnglish} ${profile.lastNameHindi || profile.lastNameEnglish} को केस से अनलिंक किया गया`
+            },
+            date: new Date()
+        });
+
+        // Save both documents
         await Promise.all([
-            Profile.findByIdAndUpdate(profileId, {
-                $pull: { cases: { case: caseId } }
-            }),
-            Case.findByIdAndUpdate(caseId, {
-                $pull: { profiles: { profile: profileId } }
-            })
+            profile.save(),
+            case_.save()
         ]);
 
-        res.json({ success: true });
+        // Return updated case data
+        return res.json({ 
+            success: true,
+            message: 'Profile unlinked successfully',
+            case: await Case.findById(caseId).populate('profiles.profile')
+        });
     } catch (error) {
         console.error('Error unlinking case:', error);
-        res.status(500).json({ error: 'Failed to unlink case' });
+        return res.status(500).json({ error: 'Failed to unlink case' });
+    }
+});
+
+// Add profile search route
+router.get('/search', async (req, res) => {
+    try {
+        const { q: query } = req.query;
+        
+        if (!query || query.length < 2) {
+            return res.json({ profiles: [] });
+        }
+
+        const profiles = await Profile.find({
+            $or: [
+                { firstNameEnglish: new RegExp(query, 'i') },
+                { lastNameEnglish: new RegExp(query, 'i') },
+                { firstNameHindi: new RegExp(query, 'i') },
+                { lastNameHindi: new RegExp(query, 'i') }
+            ]
+        })
+        .select('_id id firstNameEnglish lastNameEnglish firstNameHindi lastNameHindi')
+        .limit(10);
+
+        res.json({ profiles });
+    } catch (error) {
+        console.error('Search error:', error);
+        res.status(500).json({ error: 'Search failed' });
     }
 });
 

@@ -36,7 +36,7 @@
                 <div class="glass-effect p-6 rounded-lg mb-6">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-nasa text-blue-400">Connected Profiles</h2>
-                        <button onclick="showProfileModal()" 
+                        <button onclick="showProfileLinkModal()" 
                                 class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
                             + Add Profile
                         </button>
@@ -52,10 +52,16 @@
                                             </h3>
                                             <p class="text-sm text-gray-400">Role: <%= profile.role %></p>
                                         </div>
-                                        <a href="/record/<%= profile.profile._id %>" 
-                                           class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
-                                            View Profile
-                                        </a>
+                                        <div class="flex space-x-2">
+                                            <a href="/record/<%= profile.profile._id %>" 
+                                               class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
+                                                View Profile
+                                            </a>
+                                            <button onclick="unlinkProfile('<%= profile.profile._id %>')"
+                                                    class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1 rounded-md transition-all">
+                                                Unlink
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             <% }); %>
@@ -125,4 +131,180 @@
     </div>
 </div>
 
-<%- include('../partials/footer') %> 
+<%- include('../partials/footer') %>
+
+<!-- Add this modal for linking profiles -->
+<div id="profileLinkModal" class="fixed inset-0 bg-black/50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="glass-effect rounded-lg p-6 max-w-2xl w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-nasa text-blue-400">Link Profile</h2>
+                <button onclick="hideProfileLinkModal()" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="mb-6">
+                <input type="text" 
+                       id="profileSearch" 
+                       placeholder="Search profiles by name..."
+                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+            </div>
+
+            <div id="profileSearchResults" class="max-h-60 overflow-y-auto space-y-2">
+                <!-- Search results will appear here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this script at the bottom of the file -->
+<script>
+function showProfileLinkModal() {
+    document.getElementById('profileLinkModal').classList.remove('hidden');
+}
+
+function hideProfileLinkModal() {
+    document.getElementById('profileLinkModal').classList.add('hidden');
+}
+
+// Profile search functionality
+document.getElementById('profileSearch').addEventListener('input', async function(e) {
+    const searchTerm = e.target.value.trim();
+    const resultsDiv = document.getElementById('profileSearchResults');
+    
+    if (searchTerm.length < 2) {
+        resultsDiv.innerHTML = '';
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/profiles/search?q=${encodeURIComponent(searchTerm)}`);
+        if (!response.ok) throw new Error('Search failed');
+        
+        const data = await response.json();
+        
+        if (!data.profiles || data.profiles.length === 0) {
+            resultsDiv.innerHTML = `
+                <div class="text-center text-gray-400 py-4">
+                    <p>No profiles found</p>
+                </div>
+            `;
+            return;
+        }
+
+        resultsDiv.innerHTML = data.profiles.map(profile => `
+            <div class="glass-effect p-4 rounded-lg flex justify-between items-center mb-2">
+                <div>
+                    <p class="text-white font-medium">${profile.firstNameEnglish} ${profile.lastNameEnglish}</p>
+                    <p class="text-sm text-gray-400">ID: ${profile.id}</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <select id="role-${profile._id}" 
+                            class="bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-1 text-gray-100 text-sm">
+                        <option value="accused">Accused</option>
+                        <option value="victim">Victim</option>
+                        <option value="witness">Witness</option>
+                        <option value="complainant">Complainant</option>
+                    </select>
+                    <button onclick="linkProfile('${profile._id}')"
+                            id="link-button-${profile._id}"
+                            class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
+                        Link
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Search error:', error);
+        resultsDiv.innerHTML = `
+            <div class="text-center text-red-400 py-4">
+                <p>Error searching profiles: ${error.message}</p>
+            </div>
+        `;
+    }
+});
+
+async function linkProfile(profileId) {
+    try {
+        const role = document.getElementById(`role-${profileId}`).value;
+        const caseId = '<%= caseData._id %>';
+
+        console.log('Attempting to link profile:', { profileId, caseId, role });
+
+        const button = document.getElementById(`link-button-${profileId}`);
+        if (button) {
+            button.textContent = 'Linking...';
+            button.disabled = true;
+        }
+
+        const response = await fetch(`/api/cases/${caseId}/profiles`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                profileId: profileId,
+                role: role 
+            })
+        });
+
+        const data = await response.json();
+        console.log('Link response:', data);
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to link profile');
+        }
+
+        showNotification('Profile linked successfully', 'success');
+        hideProfileLinkModal();
+        setTimeout(() => window.location.reload(), 1000);
+    } catch (error) {
+        console.error('Error linking profile:', error);
+        showNotification(error.message || 'Failed to link profile', 'error');
+    } finally {
+        const button = document.getElementById(`link-button-${profileId}`);
+        if (button) {
+            button.textContent = 'Link';
+            button.disabled = false;
+        }
+    }
+}
+
+async function unlinkProfile(profileId) {
+    if (!confirm('Are you sure you want to unlink this profile?')) {
+        return;
+    }
+
+    try {
+        const caseId = '<%= caseData._id %>';
+        console.log('Attempting to unlink:', { profileId, caseId });
+
+        const response = await fetch(`/api/cases/${caseId}/profiles/${profileId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+        console.log('Unlink response:', data);
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to unlink profile');
+        }
+
+        showNotification('Profile unlinked successfully', 'success');
+        
+        // Force a hard reload to ensure fresh data
+        window.location.href = window.location.href;
+    } catch (error) {
+        console.error('Error unlinking profile:', error);
+        showNotification(error.message || 'Failed to unlink profile', 'error');
+    }
+}
+</script> 

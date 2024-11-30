@@ -58,7 +58,7 @@ const caseSchema = new Schema({
     },
     profiles: [{
         profile: {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'Profile'
         },
         role: {

@@ -147,17 +147,21 @@ module.exports.createCase = async (req, res) => {
 
 module.exports.viewCase = async (req, res) => {
     try {
+        // Force fresh data by disabling cache
         const case_ = await Case.findById(req.params.id)
             .populate({
                 path: 'profiles.profile',
-                select: '_id id firstNameEnglish lastNameEnglish firstNameHindi lastNameHindi role'
-            });
+                select: '_id firstNameEnglish lastNameEnglish firstNameHindi lastNameHindi role'
+            })
+            .lean(); // Use lean() for better performance
         
         if (!case_) {
             req.flash('error', 'Case not found');
             return res.redirect('/');
         }
         
+        // Add cache control headers
+        res.set('Cache-Control', 'no-store');
         res.render('cases/show', { caseData: case_ });
     } catch (error) {
         console.error('Error viewing case:', error);

@@ -440,20 +440,32 @@
         async function unlinkCase(caseId) {
             if (!confirm('Are you sure you want to unlink this case?')) return;
 
-            const profileId = '<%= record._id %>';
-
             try {
-                const response = await fetch(`/api/profiles/${profileId}/cases/${caseId}`, {
-                    method: 'DELETE'
+                const profileId = '<%= record._id %>';
+                console.log('Attempting to unlink case:', { caseId, profileId });
+
+                const response = await fetch(`/api/cases/${caseId}/profiles/${profileId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
                 });
 
-                if (!response.ok) throw new Error('Failed to unlink case');
+                const data = await response.json();
+                console.log('Unlink response:', data);
 
-                // Refresh the page to show updated links
-                window.location.reload();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to unlink case');
+                }
+
+                showNotification('Case unlinked successfully', 'success');
+                
+                // Force a hard reload to ensure fresh data
+                window.location.href = window.location.href;
             } catch (error) {
                 console.error('Error unlinking case:', error);
-                showNotification('Failed to unlink case', 'error');
+                showNotification(error.message || 'Failed to unlink case', 'error');
             }
         }
 
@@ -471,6 +483,38 @@
             setTimeout(() => {
                 notification.remove();
             }, 3000);
+        }
+
+        async function unlinkProfile(profileId) {
+            if (!confirm('Are you sure you want to unlink this profile?')) {
+                return;
+            }
+
+            try {
+                const caseId = '<%= record._id %>';
+                const response = await fetch(`/api/profiles/${profileId}/cases/${caseId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                console.log('Unlink response:', data);
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to unlink profile');
+                }
+
+                showNotification('Profile unlinked successfully', 'success');
+                
+                // Force reload the page to show updated data
+                window.location.href = window.location.href;
+            } catch (error) {
+                console.error('Error unlinking profile:', error);
+                showNotification(error.message || 'Failed to unlink profile', 'error');
+            }
         }
         </script>
     </div>

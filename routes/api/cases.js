@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Case = require('../../models/caseSchema');
+const Profile = require('../../models/profileSchema');
 const mongoose = require('mongoose');
 
 // Search route must come BEFORE any routes with :id parameter
@@ -141,49 +142,73 @@ router.patch('/cases/:id/status', async (req, res) => {
 });
 
 // Add profile to case
-router.post('/cases/:id/profiles', async (req, res) => {
+router.post('/:caseId/profiles', async (req, res) => {
     try {
         const { profileId, role } = req.body;
-        const case_ = await Case.findById(req.params.id);
+        const { caseId } = req.params;
 
-        if (!case_) {
-            return res.status(404).json({ error: 'Case not found' });
+        console.log('Linking profile:', { profileId, caseId, role });
+
+        // Validate IDs
+        if (!mongoose.Types.ObjectId.isValid(caseId) || !mongoose.Types.ObjectId.isValid(profileId)) {
+            return res.status(400).json({ error: 'Invalid case or profile ID' });
         }
 
-        // Check if profile is already connected
+        const case_ = await Case.findById(caseId);
+        const profile = await Profile.findById(profileId);
+
+        if (!case_ || !profile) {
+            return res.status(404).json({ error: 'Case or Profile not found' });
+        }
+
+        // Check if already linked
         if (case_.profiles.some(p => p.profile.toString() === profileId)) {
             return res.status(400).json({ error: 'Profile already connected to this case' });
         }
 
+        // Add profile to case
         case_.profiles.push({
             profile: profileId,
-            role
+            role,
+            addedAt: new Date()
         });
 
+        // Add timeline entry with profile name
         case_.timeline.push({
             action: 'PROFILE_ADDED',
             description: {
-                english: `New profile added with role: ${role}`,
-                hindi: `नई प्रोफ़ाइल जोड़ी गई, भूमिका: ${role}`
-            }
+                english: `Profile ${profile.firstNameEnglish} ${profile.lastNameEnglish} added as ${role}`,
+                hindi: `प्रोफ़ाइल ${profile.firstNameHindi || profile.firstNameEnglish} ${profile.lastNameHindi || profile.lastNameEnglish} को ${role} के रूप में जोड़ा गया`
+            },
+            date: new Date()
         });
 
-        await case_.save();
-
-        // Update profile's cases array
-        await Profile.findByIdAndUpdate(profileId, {
-            $push: {
-                cases: {
-                    case: case_._id,
-                    role
-                }
-            }
+        // Add case to profile
+        profile.cases.push({
+            case: caseId,
+            role,
+            addedAt: new Date()
         });
 
-        res.json(case_);
+        // Save both documents
+        await Promise.all([
+            case_.save(),
+            profile.save()
+        ]);
+
+        console.log('Successfully linked profile to case');
+
+        return res.json({
+            success: true,
+            message: 'Profile linked successfully',
+            case: case_
+        });
     } catch (error) {
-        console.error('Error adding profile to case:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Error linking profile:', error);
+        return res.status(500).json({ 
+            success: false,
+            error: 'Failed to link profile: ' + error.message 
+        });
     }
 });
 
@@ -216,6 +241,88 @@ router.post('/cases/:id/evidence', async (req, res) => {
     } catch (error) {
         console.error('Error adding evidence:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Unlink profile route
+router.delete('/:caseId/profiles/:profileId', async (req, res) => {
+    try {
+        const { caseId, profileId } = req.params;
+        console.log('Unlink request received:', { caseId, profileId });
+
+        // Validate ObjectIds
+        if (!mongoose.Types.ObjectId.isValid(caseId) || !mongoose.Types.ObjectId.isValid(profileId)) {
+            return res.status(400).json({ error: 'Invalid case or profile ID' });
+        }
+
+        // Get both documents first
+        const case_ = await Case.findById(caseId);
+        const profile = await Profile.findById(profileId);
+
+        if (!case_ || !profile) {
+            return res.status(404).json({ error: 'Case or Profile not found' });
+        }
+
+        console.log('Before removal - Case profiles:', case_.profiles.length);
+
+        // First add timeline entry
+        case_.timeline.push({
+            action: 'PROFILE_REMOVED',
+            description: {
+                english: `Profile ${profile.firstNameEnglish} ${profile.lastNameEnglish} was unlinked from case`,
+                hindi: `प्रोफ़ाइल ${profile.firstNameHindi || profile.firstNameEnglish} ${profile.lastNameHindi || profile.lastNameEnglish} को केस से अनलिंक किया गया`
+            },
+            date: new Date()
+        });
+
+        // Save timeline update
+        await case_.save();
+
+        // Then remove profile from case using atomic operation
+        const updatedCase = await Case.findByIdAndUpdate(
+            caseId,
+            {
+                $pull: { 
+                    profiles: { profile: profileId } 
+                }
+            },
+            { 
+                new: true, // Return updated document
+                runValidators: true // Run schema validations
+            }
+        ).populate('profiles.profile', 'firstNameEnglish lastNameEnglish');
+
+        // Remove case from profile using atomic operation
+        await Profile.findByIdAndUpdate(
+            profileId,
+            {
+                $pull: { 
+                    cases: { case: caseId } 
+                }
+            },
+            {
+                runValidators: true
+            }
+        );
+
+        console.log('After removal - Case profiles:', updatedCase.profiles.length);
+
+        // Fetch the final updated case to ensure we have the latest data
+        const finalCase = await Case.findById(caseId)
+            .populate('profiles.profile', 'firstNameEnglish lastNameEnglish');
+
+        // Return the updated case data
+        return res.json({
+            success: true,
+            message: 'Profile unlinked successfully',
+            case: finalCase
+        });
+    } catch (error) {
+        console.error('Error unlinking profile:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Failed to unlink profile: ' + error.message
+        });
     }
 });
 
