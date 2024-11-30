@@ -245,3 +245,25 @@ module.exports.resultRecord = async (req, res) => {
         res.redirect('/search');
     }
 };
+
+module.exports.getSuggestions = async (req, res) => {
+    try {
+        const { type, query } = req.query;
+        if (!query || query.length < 2) {
+            return res.json([]);
+        }
+
+        let searchField = type === 'firstName' ? 'firstNameEnglish' : 'lastNameEnglish';
+        let searchQuery = {};
+        searchQuery[searchField] = new RegExp('^' + query, 'i');
+
+        const suggestions = await Profile.find(searchQuery)
+            .select('firstNameEnglish firstNameHindi lastNameEnglish lastNameHindi')
+            .limit(5);
+
+        res.json(suggestions);
+    } catch (error) {
+        console.error('Error getting suggestions:', error);
+        res.status(500).json({ error: 'Failed to get suggestions' });
+    }
+};

@@ -292,3 +292,39 @@ module.exports.deleteRecord = async (req, res) => {
         res.redirect('/');
     }
 };
+
+// Add this new method
+module.exports.createProfileForCase = async (req, res) => {
+    try {
+        const { caseId } = req.params;
+        const profileData = req.body;
+
+        // Create and save the profile
+        const profile = new Profile({
+            // ... existing profile fields
+            cases: [{
+                case: caseId,
+                role: profileData.role
+            }]
+        });
+
+        const savedProfile = await profile.save();
+
+        // Update the case with the new profile
+        await Case.findByIdAndUpdate(caseId, {
+            $push: {
+                profiles: {
+                    profile: savedProfile._id,
+                    role: profileData.role
+                }
+            }
+        });
+
+        req.flash('success', 'Profile created and attached to case');
+        res.redirect(`/cases/new?profileAdded=${savedProfile._id}`);
+    } catch (error) {
+        console.error('Error creating profile:', error);
+        req.flash('error', 'Failed to create profile');
+        res.redirect(`/cases/new`);
+    }
+};

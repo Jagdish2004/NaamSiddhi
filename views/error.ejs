@@ -1,0 +1,40 @@
+<% layout('./layout/boilerplate') -%>
+
+<div class="pt-20">
+    <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto text-center">
+        <div class="mb-8">
+            <svg class="w-24 h-24 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+        </div>
+
+        <h1 class="text-3xl font-nasa text-red-400 mb-4">
+            Error <%= err.statusCode || 500 %>
+        </h1>
+
+        <p class="text-gray-300 mb-8">
+            <%= err.message %>
+        </p>
+
+        <div class="space-y-4">
+            <% if (process.env.NODE_ENV !== 'production') { %>
+                <pre class="text-left bg-space-dark/50 p-4 rounded-lg overflow-x-auto text-sm text-gray-400">
+                    <%= err.stack %>
+                </pre>
+            <% } %>
+
+            <div class="space-x-4">
+                <button onclick="history.back()" 
+                        class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-6 py-3 rounded-md transition-all">
+                    Go Back
+                </button>
+
+                <a href="/" 
+                   class="inline-block bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-6 py-3 rounded-md transition-all">
+                    Home Page
+                </a>
+            </div>
+        </div>
+    </div>
+</div> 
