@@ -147,15 +147,18 @@ module.exports.createCase = async (req, res) => {
 
 module.exports.viewCase = async (req, res) => {
     try {
-        const caseData = await Case.findById(req.params.id)
-            .populate('profiles.profile');
+        const case_ = await Case.findById(req.params.id)
+            .populate({
+                path: 'profiles.profile',
+                select: '_id id firstNameEnglish lastNameEnglish firstNameHindi lastNameHindi role'
+            });
         
-        if (!caseData) {
+        if (!case_) {
             req.flash('error', 'Case not found');
             return res.redirect('/');
         }
         
-        res.render('cases/show', { caseData });
+        res.render('cases/show', { caseData: case_ });
     } catch (error) {
         console.error('Error viewing case:', error);
         req.flash('error', 'Failed to load case');
@@ -228,47 +231,28 @@ module.exports.handleFormSubmission = async (req, res) => {
 
 module.exports.searchCases = async (req, res) => {
     try {
-        const {
-            query,
-            caseType,
-            status,
-            dateFrom,
-            dateTo,
-            district,
-            priority
-        } = req.query;
-
+        const { q: query, caseType, status, priority } = req.query;
+        
         let searchQuery = {};
 
-        // Build search query
         if (query) {
             searchQuery.$or = [
                 { caseNumber: new RegExp(query, 'i') },
                 { 'description.english': new RegExp(query, 'i') },
-                { 'reporter.name.english': new RegExp(query, 'i') },
                 { 'location.district.english': new RegExp(query, 'i') }
             ];
         }
 
-        // Apply filters
         if (caseType) searchQuery.caseType = caseType;
         if (status) searchQuery.status = status;
         if (priority) searchQuery.priority = priority;
-        if (district) searchQuery['location.district.english'] = new RegExp(district, 'i');
-
-        // Date range filter
-        if (dateFrom || dateTo) {
-            searchQuery.createdAt = {};
-            if (dateFrom) searchQuery.createdAt.$gte = new Date(dateFrom);
-            if (dateTo) searchQuery.createdAt.$lte = new Date(dateTo);
-        }
 
         const cases = await Case.find(searchQuery)
+            .select('_id caseNumber caseType status location description profiles')
             .populate('profiles.profile', 'firstNameEnglish lastNameEnglish')
             .sort('-createdAt')
-            .limit(50);
+            .limit(10);
 
-        console.log('Search results:', cases.length); // Debug log
         res.json({ cases });
     } catch (error) {
         console.error('Search error:', error);
@@ -277,10 +261,7 @@ module.exports.searchCases = async (req, res) => {
 };
 
 module.exports.renderSearchPage = (req, res) => {
-    res.render('cases/search', { 
-        title: 'Search Cases',
-        currentUser: req.session.user 
-    });
+    res.render('cases/search', { title: 'Search Cases' });
 };
 
 module.exports.addProfileToCase = async (req, res) => {

@@ -1,6 +1,70 @@
 const express = require('express');
 const router = express.Router();
 const Case = require('../../models/caseSchema');
+const mongoose = require('mongoose');
+
+// Search route must come BEFORE any routes with :id parameter
+router.get('/search', async (req, res) => {
+    try {
+        const { q: query, caseType, status, priority } = req.query;
+        
+        let searchQuery = {};
+
+        // Build search query for case number or description
+        if (query) {
+            searchQuery.$or = [
+                { caseNumber: new RegExp(query, 'i') },
+                { 'description.english': new RegExp(query, 'i') },
+                { 'location.district.english': new RegExp(query, 'i') }
+            ];
+        }
+
+        if (caseType) searchQuery.caseType = caseType;
+        if (status) searchQuery.status = status;
+        if (priority) searchQuery.priority = priority;
+
+        console.log('Search Query:', searchQuery); // Debug log
+
+        const cases = await Case.find(searchQuery)
+            .select('_id caseNumber caseType status location description profiles')
+            .populate('profiles.profile', 'firstNameEnglish lastNameEnglish')
+            .sort('-createdAt')
+            .limit(10);
+
+        console.log('Found Cases:', cases.length, 'cases'); // Debug log
+        res.json({ cases });
+    } catch (error) {
+        console.error('Search error:', error);
+        res.status(500).json({ error: 'Search failed' });
+    }
+});
+
+// Get case by ID - Add ObjectId validation
+router.get('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid case ID format' });
+        }
+
+        const case_ = await Case.findById(id)
+            .select('_id caseNumber caseType status location description profiles')
+            .populate('profiles.profile', 'firstNameEnglish lastNameEnglish');
+
+        if (!case_) {
+            return res.status(404).json({ error: 'Case not found' });
+        }
+
+        return res.json({
+            success: true,
+            case: case_
+        });
+    } catch (error) {
+        console.error('Error fetching case:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // Get all cases with pagination and filters
 router.get('/cases', async (req, res) => {
@@ -45,24 +109,6 @@ router.get('/cases', async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching cases:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// Get case by ID
-router.get('/cases/:id', async (req, res) => {
-    try {
-        const case_ = await Case.findById(req.params.id)
-            .populate('profiles.profile')
-            .populate('assignedOfficers.officer');
-
-        if (!case_) {
-            return res.status(404).json({ error: 'Case not found' });
-        }
-
-        res.json(case_);
-    } catch (error) {
-        console.error('Error fetching case:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

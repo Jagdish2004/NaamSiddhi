@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Profile = require('../../models/profileSchema');
+const Case = require('../../models/caseSchema');
+const mongoose = require('mongoose');
 
 // Get all profiles (with pagination)
 router.get('/profiles', async (req, res) => {
@@ -152,6 +154,91 @@ router.get('/suggestions', async (req, res) => {
     } catch (error) {
         console.error('Error getting suggestions:', error);
         res.status(500).json({ error: 'Failed to get suggestions' });
+    }
+});
+
+// Add case to profile
+router.post('/:profileId/cases', async (req, res) => {
+    try {
+        const { profileId } = req.params;
+        const { caseId, role } = req.body;
+
+        console.log('Received link request:', { profileId, caseId, role });
+
+        // Validate ObjectIds
+        if (!mongoose.Types.ObjectId.isValid(profileId) || !mongoose.Types.ObjectId.isValid(caseId)) {
+            return res.status(400).json({ error: 'Invalid profile or case ID' });
+        }
+
+        const profile = await Profile.findById(profileId);
+        const case_ = await Case.findById(caseId);
+
+        if (!profile || !case_) {
+            return res.status(404).json({ error: 'Profile or Case not found' });
+        }
+
+        // Check if already linked
+        const isAlreadyLinked = profile.cases.some(c => c.case?.toString() === caseId);
+        if (isAlreadyLinked) {
+            return res.status(400).json({ error: 'Case already linked to this profile' });
+        }
+
+        // Add case to profile
+        profile.cases.push({
+            case: caseId,
+            role,
+            addedAt: new Date()
+        });
+
+        // Add profile to case
+        case_.profiles.push({
+            profile: profileId,
+            role,
+            addedAt: new Date()
+        });
+
+        // Save both documents
+        await Promise.all([
+            profile.save(),
+            case_.save()
+        ]);
+
+        console.log('Successfully linked case to profile');
+
+        return res.json({
+            success: true,
+            message: 'Case linked successfully',
+            profile: profile._id,
+            case: case_._id
+        });
+
+    } catch (error) {
+        console.error('Error linking case:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Failed to link case: ' + error.message
+        });
+    }
+});
+
+// Remove case from profile
+router.delete('/:profileId/cases/:caseId', async (req, res) => {
+    try {
+        const { profileId, caseId } = req.params;
+
+        await Promise.all([
+            Profile.findByIdAndUpdate(profileId, {
+                $pull: { cases: { case: caseId } }
+            }),
+            Case.findByIdAndUpdate(caseId, {
+                $pull: { profiles: { profile: profileId } }
+            })
+        ]);
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error unlinking case:', error);
+        res.status(500).json({ error: 'Failed to unlink case' });
     }
 });
 

@@ -175,13 +175,20 @@ module.exports.submitRecord = async (req, res) => {
 // View a specific record
 module.exports.viewRecord = async (req, res) => {
     try {
-        const record = await Profile.findOne({ id: req.params.id });
+        const record = await Profile.findOne({ id: req.params.id })
+            .populate({
+                path: 'cases.case',
+                select: 'caseNumber status description location'
+            });
+
         if (!record) {
             req.flash('error', 'Record not found');
             return res.redirect('/');
         }
+
         res.render('records/view', { record });
     } catch (error) {
+        console.error('Error viewing record:', error);
         req.flash('error', 'Error viewing record');
         res.redirect('/');
     }

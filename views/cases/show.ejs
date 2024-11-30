@@ -42,23 +42,24 @@
                         </button>
                     </div>
                     <div class="divide-y divide-blue-400/20">
-                        <% caseData.profiles.forEach(profile => { %>
-                            <div class="py-4">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <h3 class="font-medium text-white">
-                                            <%= profile.profile.firstNameEnglish %> <%= profile.profile.lastNameEnglish %>
-                                        </h3>
-                                        <p class="text-sm text-gray-400">Role: <%= profile.role %></p>
+                        <% if (caseData.profiles && caseData.profiles.length > 0) { %>
+                            <% caseData.profiles.forEach(profile => { %>
+                                <div class="py-4">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <h3 class="font-medium text-white">
+                                                <%= profile.profile.firstNameEnglish %> <%= profile.profile.lastNameEnglish %>
+                                            </h3>
+                                            <p class="text-sm text-gray-400">Role: <%= profile.role %></p>
+                                        </div>
+                                        <a href="/record/<%= profile.profile._id %>" 
+                                           class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
+                                            View Profile
+                                        </a>
                                     </div>
-                                    <a href="/record/<%= profile.profile._id %>" 
-                                       class="text-blue-400 hover:text-blue-300 transition-colors">
-                                        View Profile
-                                    </a>
                                 </div>
-                            </div>
-                        <% }) %>
-                        <% if (caseData.profiles.length === 0) { %>
+                            <% }); %>
+                        <% } else { %>
                             <p class="text-gray-400 py-4">No profiles connected to this case</p>
                         <% } %>
                     </div>

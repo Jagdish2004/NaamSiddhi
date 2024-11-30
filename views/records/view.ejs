@@ -228,5 +228,250 @@
                 </div>
             </div>
         <% } %>
+
+        <!-- Add this section where you want to show connected cases -->
+        <div class="space-y-6 mb-8">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-nasa text-blue-400/80">Connected Cases</h2>
+                <button onclick="showCaseLinkModal()" 
+                        class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all">
+                    + Link Case
+                </button>
+            </div>
+            
+            <div id="connectedCases" class="space-y-4">
+                <% if (record.cases && record.cases.length > 0) { %>
+                    <% record.cases.forEach(caseLink => { %>
+                        <div class="glass-effect p-4 rounded-lg flex justify-between items-center">
+                            <div>
+                                <p class="text-white">Case #<%= caseLink.case.caseNumber %></p>
+                                <p class="text-sm text-gray-400">Role: <%= caseLink.role %></p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <a href="/cases/<%= caseLink.case._id %>" 
+                                   class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
+                                    View Case
+                                </a>
+                                <button onclick="unlinkCase('<%= caseLink.case._id %>')"
+                                        class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1 rounded-md transition-all">
+                                    Unlink
+                                </button>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="text-gray-400 text-center py-4">
+                        No cases linked to this profile
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Case Link Modal -->
+        <div id="caseLinkModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+            <div class="flex items-center justify-center min-h-screen px-4">
+                <div class="glass-effect rounded-lg p-8 max-w-2xl w-full">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-nasa text-blue-400">Link Case to Profile</h3>
+                        <button onclick="hideCaseLinkModal()" class="text-gray-400 hover:text-gray-200">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="mb-6">
+                        <input type="text" 
+                               id="caseSearch" 
+                               placeholder="Search by case number..."
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+
+                    <div id="caseSearchResults" class="max-h-60 overflow-y-auto space-y-2">
+                        <!-- Search results will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        // Add these functions to handle case linking
+        function showCaseLinkModal() {
+            document.getElementById('caseLinkModal').classList.remove('hidden');
+        }
+
+        function hideCaseLinkModal() {
+            document.getElementById('caseLinkModal').classList.add('hidden');
+        }
+
+        // Update the displayResults function
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('caseSearchResults');
+            
+            console.log('Displaying results:', results); // Debug log
+
+            if (!results.cases || results.cases.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <p>No cases found matching your search criteria</p>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsDiv.innerHTML = results.cases.map(case_ => `
+                <div class="glass-effect p-4 rounded-lg flex justify-between items-center mb-2">
+                    <div>
+                        <p class="text-white font-medium">Case #${case_.caseNumber || 'N/A'}</p>
+                        <p class="text-sm text-gray-400">${case_.caseType || 'N/A'} - ${case_.status || 'N/A'}</p>
+                        <p class="text-sm text-gray-400">${case_.location?.district?.english || 'Location not specified'}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <select id="role-${case_._id}" 
+                                class="bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-1 text-gray-100 text-sm">
+                            <option value="accused">Accused</option>
+                            <option value="victim">Victim</option>
+                            <option value="witness">Witness</option>
+                            <option value="complainant">Complainant</option>
+                        </select>
+                        <button onclick="linkCase('${case_._id}')"
+                                id="link-button-${case_._id}"
+                                class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
+                            Link
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update the case search functionality
+        document.getElementById('caseSearch').addEventListener('input', async function(e) {
+            const searchTerm = e.target.value.trim();
+            const resultsDiv = document.getElementById('caseSearchResults');
+            
+            if (searchTerm.length < 1) {
+                resultsDiv.innerHTML = '';
+                return;
+            }
+
+            try {
+                console.log('Searching for:', searchTerm);
+                const response = await fetch(`/api/cases/search?q=${encodeURIComponent(searchTerm)}`);
+                if (!response.ok) throw new Error('Search failed');
+                
+                const data = await response.json();
+                console.log('Search response:', data);
+
+                displayResults(data);
+            } catch (error) {
+                console.error('Search error:', error);
+                resultsDiv.innerHTML = `
+                    <div class="text-center text-red-400 py-8">
+                        <p>Error searching cases: ${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+
+        async function linkCase(caseId) {
+            try {
+                const role = document.getElementById(`role-${caseId}`).value;
+                const profileId = '<%= record._id %>';
+
+                console.log('Attempting to link case:', { caseId, profileId, role });
+
+                // Show loading state
+                const button = document.getElementById(`link-button-${caseId}`);
+                if (button) {
+                    button.textContent = 'Linking...';
+                    button.disabled = true;
+                }
+
+                // First check if the case exists
+                const checkResponse = await fetch(`/api/cases/${caseId}`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!checkResponse.ok) {
+                    const checkData = await checkResponse.json();
+                    throw new Error(checkData.error || 'Case not found');
+                }
+
+                // Proceed with linking
+                const response = await fetch(`/api/profiles/${profileId}/cases`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ caseId, role })
+                });
+
+                const data = await response.json();
+                console.log('Link response:', data);
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to link case');
+                }
+
+                showNotification('Case linked successfully', 'success');
+                
+                // Hide modal and refresh after delay
+                if (typeof hideCaseLinkModal === 'function') {
+                    hideCaseLinkModal();
+                }
+                setTimeout(() => window.location.reload(), 1000);
+
+            } catch (error) {
+                console.error('Error linking case:', error);
+                showNotification(error.message || 'Failed to link case', 'error');
+            } finally {
+                // Reset button state
+                const button = document.getElementById(`link-button-${caseId}`);
+                if (button) {
+                    button.textContent = 'Link';
+                    button.disabled = false;
+                }
+            }
+        }
+
+        async function unlinkCase(caseId) {
+            if (!confirm('Are you sure you want to unlink this case?')) return;
+
+            const profileId = '<%= record._id %>';
+
+            try {
+                const response = await fetch(`/api/profiles/${profileId}/cases/${caseId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Failed to unlink case');
+
+                // Refresh the page to show updated links
+                window.location.reload();
+            } catch (error) {
+                console.error('Error unlinking case:', error);
+                showNotification('Failed to unlink case', 'error');
+            }
+        }
+
+        // Add this notification function if not already present
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+            }`;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        </script>
     </div>
 </div> 

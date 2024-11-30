@@ -72,10 +72,31 @@ app.use((req, res, next) => {
     next();
 });
 
+// Add this before your routes
+app.use((req, res, next) => {
+    // Add helper method to send JSON responses
+    res.sendJsonResponse = function(data, status = 200) {
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(status).json(data);
+    };
+    next();
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err);
-    req.flash('error', err.message || 'Something went wrong!');
+
+    // Check if request expects JSON
+    if (req.xhr || req.headers.accept.includes('application/json')) {
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(500).json({
+            success: false,
+            error: err.message || 'Internal server error'
+        });
+    }
+
+    // For non-JSON requests
+    req.flash('error', err.message || 'Something went wrong');
     res.redirect('back');
 });
 
@@ -86,8 +107,8 @@ mongoose.connect(dbURL)
     .catch(err => console.error('MongoDB connection error:', err));
 
 // API Routes
-app.use('/api', apiProfileRoutes);
-app.use('/api', apiCaseRoutes);
+app.use('/api/cases', apiCaseRoutes);
+app.use('/api/profiles', apiProfileRoutes);
 
 // Web Routes
 app.use("/", dashboardRoute);

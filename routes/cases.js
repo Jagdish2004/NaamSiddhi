@@ -2,23 +2,17 @@ const express = require('express');
 const router = express.Router();
 const caseController = require('../controllers/caseController');
 
-// Search routes (place these before /:id route to avoid conflicts)
+// Important: Order matters! Put static routes before dynamic routes
 router.get('/search', caseController.renderSearchPage);
-router.get('/api/search', caseController.searchCases);
-
-// Route to show the form for creating a new case
 router.get('/new', caseController.renderNewCaseForm);
-
-// Route to handle the creation of a new case
 router.post('/', caseController.handleFormSubmission);
 
-// Route to view a case
-router.get('/:id', caseController.viewCase);
+// API routes for search
+router.get('/api/search', caseController.searchCases);
 
-// Route to add a profile to a case
+// Dynamic routes with parameters should come last
+router.get('/:id([0-9a-fA-F]{24})', caseController.viewCase);
 router.post('/:caseId/profiles', caseController.addProfileToCase);
-
-// Route to remove a profile from a case
 router.delete('/:caseId/profiles/:profileId', caseController.removeProfileFromCase);
 
 module.exports = router; 

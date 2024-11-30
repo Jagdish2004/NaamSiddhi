@@ -267,3 +267,31 @@ module.exports.getSuggestions = async (req, res) => {
         res.status(500).json({ error: 'Failed to get suggestions' });
     }
 };
+
+module.exports.searchCases = async (req, res) => {
+    try {
+        const { query } = req.query;
+        
+        let searchQuery = {};
+        if (query) {
+            searchQuery.$or = [
+                { caseNumber: new RegExp(query, 'i') },
+                { 'description.english': new RegExp(query, 'i') },
+                { 'location.district.english': new RegExp(query, 'i') }
+            ];
+        }
+
+        const cases = await Case.find(searchQuery)
+            .select('_id caseNumber caseType status location description')
+            .sort('-createdAt')
+            .limit(10);
+
+        // Ensure proper JSON response
+        res.setHeader('Content-Type', 'application/json');
+        return res.json({ cases });
+    } catch (error) {
+        console.error('Search error:', error);
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(500).json({ error: 'Search failed' });
+    }
+};

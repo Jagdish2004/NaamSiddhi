@@ -59,17 +59,11 @@ const caseSchema = new Schema({
     profiles: [{
         profile: {
             type: Schema.Types.ObjectId,
-            ref: 'Profile',
-            required: true
+            ref: 'Profile'
         },
         role: {
             type: String,
-            enum: ['accused', 'victim', 'witness', 'complainant'],
-            required: true
-        },
-        statement: {
-            english: String,
-            hindi: String
+            enum: ['accused', 'victim', 'witness', 'complainant']
         },
         addedAt: {
             type: Date,
@@ -158,7 +152,19 @@ const caseSchema = new Schema({
     timestamps: true
 });
 
-// Auto-generate case number
+// Update the pre-find middleware to only populate profiles
+caseSchema.pre('find', function(next) {
+    this.populate('profiles.profile', 'firstNameEnglish lastNameEnglish');
+    next();
+});
+
+// Add a pre-findOne middleware as well
+caseSchema.pre('findOne', function(next) {
+    this.populate('profiles.profile', 'firstNameEnglish lastNameEnglish');
+    next();
+});
+
+// Update the pre-save middleware
 caseSchema.pre('save', async function(next) {
     try {
         if (this.isNew && !this.caseNumber) {
