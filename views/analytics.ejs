@@ -92,14 +92,15 @@
 
     // Monthly Trend Chart
     new Chart(document.getElementById('monthlyChart'), {
-        type: 'line',
+        type: 'bar',
         data: {
-            labels: monthlyData.map(d => `${d._id.month}/${d._id.year}`),
+            labels: monthlyData.map(d => d.monthLabel),
             datasets: [{
                 label: 'Records',
                 data: monthlyData.map(d => d.count),
-                borderColor: '#60A5FA',
-                tension: 0.4
+                backgroundColor: '#60A5FA',
+                barThickness: 30,  // Adjusted to match locations graph
+                maxBarThickness: 35  // Adjusted maximum width
             }]
         },
         options: {
@@ -113,12 +114,22 @@
             },
             scales: {
                 y: {
-                    ticks: { color: '#9CA3AF' }
+                    beginAtZero: true,
+                    ticks: { 
+                        color: '#9CA3AF',
+                        precision: 0
+                    }
                 },
                 x: {
-                    ticks: { color: '#9CA3AF' }
+                    ticks: { 
+                        color: '#9CA3AF',
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
                 }
-            }
+            },
+            barPercentage: 0.6,  // Adjusted to match locations graph
+            categoryPercentage: 0.8  // Adjusted spacing
         }
     });
 

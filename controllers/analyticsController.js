@@ -14,6 +14,30 @@ module.exports.getAnalytics = async (req, res) => {
             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
         ];
 
+        // Get current date and create date for start of current month
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1; // 1-12
+
+        // Create array of last 12 months in sequence
+        const monthsArray = [];
+        for (let i = 0; i < 12; i++) {
+            let monthIndex = currentMonth - i;
+            let yearOffset = 0;
+            
+            // Adjust for previous year when going back past January
+            if (monthIndex <= 0) {
+                monthIndex += 12;
+                yearOffset = -1;
+            }
+            
+            monthsArray.unshift({
+                month: monthIndex,
+                year: currentYear + yearOffset
+            });
+        }
+
+        // Get data for all months
         const monthlyStats = await Profile.aggregate([
             {
                 $group: {
@@ -23,31 +47,47 @@ module.exports.getAnalytics = async (req, res) => {
                     },
                     count: { $sum: 1 }
                 }
-            },
-            { $sort: { "_id.year": -1, "_id.month": -1 } },
-            { $limit: 12 }
+            }
         ]);
 
-        // Format monthly stats with proper labels
-        const formattedMonthlyStats = monthlyStats.map(stat => ({
-            ...stat,
-            monthLabel: `${monthNames[stat._id.month - 1]} ${stat._id.year}`,
-            count: stat.count,
-            axisLabels: {
-                x: 'Timeline (Months)',
-                y: 'Number of Records'
-            }
-        }));
+        // Map the data to include all months with zero for months without data
+        const formattedMonthlyStats = monthsArray.map(monthYear => {
+            const monthData = monthlyStats.find(stat => 
+                stat._id.year === monthYear.year && 
+                stat._id.month === monthYear.month
+            );
+            
+            return {
+                _id: {
+                    month: monthYear.month,
+                    year: monthYear.year
+                },
+                monthLabel: `${monthNames[monthYear.month - 1]} ${monthYear.year}`,
+                count: monthData ? monthData.count : 0
+            };
+        });
 
         // Get location-based statistics
         const locationStats = await Profile.aggregate([
             {
+                $match: {
+                    "address.cityEnglish": { $exists: true, $ne: "" }  // Only include records with valid cities
+                }
+            },
+            {
                 $group: {
-                    _id: "$address.cityEnglish",
+                    _id: { $toLower: "$address.cityEnglish" },  // Convert to lowercase to prevent case-based duplicates
+                    cityName: { $first: "$address.cityEnglish" },  // Preserve original city name
                     count: { $sum: 1 }
                 }
             },
             { $sort: { count: -1 } },
+            { 
+                $project: {
+                    _id: "$cityName",  // Use the preserved original city name
+                    count: 1
+                }
+            },
             { $limit: 10 }
         ]);
 
