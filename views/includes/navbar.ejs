@@ -1,32 +1,67 @@
-<nav class="glass-effect fixed w-full z-50">
+<nav class="glass-effect fixed w-full z-50 border-b border-blue-400/20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
-            <div class="flex items-center">
-                <a href="/" class="flex items-center">
-                    <span class="font-nasa text-2xl text-blue-400">नामसिद्धि</span>
+            <!-- Logo -->
+            <div class="flex-shrink-0">
+                <a href="/" class="flex items-center space-x-2">
+                    <span class="font-nasa text-2xl bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">नामसिद्धि</span>
                 </a>
             </div>
             
+            <!-- Desktop Navigation -->
             <div class="hidden md:flex items-center space-x-4">
-                <a href="/cases/new" 
-                   class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all">
-                    + New Case
-                </a>
-                <a href="/newrecord" 
-                   class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
-                    + New Profile
-                </a>
-                <a href="/search" 
-                   class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
-                    🔍 Search Records
-                </a>
-                <a href="/cases/search" 
-                   class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
-                    🔍 Search Cases
-                </a>
-                <div class="ml-10 flex items-baseline space-x-4">
-                    <a href="/" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">Dashboard</a>
-                    <a href="/analytics" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">Analytics</a>
+                <!-- Case Management Section -->
+                <div class="flex items-center space-x-2">
+                    <a href="/cases/new" 
+                       class="<%= path === '/cases/new' ? 'bg-gradient-to-r from-emerald-500/30 to-green-500/30 text-emerald-300 shadow-lg shadow-emerald-500/20' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400' %> font-nasa px-4 py-2 rounded-md transition-all flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span>New Case</span>
+                    </a>
+                    <a href="/cases/search" 
+                       class="<%= path === '/cases/search' ? 'bg-gradient-to-r from-emerald-500/30 to-green-500/30 text-emerald-300 shadow-lg shadow-emerald-500/20' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400' %> font-nasa px-4 py-2 rounded-md transition-all flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <span>Search Cases</span>
+                    </a>
+                </div>
+
+                <!-- Profile Management Section -->
+                <div class="flex items-center space-x-2">
+                    <a href="/newrecord" 
+                       class="<%= path === '/newrecord' ? 'bg-gradient-to-r from-blue-500/30 to-indigo-500/30 text-blue-300 shadow-lg shadow-blue-500/20' : 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-400' %> font-nasa px-4 py-2 rounded-md transition-all flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                        <span>New Profile</span>
+                    </a>
+                    <a href="/search" 
+                       class="<%= path === '/search' ? 'bg-gradient-to-r from-blue-500/30 to-indigo-500/30 text-blue-300 shadow-lg shadow-blue-500/20' : 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-400' %> font-nasa px-4 py-2 rounded-md transition-all flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <span>Search Profiles</span>
+                    </a>
+                </div>
+
+                <!-- Navigation Section -->
+                <div class="flex items-center space-x-2 ml-4">
+                    <a href="/" 
+                       class="<%= path === '/' ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-300 shadow-lg shadow-purple-500/20' : 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-400' %> font-nasa px-4 py-2 rounded-md transition-all flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="/analytics" 
+                       class="<%= path === '/analytics' ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-300 shadow-lg shadow-purple-500/20' : 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-400' %> font-nasa px-4 py-2 rounded-md transition-all flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        <span>Analytics</span>
+                    </a>
                 </div>
             </div>
 
@@ -34,7 +69,7 @@
             <div class="md:hidden">
                 <button type="button" 
                         onclick="toggleMobileMenu()"
-                        class="text-gray-400 hover:text-white">
+                        class="text-gray-400 hover:text-white p-2 rounded-md hover:bg-gray-700/50 transition-all">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
@@ -46,12 +81,38 @@
     <!-- Mobile menu -->
     <div id="mobileMenu" class="md:hidden hidden">
         <div class="px-2 pt-2 pb-3 space-y-1">
-            <a href="/cases/new" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">+ New Case</a>
-            <a href="/newrecord" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">+ New Record</a>
-            <a href="/search" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Search Records</a>
-            <a href="/cases/search" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Search Cases</a>
-            <a href="/" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Dashboard</a>
-            <a href="/analytics" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Analytics</a>
+            <!-- Case Management -->
+            <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Case Management</div>
+            <a href="/cases/new" 
+               class="block px-3 py-2 text-base font-medium rounded-md <%= path === '/cases/new' ? 'bg-emerald-500/20 text-emerald-300' : 'text-gray-300 hover:bg-gray-700/50 hover:text-emerald-400' %> transition-all">
+                + New Case
+            </a>
+            <a href="/cases/search" 
+               class="block px-3 py-2 text-base font-medium rounded-md <%= path === '/cases/search' ? 'bg-emerald-500/20 text-emerald-300' : 'text-gray-300 hover:bg-gray-700/50 hover:text-emerald-400' %> transition-all">
+                Search Cases
+            </a>
+
+            <!-- Profile Management -->
+            <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mt-4">Profile Management</div>
+            <a href="/newrecord" 
+               class="block px-3 py-2 text-base font-medium rounded-md <%= path === '/newrecord' ? 'bg-blue-500/20 text-blue-300' : 'text-gray-300 hover:bg-gray-700/50 hover:text-blue-400' %> transition-all">
+                + New Profile
+            </a>
+            <a href="/search" 
+               class="block px-3 py-2 text-base font-medium rounded-md <%= path === '/search' ? 'bg-blue-500/20 text-blue-300' : 'text-gray-300 hover:bg-gray-700/50 hover:text-blue-400' %> transition-all">
+                Search Profiles
+            </a>
+
+            <!-- Navigation -->
+            <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mt-4">Navigation</div>
+            <a href="/" 
+               class="block px-3 py-2 text-base font-medium rounded-md <%= path === '/' ? 'bg-purple-500/20 text-purple-300' : 'text-gray-300 hover:bg-gray-700/50 hover:text-purple-400' %> transition-all">
+                Dashboard
+            </a>
+            <a href="/analytics" 
+               class="block px-3 py-2 text-base font-medium rounded-md <%= path === '/analytics' ? 'bg-purple-500/20 text-purple-300' : 'text-gray-300 hover:bg-gray-700/50 hover:text-purple-400' %> transition-all">
+                Analytics
+            </a>
         </div>
     </div>
 </nav>
@@ -59,10 +120,6 @@
 <script>
 function toggleMobileMenu() {
     const mobileMenu = document.getElementById('mobileMenu');
-    if (mobileMenu.classList.contains('hidden')) {
-        mobileMenu.classList.remove('hidden');
-    } else {
-        mobileMenu.classList.add('hidden');
-    }
+    mobileMenu.classList.toggle('hidden');
 }
 </script>

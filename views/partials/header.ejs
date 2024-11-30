@@ -52,21 +52,58 @@
                 </div>
                 
                 <div class="hidden md:flex items-center space-x-4">
-                    <a href="/cases/new" 
-                       class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all">
-                        + New Case
-                    </a>
-                    <a href="/newrecord" 
-                       class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
-                        + New Record
-                    </a>
-                    <a href="/cases/search" 
-                       class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
-                        🔍 Search Cases
-                    </a>
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="/" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">Dashboard</a>
-                        <a href="/analytics" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">Analytics</a>
+                    <!-- Case Management Section -->
+                    <div class="flex items-center space-x-2">
+                        <a href="/cases/new" 
+                           class="<%= path === '/cases/new' ? 'bg-gradient-to-r from-emerald-500/30 to-green-500/30 text-emerald-300 shadow-lg shadow-emerald-500/20' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400' %> font-nasa px-4 py-2 rounded-md transition-all flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            <span>New Case</span>
+                        </a>
+                        <a href="/cases/search" 
+                           class="<%= path === '/cases/search' ? 'bg-gradient-to-r from-emerald-500/30 to-green-500/30 text-emerald-300 shadow-lg shadow-emerald-500/20' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400' %> font-nasa px-4 py-2 rounded-md transition-all flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <span>Search Cases</span>
+                        </a>
+                    </div>
+    
+                    <!-- Profile Management Section -->
+                    <div class="flex items-center space-x-2">
+                        <a href="/newrecord" 
+                           class="<%= path === '/newrecord' ? 'bg-gradient-to-r from-blue-500/30 to-indigo-500/30 text-blue-300 shadow-lg shadow-blue-500/20' : 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-400' %> font-nasa px-4 py-2 rounded-md transition-all flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                            </svg>
+                            <span>New Profile</span>
+                        </a>
+                        <a href="/search" 
+                           class="<%= path === '/search' ? 'bg-gradient-to-r from-blue-500/30 to-indigo-500/30 text-blue-300 shadow-lg shadow-blue-500/20' : 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-400' %> font-nasa px-4 py-2 rounded-md transition-all flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <span>Search Profiles</span>
+                        </a>
+                    </div>
+    
+                    <!-- Navigation Section -->
+                    <div class="flex items-center space-x-2 ml-4">
+                        <a href="/" 
+                           class="<%= path === '/' ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-300 shadow-lg shadow-purple-500/20' : 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-400' %> font-nasa px-4 py-2 rounded-md transition-all flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="/analytics" 
+                           class="<%= path === '/analytics' ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-300 shadow-lg shadow-purple-500/20' : 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-400' %> font-nasa px-4 py-2 rounded-md transition-all flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            <span>Analytics</span>
+                        </a>
                     </div>
                 </div>
 
