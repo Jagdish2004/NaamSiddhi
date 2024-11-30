@@ -91,6 +91,7 @@ app.use((req, res, next) => {
 // API Routes
 app.use('/api/cases', apiCaseRoutes);
 app.use('/api/profiles', apiProfileRoutes);
+app.use('/api/suggestions', suggestionRoutes);
 
 // Web Routes
 app.use("/", dashboardRoute);
@@ -99,7 +100,6 @@ app.use("/newrecord", newRecord);
 app.use("/record", recordRoutes);
 app.use('/cases', caseRoutes);
 app.use('/analytics', analyticsRoutes);
-app.use('/api/suggestions', suggestionRoutes);
 
 // 404 handler
 app.use((req, res) => {
