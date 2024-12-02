@@ -1,6 +1,50 @@
 const Case = require('../models/caseSchema');
 const Profile = require('../models/profileSchema');
-const { translateText } = require('../utils/translator');
+const { 
+    detectHindiScript,
+    transliterateToHindi,
+    transliterateToEnglish,
+    translateToHindi,
+    translateToEnglish
+} = require('../utils/translator');
+
+// Helper function to process bilingual fields
+async function processField(text, fieldType = 'text') {
+    if (!text) return { english: '', hindi: '' };
+    
+    try {
+        const isHindi = detectHindiScript(text);
+        let english, hindi;
+
+        if (isHindi) {
+            hindi = text;
+            if (fieldType === 'name') {
+                english = await transliterateToEnglish(text, 'name');
+            } else {
+                english = await translateToEnglish(text);
+            }
+        } else {
+            english = text;
+            if (fieldType === 'name') {
+                hindi = await transliterateToHindi(text, 'name');
+            } else {
+                hindi = await translateToHindi(text);
+            }
+        }
+
+        console.log(`Processed ${fieldType}:`, { english, hindi });
+        return {
+            english: english.trim(),
+            hindi: hindi.trim()
+        };
+    } catch (error) {
+        console.error(`Error processing field ${fieldType}:`, error);
+        return {
+            english: text.trim(),
+            hindi: text.trim()
+        };
+    }
+}
 
 module.exports.renderNewCaseForm = async (req, res) => {
     try {
@@ -41,6 +85,18 @@ module.exports.createCase = async (req, res) => {
             connectedProfiles
         } = req.body;
 
+        // Process all text fields for bilingual support
+        const descriptionResult = await processField(description, 'text');
+        const locationResult = await processField(location, 'text');
+        const cityResult = await processField(city, 'text');
+        const districtResult = await processField(district, 'text');
+        const stateResult = await processField(state, 'text');
+        const reporterNameResult = await processField(reporterName, 'name');
+        const reporterAddressResult = await processField(reporterAddress, 'text');
+        const reporterCityResult = await processField(reporterCity, 'text');
+        const reporterDistrictResult = await processField(reporterDistrict, 'text');
+        const reporterStateResult = await processField(reporterState, 'text');
+
         // Create new case object
         const newCase = new Case({
             caseType,
@@ -48,50 +104,50 @@ module.exports.createCase = async (req, res) => {
             status: 'active',
             incidentDate: new Date(incidentDate),
             description: {
-                english: description,
-                hindi: await translateText(description)
+                english: descriptionResult.english,
+                hindi: descriptionResult.hindi
             },
             location: {
                 address: {
-                    english: location,
-                    hindi: await translateText(location)
+                    english: locationResult.english,
+                    hindi: locationResult.hindi
                 },
                 city: {
-                    english: city,
-                    hindi: await translateText(city)
+                    english: cityResult.english,
+                    hindi: cityResult.hindi
                 },
                 district: {
-                    english: district,
-                    hindi: await translateText(district)
+                    english: districtResult.english,
+                    hindi: districtResult.hindi
                 },
                 state: {
-                    english: state,
-                    hindi: await translateText(state)
+                    english: stateResult.english,
+                    hindi: stateResult.hindi
                 }
             },
             reporter: {
                 name: {
-                    english: reporterName,
-                    hindi: await translateText(reporterName)
+                    english: reporterNameResult.english,
+                    hindi: reporterNameResult.hindi
                 },
                 contact: reporterContact,
                 email: reporterEmail,
                 address: {
                     location: {
-                        english: reporterAddress,
-                        hindi: await translateText(reporterAddress)
+                        english: reporterAddressResult.english,
+                        hindi: reporterAddressResult.hindi
                     },
                     city: {
-                        english: reporterCity,
-                        hindi: await translateText(reporterCity)
+                        english: reporterCityResult.english,
+                        hindi: reporterCityResult.hindi
                     },
                     district: {
-                        english: reporterDistrict,
-                        hindi: await translateText(reporterDistrict)
+                        english: reporterDistrictResult.english,
+                        hindi: reporterDistrictResult.hindi
                     },
                     state: {
-                        english: reporterState,
-                        hindi: await translateText(reporterState)
+                        english: reporterStateResult.english,
+                        hindi: reporterStateResult.hindi
                     }
                 },
                 idType: reporterIdType,
@@ -102,7 +158,7 @@ module.exports.createCase = async (req, res) => {
         // Generate case number before saving
         const count = await Case.countDocuments();
         const year = new Date().getFullYear();
-        const districtCode = district?.substring(0, 3).toUpperCase() || 'DEL';
+        const districtCode = districtResult.english?.substring(0, 3).toUpperCase() || 'DEL';
         newCase.caseNumber = `${districtCode}/${year}/${(count + 1).toString().padStart(6, '0')}`;
 
         // Handle connected profiles
