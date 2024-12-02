@@ -20,6 +20,7 @@
     "ejs-mate": "^4.0.0",
     "express": "^4.21.1",
     "express-session": "^1.18.1",
+    "google-transliterate": "^0.1.0",
     "helmet": "^8.0.0",
     "install": "^0.13.0",
     "method-override": "^3.0.0",

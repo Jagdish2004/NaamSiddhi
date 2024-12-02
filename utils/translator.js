@@ -1,84 +1,47 @@
 require('dotenv').config();
 const { Translate } = require('@google-cloud/translate').v2;
-const Sanscript = require('@indic-transliteration/sanscript');
+const googleTransliterate = require('google-transliterate');
 
 const translate = new Translate({
     key: process.env.GOOGLE_TRANSLATE_API,
 });
 
-// Function to detect language
-async function detectLanguage(text) {
-    if (!text) return 'en';
-    try {
-        const [detection] = await translate.detect(text);
-        return detection.language;
-    } catch (error) {
-        console.error('Language detection error:', error);
-        return 'en';
-    }
+// 1. Function to detect Hindi script
+function detectHindiScript(text) {
+    if (!text) return false;
+    const hindiRange = /[\u0900-\u097F]/;
+    return hindiRange.test(text);
 }
 
-// Function to transliterate names from English to Hindi
-function transliterateName(text, toHindi = true) {
+// 2. Function to translate text to Hindi
+async function translateToHindi(text) {
     if (!text) return '';
     try {
-        if (toHindi) {
-            // English to Hindi
-            return Sanscript.t(text, 'itrans', 'devanagari');
-        } else {
-            // Hindi to English
-            const hk = Sanscript.t(text, 'devanagari', 'hk');
-            // Convert HK to readable English
-            return hk.split(' ')
-                .map(word => {
-                    word = word.replace(/aa/g, 'a')
-                           .replace(/ii/g, 'i')
-                           .replace(/uu/g, 'u')
-                           .replace(/[~\.]/g, '')
-                           .replace(/nn/g, 'n')
-                           .replace(/ch/g, 'ch');
-                    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-                })
-                .join(' ');
-        }
-    } catch (error) {
-        console.error('Name transliteration error:', error);
-        return text;
-    }
-}
-
-// Function to transliterate text from English to Hindi script
-async function transliterateToHindi(text, fieldType = 'text') {
-    if (!text) return '';
-    try {
-        // For names, use Sanscript transliteration
-        if (fieldType === 'name') {
-            return transliterateName(text, true);
-        }
-
-        // For other fields, use Google Translate
-        const [transliteratedText] = await translate.translate(text, {
+        console.log('Translating to Hindi:', text);
+        const [translatedText] = await translate.translate(text, {
             to: 'hi',
             from: 'en',
-            format: 'text',
             model: 'nmt'
         });
-        return transliteratedText;
+        console.log('Translation result:', translatedText);
+        return translatedText;
     } catch (error) {
-        console.error('Hindi transliteration error:', error);
+        console.error('Hindi translation error:', error);
         return text;
     }
 }
 
-// Function to translate text from Hindi to English
+// 3. Function to translate text to English
 async function translateToEnglish(text) {
     if (!text) return '';
     try {
+        console.log('Translating to English:', text);
         const [translatedText] = await translate.translate(text, {
             to: 'en',
             from: 'hi',
             model: 'nmt'
         });
+        console.log('Translation result:', translatedText);
         return translatedText;
     } catch (error) {
         console.error('English translation error:', error);
@@ -86,49 +49,90 @@ async function translateToEnglish(text) {
     }
 }
 
-// Function to transliterate text from Hindi to English script
+// 4. Function to transliterate text to English
 async function transliterateToEnglish(text, fieldType = 'text') {
     if (!text) return '';
     try {
-        // For names, use Sanscript transliteration
+        console.log('Transliterating to English:', text);
+        
+        // For names and special fields, use Google Transliterate
         if (fieldType === 'name') {
-            return transliterateName(text, false);
+            return new Promise((resolve, reject) => {
+                googleTransliterate.transliterate(text, 'hi', 'en', (err, results) => {
+                    if (err) {
+                        console.error('Transliteration error:', err);
+                        reject(err);
+                    } else {
+                        console.log('Transliteration results:', results);
+                        
+                        // Extract the first Hindi word suggestion
+                        const firstResult = Array.isArray(results) && results.length > 0 && results[0].hws
+                            ? results[0].hws[0]  // Take first suggestion from hws array
+                            : text;
+                        
+                        // Capitalize each word
+                        const formattedResult = firstResult
+                            .split(/\s+/)
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                            .join(' ');
+                            
+                        console.log('Selected result:', formattedResult);
+                        resolve(formattedResult);
+                    }
+                });
+            });
         }
 
-        // For occupation, use translation
-        if (fieldType === 'occupation') {
-            return await translateToEnglish(text);
-        }
-
-        // For other fields, use Google Translate
-        const [transliteratedText] = await translate.translate(text, {
-            to: 'en',
-            from: 'hi',
-            format: 'text',
-            model: 'nmt'
-        });
-
-        // Capitalize first letter of each word
-        return transliteratedText.split(' ')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-            .join(' ');
+        // For other fields, use translation
+        const translatedText = await translateToEnglish(text);
+        return translatedText;
     } catch (error) {
         console.error('English transliteration error:', error);
         return text;
     }
 }
 
-// Helper function to check if text contains Hindi characters
-function containsHindi(text) {
-    if (!text) return false;
-    const hindiRange = /[\u0900-\u097F]/;
-    return hindiRange.test(text);
+// 5. Function to transliterate text to Hindi
+async function transliterateToHindi(text, fieldType = 'text') {
+    if (!text) return '';
+    try {
+        console.log('Transliterating to Hindi:', text);
+        
+        // For names and special fields, use Google Transliterate
+        if (fieldType === 'name') {
+            return new Promise((resolve, reject) => {
+                googleTransliterate.transliterate(text, 'en', 'hi', (err, results) => {
+                    if (err) {
+                        console.error('Transliteration error:', err);
+                        reject(err);
+                    } else {
+                        console.log('Transliteration results:', results);
+                        
+                        // Extract the Hindi word suggestions
+                        const selectedResult = Array.isArray(results) && results.length > 0 && results[0].hws
+                            ? results[0].hws[0]  // Take first Hindi suggestion
+                            : text;
+                            
+                        console.log('Selected Hindi result:', selectedResult);
+                        resolve(selectedResult);
+                    }
+                });
+            });
+        }
+
+        // For other fields, use translation
+        const translatedText = await translateToHindi(text);
+        return translatedText;
+    } catch (error) {
+        console.error('Hindi transliteration error:', error);
+        return text;
+    }
 }
 
 module.exports = {
-    detectLanguage,
+    detectHindiScript,
     transliterateToHindi,
     transliterateToEnglish,
-    translateToEnglish,
-    containsHindi
+    translateToHindi,
+    translateToEnglish
 }; 

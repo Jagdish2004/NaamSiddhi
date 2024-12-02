@@ -1,6 +1,10 @@
 const Profile = require('../models/profileSchema');
 const { getSoundex } = require('../utils/soundex');
-const { transliterateToEnglish, containsHindi } = require('../utils/translator');
+const { 
+    detectHindiScript, 
+    transliterateToEnglish, 
+    transliterateToHindi 
+} = require('../utils/translator');
 const { calculateMatchPercentage } = require('../utils/levenshtein');
 
 module.exports.searchRecord = (req, res) => {
@@ -18,57 +22,55 @@ module.exports.resultRecord = async (req, res) => {
         if (firstName || lastName) {
             if (firstName) {
                 // Check if input is Hindi
-                const isHindiFirst = containsHindi(firstName);
-                let firstNameForSoundex = firstName;
-            
+                const isHindiFirst = detectHindiScript(firstName);
+                let firstNameForSearch = firstName;
                 
-                // If input is Hindi, transliterate to English for Soundex
-                if (isHindiFirst) {
-                    firstNameForSoundex = await transliterateToEnglish(firstName);
-                    console.log(firstNameForSoundex);
-                }
-                
-                // Generate Soundex from English version
-                const firstNameSoundex = getSoundex(firstNameForSoundex, false, false);
-                  console.log(firstNameSoundex);
-                
-                if (isHindiFirst) {
+                try {
+                    // If input is Hindi, transliterate to English for search
+                    if (isHindiFirst) {
+                        firstNameForSearch = await transliterateToEnglish(firstName, 'name');
+                        console.log('Transliterated first name:', firstNameForSearch);
+                    }
+                    
+                    // Generate Soundex from English version
+                    const firstNameSoundex = getSoundex(firstNameForSearch, false, false);
+                    console.log('First name Soundex:', firstNameSoundex);
+                    
                     conditions.push(
                         { 'soundexCode.firstName': firstNameSoundex },
-                        { firstNameHindi: new RegExp(firstName, 'i') }
+                        isHindiFirst 
+                            ? { firstNameHindi: new RegExp(firstName, 'i') }
+                            : { firstNameEnglish: new RegExp(firstNameForSearch, 'i') }
                     );
-                } else {
-                    conditions.push(
-                        { 'soundexCode.firstName': firstNameSoundex },
-                        { firstNameEnglish: new RegExp(firstName, 'i') }
-                    );
+                } catch (error) {
+                    console.error('Error processing first name:', error);
                 }
             }
 
             if (lastName) {
                 // Check if input is Hindi
-                const isHindiLast = containsHindi(lastName);
-                let lastNameForSoundex = lastName;
-                console.log(lastNameForSoundex);
+                const isHindiLast = detectHindiScript(lastName);
+                let lastNameForSearch = lastName;
                 
-                // If input is Hindi, transliterate to English for Soundex
-                if (isHindiLast) {
-                    lastNameForSoundex = await transliterateToEnglish(lastName);
-                }
-                
-                // Generate Soundex from English version
-                const lastNameSoundex = getSoundex(lastNameForSoundex, false, false);
-                
-                if (isHindiLast) {
+                try {
+                    // If input is Hindi, transliterate to English for search
+                    if (isHindiLast) {
+                        lastNameForSearch = await transliterateToEnglish(lastName, 'name');
+                        console.log('Transliterated last name:', lastNameForSearch);
+                    }
+                    
+                    // Generate Soundex from English version
+                    const lastNameSoundex = getSoundex(lastNameForSearch, false, false);
+                    console.log('Last name Soundex:', lastNameSoundex);
+                    
                     conditions.push(
                         { 'soundexCode.lastName': lastNameSoundex },
-                        { lastNameHindi: new RegExp(lastName, 'i') }
+                        isHindiLast 
+                            ? { lastNameHindi: new RegExp(lastName, 'i') }
+                            : { lastNameEnglish: new RegExp(lastNameForSearch, 'i') }
                     );
-                } else {
-                    conditions.push(
-                        { 'soundexCode.lastName': lastNameSoundex },
-                        { lastNameEnglish: new RegExp(lastName, 'i') }
-                    );
+                } catch (error) {
+                    console.error('Error processing last name:', error);
                 }
             }
         }
@@ -82,7 +84,7 @@ module.exports.resultRecord = async (req, res) => {
         if (address) {
             const { location, city, district, state } = address;
             if (location) {
-                const isHindi = containsHindi(location);
+                const isHindi = detectHindiScript(location);
                 conditions.push(
                     isHindi 
                         ? { 'address.locationHindi': new RegExp(location, 'i') }
@@ -90,7 +92,7 @@ module.exports.resultRecord = async (req, res) => {
                 );
             }
             if (city) {
-                const isHindi = containsHindi(city);
+                const isHindi = detectHindiScript(city);
                 conditions.push(
                     isHindi 
                         ? { 'address.cityHindi': new RegExp(city, 'i') }
@@ -98,7 +100,7 @@ module.exports.resultRecord = async (req, res) => {
                 );
             }
             if (district) {
-                const isHindi = containsHindi(district);
+                const isHindi = detectHindiScript(district);
                 conditions.push(
                     isHindi 
                         ? { 'address.districtHindi': new RegExp(district, 'i') }
@@ -106,7 +108,7 @@ module.exports.resultRecord = async (req, res) => {
                 );
             }
             if (state) {
-                const isHindi = containsHindi(state);
+                const isHindi = detectHindiScript(state);
                 conditions.push(
                     isHindi 
                         ? { 'address.stateHindi': new RegExp(state, 'i') }
@@ -117,35 +119,24 @@ module.exports.resultRecord = async (req, res) => {
 
         // Process appearance search
         if (appearance) {
-            const { height, weight, complexion, build } = appearance;
-            if (height) query['appearance.height'] = height;
-            if (weight) query['appearance.weight'] = weight;
-            if (complexion) query['appearance.complexion'] = complexion;
-            if (build) query['appearance.build'] = build;
+            if (appearance.height) query['appearance.height'] = appearance.height;
+            if (appearance.weight) query['appearance.weight'] = appearance.weight;
+            if (appearance.complexion) query['appearance.complexion'] = appearance.complexion;
+            if (appearance.build) query['appearance.build'] = appearance.build;
         }
 
+        // Combine all conditions
         if (conditions.length > 0) {
-            searchQuery.$or = conditions;
+            query.$or = conditions;
         }
 
-        // Combine queries
-        if (Object.keys(searchQuery).length > 0) {
-            if (Object.keys(query).length > 0) {
-                query = {
-                    $and: [
-                        query,
-                        searchQuery
-                    ]
-                };
-            } else {
-                query = searchQuery;
-            }
-        }
+        console.log('Final search query:', JSON.stringify(query, null, 2));
 
         // Execute search
         const profiles = await Profile.find(query);
+        console.log('Found profiles:', profiles.length);
 
-        // Calculate matches
+        // Calculate match percentages
         const profilesWithMatches = profiles.map(profile => {
             let totalScore = 0;
             let totalFields = 0;
@@ -157,7 +148,7 @@ module.exports.resultRecord = async (req, res) => {
 
                 if (firstName) {
                     nameFields++;
-                    const isHindiInput = containsHindi(firstName);
+                    const isHindiInput = detectHindiScript(firstName);
                     const fieldToCompare = isHindiInput ? 'firstNameHindi' : 'firstNameEnglish';
                     nameScore += calculateMatchPercentage(
                         firstName.toLowerCase(),
@@ -167,7 +158,7 @@ module.exports.resultRecord = async (req, res) => {
 
                 if (lastName) {
                     nameFields++;
-                    const isHindiInput = containsHindi(lastName);
+                    const isHindiInput = detectHindiScript(lastName);
                     const fieldToCompare = isHindiInput ? 'lastNameHindi' : 'lastNameEnglish';
                     nameScore += calculateMatchPercentage(
                         lastName.toLowerCase(),
