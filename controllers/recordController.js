@@ -1,12 +1,6 @@
 const Profile = require('../models/profileSchema'); // Assuming your model file is at this path
 const {getSoundex} = require('../utils/soundex');
-const {Translate} = require('@google-cloud/translate').v2;
-require('dotenv').config();
-
-// Initialize Google Translate client
-const translate = new Translate({
-  key: process.env.GOOGLE_TRANSLATE_API,
-});
+const { detectLanguage, transliterateToHindi, transliterateToEnglish, containsHindi } = require('../utils/translator');
 
 module.exports.createRecord = (req, res) => {
   res.render('records/new.ejs');
@@ -27,134 +21,126 @@ module.exports.saveRecord = async (req, res) => {
 // Add new route for final submission
 module.exports.submitRecord = async (req, res) => {
     try {
-        console.log(req.body);
         const {
             firstName, lastName, occupation, dob, gender, role, mNumber,
             address, description, familyDetails, caseDetails, appearance
         } = req.body;
 
-        const firstNameSoundex = getSoundex(firstName, false, false); // Generate Soundex code for first name
-        const lastNameSoundex = getSoundex(lastName, false, false);
-
-        // Translate fields to Hindi
-        const translateText = async (text) => {
-            try {
-                const [translatedText] = await translate.translate(text, 'hi'); // 'hi' is the language code for Hindi
-                return translatedText;
-            } catch (error) {
-                console.error('Error translating text:', error);
-                return text;
-            }
-        };
-        const transliterateToHindi = async (text) => {
-            try {
-                // Transliteration using Google Translate API by keeping the source language as `en` and target as `hi`
-                const [transliteratedText] = await translate.translate(text, {
-                    to: 'hi', // Target Hindi script
-                    from: 'en', // Source English script
-                    format: 'text', // Ensure it's treated as text, not translated
-                    model: 'nmt', // Neural Machine Translation
-                });
+        // Helper function to process bilingual fields
+        async function processField(text) {
+            if (!text) return { english: '', hindi: '' };
             
-                // Return the transliterated text
-                return transliteratedText;
-            } catch (error) {
-                console.error('Error during transliteration:', error.message);
-                return text; // Return original text if transliteration fails
-            }
-        };
-        
+            // Check if text contains Hindi characters
+            const isHindi = containsHindi(text);
+            let english, hindi;
 
-        // Translate the required fields
-        const firstNameHindi = await transliterateToHindi(firstName);
-        const lastNameHindi = await transliterateToHindi(lastName);
-        const occupationHindi = await translateText(occupation);
-        const locationHindi = await transliterateToHindi(address.location);
-        const cityHindi = await transliterateToHindi(address.city);
-        const districtHindi = await transliterateToHindi(address.district);
-        const stateHindi = await translateText(address.state);
-        const descriptionHindi = await translateText(description);
+            if (isHindi) {
+                // If input is Hindi, keep Hindi as is and transliterate to English
+                hindi = text;
+                english = await transliterateToEnglish(text);
+            } else {
+                // If input is English, keep English as is and transliterate to Hindi
+                english = text;
+                hindi = await transliterateToHindi(text);
+            }
+
+            return {
+                english: english.trim(),
+                hindi: hindi.trim()
+            };
+        }
+
+        // Process name fields
+        const firstNameResult = await processField(firstName);
+        const lastNameResult = await processField(lastName);
+        
+        // Process other fields
+        const occupationResult = await processField(occupation);
+        const descriptionResult = await processField(description);
+
+        // Process address fields
+        const locationResult = await processField(address.location);
+        const cityResult = await processField(address.city);
+        const districtResult = await processField(address.district);
+        const stateResult = await processField(address.state);
+
+        // Generate Soundex codes from English versions
+        const firstNameSoundex = getSoundex(firstNameResult.english, false, false);
+        const lastNameSoundex = getSoundex(lastNameResult.english, false, false);
 
         // Process family details
-        const processedFamilyDetails = await Promise.all((familyDetails?.name || []).map(async (_, index) => ({
-            name: {
-                english: familyDetails.name[index],
-                hindi: await transliterateToHindi(familyDetails.name[index])
-            },
-            relation: {
-                english: familyDetails.relation[index],
-                hindi: await transliterateToHindi(familyDetails.relation[index])
-            },
-            contact: familyDetails.contact[index]
-        })));
+        const processedFamilyDetails = await Promise.all((familyDetails?.name || []).map(async (_, index) => {
+            const nameResult = await processField(familyDetails.name[index]);
+            const relationResult = await processField(familyDetails.relation[index]);
+
+            return {
+                name: {
+                    english: nameResult.english,
+                    hindi: nameResult.hindi
+                },
+                relation: {
+                    english: relationResult.english,
+                    hindi: relationResult.hindi
+                },
+                contact: familyDetails.contact[index]
+            };
+        }));
 
         // Process case details
-        const processedCaseDetails = await Promise.all((caseDetails?.caseNumber || []).map(async (_, index) => ({
-            caseNumber: caseDetails.caseNumber[index],
-            section: caseDetails.section[index],
-            role: caseDetails.role[index],
-            details: {
-                english: caseDetails.details[index],
-                hindi: await translateText(caseDetails.details[index])
-            }
-        })));
+        const processedCaseDetails = await Promise.all((caseDetails?.caseNumber || []).map(async (_, index) => {
+            const detailsResult = await processField(caseDetails.details[index]);
+            return {
+                caseNumber: caseDetails.caseNumber[index],
+                section: caseDetails.section[index],
+                role: caseDetails.role[index],
+                details: {
+                    english: detailsResult.english,
+                    hindi: detailsResult.hindi
+                }
+            };
+        }));
 
-        // In the saveRecord function, add translations for appearance details
-        const facialFeaturesHindi = await transliterateToHindi(appearance.facialFeatures);
-        const scarsHindi = await transliterateToHindi(appearance.scars);
-        const tattoosHindi = await transliterateToHindi(appearance.tattoos);
-        const otherFeaturesHindi = await transliterateToHindi(appearance.otherFeatures);
+        // Process appearance details
+        const processedAppearance = {
+            height: appearance.height,
+            weight: appearance.weight,
+            complexion: appearance.complexion,
+            build: appearance.build,
+            facialFeatures: await processField(appearance.facialFeatures),
+            scars: await processField(appearance.scars),
+            tattoos: await processField(appearance.tattoos),
+            otherFeatures: await processField(appearance.otherFeatures)
+        };
 
-        // Create a new profile (id will be automatically generated)
+        // Create a new profile
         const profile = new Profile({
             soundexCode: {
-                firstName: firstNameSoundex, // Store Soundex code for first name in the nested object
-                lastName: lastNameSoundex,   // Store Soundex code for last name in the nested object
+                firstName: firstNameSoundex,
+                lastName: lastNameSoundex,
             },
-            firstNameHindi,  // Translated first name to Hindi
-            firstNameEnglish: firstName,
-            lastNameHindi,   // Translated last name to Hindi
-            lastNameEnglish: lastName,
-            occupationHindi, // Translated occupation to Hindi
-            occupationEnglish: occupation,
+            firstNameHindi: firstNameResult.hindi,
+            firstNameEnglish: firstNameResult.english,
+            lastNameHindi: lastNameResult.hindi,
+            lastNameEnglish: lastNameResult.english,
+            occupationHindi: occupationResult.hindi,
+            occupationEnglish: occupationResult.english,
             dob,
             gender,
             role,
             mNumber,
             address: {
-                locationHindi, // Translated location to Hindi
-                locationEnglish: address.location,
-                cityHindi,     // Translated city to Hindi
-                cityEnglish: address.city,
-                districtHindi, // Translated district to Hindi
-                districtEnglish: address.district,
-                stateHindi,    // Translated state to Hindi
-                stateEnglish: address.state,
+                locationHindi: locationResult.hindi,
+                locationEnglish: locationResult.english,
+                cityHindi: cityResult.hindi,
+                cityEnglish: cityResult.english,
+                districtHindi: districtResult.hindi,
+                districtEnglish: districtResult.english,
+                stateHindi: stateResult.hindi,
+                stateEnglish: stateResult.english,
             },
-            descriptionHindi, // Translated description to Hindi
-            descriptionEnglish: description,
-            appearance: {
-                height: appearance.height,
-                weight: appearance.weight,
-                complexion: appearance.complexion,
-                build: appearance.build,
-                facialFeatures: {
-                    english: appearance.facialFeatures,
-                    hindi: facialFeaturesHindi
-                },
-                scars: {
-                    english: appearance.scars,
-                    hindi: scarsHindi
-                },
-                tattoos: {
-                    english: appearance.tattoos,
-                    hindi: tattoosHindi
-                },
-                otherFeatures: {
-                    english: appearance.otherFeatures,
-                    hindi: otherFeaturesHindi
-                }
-            },
+            descriptionHindi: descriptionResult.hindi,
+            descriptionEnglish: descriptionResult.english,
+            appearance: processedAppearance,
             familyDetails: processedFamilyDetails,
             caseDetails: processedCaseDetails,
         });
