@@ -140,6 +140,21 @@ const profileSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         }
+    }],
+
+    // Add these fields to your schema
+    images: [{
+        url: String,
+        filename: String,
+        type: {
+            type: String,
+            enum: ['profile', 'identification', 'evidence'],
+            default: 'profile'
+        },
+        uploadedAt: {
+            type: Date,
+            default: Date.now
+        }
     }]
 }, {
     timestamps: true

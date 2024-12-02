@@ -4,7 +4,7 @@
     <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto">
         <h1 class="text-3xl font-nasa text-center mb-8 text-blue-400">Create Profile</h1>
 
-        <form action="/newrecord" method="POST" class="space-y-8">
+        <form action="/newrecord" method="POST" enctype="multipart/form-data" class="space-y-8">
             <!-- Personal Information Section -->
             <div class="space-y-6">
                 <h2 class="text-xl font-nasa text-blue-400/80">Personal Information</h2>
@@ -204,6 +204,58 @@
   </div>
 </div>
 
+            <!-- Profile Images Section -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-nasa text-blue-400/80">Profile Images</h2>
+                <div class="space-y-4">
+                    <!-- Profile Photo -->
+                    <div>
+                        <label class="block text-gray-400 mb-2">Profile Photo</label>
+                        <div class="flex items-center space-x-4">
+                            <div class="relative">
+                                <input type="file" 
+                                       name="profileImage" 
+                                       accept="image/*"
+                                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                       onchange="previewImage(this, 'profilePreview')">
+                                <div class="bg-space-dark/50 border-2 border-dashed border-blue-400/30 rounded-lg p-4 text-center">
+                                    <img id="profilePreview" src="" alt="" class="mx-auto max-h-40 hidden">
+                                    <div id="profilePlaceholder" class="text-gray-400">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="mt-1">Click to upload profile photo</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ID Proof -->
+                    <div>
+                        <label class="block text-gray-400 mb-2">ID Proof</label>
+                        <div class="flex items-center space-x-4">
+                            <div class="relative">
+                                <input type="file" 
+                                       name="idProof" 
+                                       accept="image/*"
+                                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                       onchange="previewImage(this, 'idPreview')">
+                                <div class="bg-space-dark/50 border-2 border-dashed border-blue-400/30 rounded-lg p-4 text-center">
+                                    <img id="idPreview" src="" alt="" class="mx-auto max-h-40 hidden">
+                                    <div id="idPlaceholder" class="text-gray-400">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="mt-1">Click to upload ID proof</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Submit Button -->
             <div class="flex justify-center pt-6">
                 <button type="submit" 
@@ -290,7 +342,7 @@
                         required
                         class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     <option value="" disabled selected>Select Role / भूमिका चुनें</option>
-                    <option value="criminal">Criminal / अपराध��</option>
+                    <option value="criminal">Criminal / अपराध</option>
                     <option value="victim">Victim / पीड़ित</option>
                     <option value="witness">Witness / गवाह</option>
                 </select>
@@ -333,4 +385,21 @@
             form.appendChild(hiddenInput);
         }
     });
+
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        const placeholder = document.getElementById(previewId.replace('Preview', 'Placeholder'));
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 </script>
