@@ -62,43 +62,56 @@ router.post('/:id/link-case', async (req, res) => {
         // Find the profile
         const profile = await Profile.findOne({ id });
         if (!profile) {
-            req.flash('error', 'Profile not found');
-            return res.redirect('back');
+            return res.status(400).json({ error: 'Profile not found' });
         }
 
         // Find the case
         const case_ = await Case.findOne({ caseNumber });
         if (!case_) {
-            req.flash('error', 'Case not found');
-            return res.redirect('back');
+            return res.status(400).json({ error: 'Case not found' });
         }
+
+        // Check if already linked
+        const isAlreadyLinked = profile.cases.some(c => c.case?.toString() === case_._id.toString());
+        if (isAlreadyLinked) {
+            return res.status(400).json({ error: 'Case is already linked to this profile' });
+        }
+
+        // Add timeline entry to case
+        case_.timeline.push({
+            action: 'PROFILE_LINKED',
+            description: {
+                english: `Profile ${profile.firstNameEnglish} ${profile.lastNameEnglish} linked as ${role}`,
+                hindi: `प्रोफ़ाइल ${profile.firstNameHindi || profile.firstNameEnglish} ${profile.lastNameHindi || profile.lastNameEnglish} को ${role} के रूप में जोड़ा गया`
+            },
+            date: new Date()
+        });
+
+        // Add profile to case's profiles array
+        case_.profiles.push({
+            profile: profile._id,
+            role,
+            addedAt: new Date()
+        });
 
         // Link profile to case
         await Profile.findByIdAndUpdate(profile._id, {
             $addToSet: {
                 cases: {
                     case: case_._id,
-                    role
+                    role,
+                    addedAt: new Date()
                 }
             }
         });
 
-        // Link case to profile
-        await Case.findByIdAndUpdate(case_._id, {
-            $addToSet: {
-                profiles: {
-                    profile: profile._id,
-                    role
-                }
-            }
-        });
+        // Save case with timeline and profile updates
+        await case_.save();
 
-        req.flash('success', 'Profile linked to case successfully');
-        res.redirect('back');
+        return res.json({ success: true, message: 'Case linked successfully' });
     } catch (error) {
         console.error('Error linking case:', error);
-        req.flash('error', 'Failed to link case');
-        res.redirect('back');
+        return res.status(500).json({ error: 'Failed to link case' });
     }
 });
 
