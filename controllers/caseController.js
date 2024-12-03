@@ -46,6 +46,106 @@ async function processField(text, fieldType = 'text') {
     }
 }
 
+// Helper function to check if a word is likely a name
+function isLikelyName(word) {
+    // Check if word starts with capital letter (for English)
+    if (/^[A-Z]/.test(word)) return true;
+    
+    // For Hindi, check if it's followed by common name indicators
+    const nameIndicators = ['ने', 'को', 'की', 'का', 'के'];
+    return nameIndicators.some(indicator => word.endsWith(indicator));
+}
+
+// Helper function to process description
+async function processDescription(text) {
+    if (!text) return { english: '', hindi: '' };
+    
+    try {
+        const isHindi = detectHindiScript(text);
+        let english, hindi;
+
+        if (isHindi) {
+            hindi = text;
+            // First translate the entire text
+            english = await translateToEnglish(text);
+
+            // Then find and replace names with transliterated versions
+            const words = text.split(/\s+/);
+            const transliteratedNames = await Promise.all(words.map(async (word) => {
+                if (isLikelyName(word)) {
+                    // Remove common postfixes before transliteration
+                    const nameIndicators = ['ने', 'को', 'की', 'का', 'के'];
+                    let baseName = word;
+                    let postfix = '';
+                    
+                    for (const indicator of nameIndicators) {
+                        if (word.endsWith(indicator)) {
+                            baseName = word.slice(0, -indicator.length);
+                            postfix = indicator;
+                            break;
+                        }
+                    }
+
+                    const transliteratedName = await transliterateToEnglish(baseName, 'name');
+                    // Replace the translated name in the English text with the transliterated version
+                    const translatedWord = await translateToEnglish(word);
+                    english = english.replace(translatedWord, transliteratedName + (postfix ? ' ' + await translateToEnglish(postfix) : ''));
+                }
+            }));
+        } else {
+            english = text;
+            // First translate the entire text
+            hindi = await translateToHindi(text);
+
+            // Then find and replace names with transliterated versions
+            const words = text.split(/\s+/);
+            const transliteratedNames = await Promise.all(words.map(async (word) => {
+                if (isLikelyName(word)) {
+                    const transliteratedName = await transliterateToHindi(word, 'name');
+                    // Replace the translated name in the Hindi text with the transliterated version
+                    const translatedWord = await translateToHindi(word);
+                    hindi = hindi.replace(translatedWord, transliteratedName);
+                }
+            }));
+        }
+
+        console.log('Processed description:', { english, hindi });
+        return {
+            english: english.trim(),
+            hindi: hindi.trim()
+        };
+    } catch (error) {
+        console.error('Error processing description:', error);
+        return {
+            english: text.trim(),
+            hindi: text.trim()
+        };
+    }
+}
+
+// Function to generate unique case number
+async function generateUniqueCaseNumber(district) {
+    const year = new Date().getFullYear();
+    const districtCode = district?.substring(0, 3).toUpperCase() || 'DEL';
+    
+    // Find the highest case number for this district and year
+    const latestCase = await Case.findOne({
+        caseNumber: new RegExp(`^${districtCode}/${year}/`)
+    }).sort({ caseNumber: -1 });
+
+    let nextNumber = 1;
+    if (latestCase) {
+        // Extract the number from the latest case number
+        const match = latestCase.caseNumber.match(/\/(\d+)$/);
+        if (match) {
+            nextNumber = parseInt(match[1]) + 1;
+        }
+    }
+
+    // Format the case number
+    return `${districtCode}/${year}/${nextNumber.toString().padStart(6, '0')}`;
+}
+
 module.exports.renderNewCaseForm = async (req, res) => {
     try {
         const profiles = await Profile.find()
@@ -85,8 +185,10 @@ module.exports.createCase = async (req, res) => {
             connectedProfiles
         } = req.body;
 
-        // Process all text fields for bilingual support
-        const descriptionResult = await processField(description, 'text');
+        // Process description with special handling for names
+        const descriptionResult = await processDescription(description);
+
+        // Process other fields
         const locationResult = await processField(location, 'text');
         const cityResult = await processField(city, 'text');
         const districtResult = await processField(district, 'text');
@@ -97,8 +199,12 @@ module.exports.createCase = async (req, res) => {
         const reporterDistrictResult = await processField(reporterDistrict, 'text');
         const reporterStateResult = await processField(reporterState, 'text');
 
+        // Generate unique case number
+        const caseNumber = await generateUniqueCaseNumber(districtResult.english);
+
         // Create new case object
         const newCase = new Case({
+            caseNumber,
             caseType,
             priority,
             status: 'active',
@@ -154,12 +260,6 @@ module.exports.createCase = async (req, res) => {
                 idNumber: reporterIdNumber
             }
         });
-
-        // Generate case number before saving
-        const count = await Case.countDocuments();
-        const year = new Date().getFullYear();
-        const districtCode = districtResult.english?.substring(0, 3).toUpperCase() || 'DEL';
-        newCase.caseNumber = `${districtCode}/${year}/${(count + 1).toString().padStart(6, '0')}`;
 
         // Handle connected profiles
         if (connectedProfiles && connectedProfiles !== '[]') {
