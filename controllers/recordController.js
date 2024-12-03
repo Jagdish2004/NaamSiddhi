@@ -33,7 +33,6 @@ async function processField(text, fieldType = 'text') {
             }
         }
 
-        console.log(`Processed ${fieldType}:`, { english, hindi });
         return {
             english: english.trim(),
             hindi: hindi.trim()
@@ -57,7 +56,6 @@ module.exports = {
             // Store uploaded files in session
             if (req.processedFiles) {
                 req.session.uploadedFiles = req.processedFiles;
-                console.log('Stored files in session:', req.session.uploadedFiles);
             }
 
             const formData = {
@@ -74,8 +72,6 @@ module.exports = {
 
     submitRecord: [handleUpload, async (req, res) => {
         try {
-            console.log('Starting submitRecord');
-            console.log('Session files:', req.session.uploadedFiles);
             
             const {
                 firstName, lastName, occupation, dob, gender, role, mNumber,
@@ -90,7 +86,6 @@ module.exports = {
             
             if (uploadedFiles?.profileImage?.[0]) {
                 const profileImage = uploadedFiles.profileImage[0];
-                console.log('Found profile image:', profileImage);
                 
                 images.push({
                     url: profileImage.cloudinaryUrl,
@@ -98,12 +93,10 @@ module.exports = {
                     type: 'profile',
                     uploadedAt: new Date()
                 });
-                console.log('Added profile image to array:', images[images.length - 1]);
             }
             
             if (uploadedFiles?.idProof?.[0]) {
                 const idProof = uploadedFiles.idProof[0];
-                console.log('Found ID proof:', idProof);
                 
                 images.push({
                     url: idProof.cloudinaryUrl,
@@ -111,13 +104,10 @@ module.exports = {
                     type: 'identification',
                     uploadedAt: new Date()
                 });
-                console.log('Added ID proof to array:', images[images.length - 1]);
             }
 
             // Clear the session files after using them
             delete req.session.uploadedFiles;
-
-            console.log('Final images array before profile creation:', images);
 
             // Process name fields with new transliteration
             const firstNameResult = await processField(firstName, 'name');
@@ -189,8 +179,7 @@ module.exports = {
                 appearance,
                 images: images.length > 0 ? images : []
             });
-
-            console.log('Profile before save (with images):', JSON.stringify(profile, null, 2));
+            
             const savedProfile = await profile.save();
             console.log('Saved profile with images:', JSON.stringify(savedProfile.images, null, 2));
 
@@ -218,21 +207,134 @@ module.exports = {
         }
     },
 
-    updateRecord: async (req, res) => {
+    updateRecord: [handleUpload, async (req, res) => {
         try {
+            const {
+                firstName, lastName, occupation, dob, gender, role, mNumber,
+                address, description, familyDetails, appearance
+            } = req.body;
+
+            // Process uploaded files
+            const images = [];
+            if (req.processedFiles) {
+                if (req.processedFiles.profileImage?.[0]) {
+                    images.push({
+                        url: req.processedFiles.profileImage[0].cloudinaryUrl,
+                        filename: req.processedFiles.profileImage[0].filename,
+                        type: 'profile',
+                        uploadedAt: new Date()
+                    });
+                }
+                if (req.processedFiles.idProof?.[0]) {
+                    images.push({
+                        url: req.processedFiles.idProof[0].cloudinaryUrl,
+                        filename: req.processedFiles.idProof[0].filename,
+                        type: 'identification',
+                        uploadedAt: new Date()
+                    });
+                }
+            }
+
+            // Process bilingual fields
+            const firstNameResult = await processField(firstName, 'name');
+            const lastNameResult = await processField(lastName, 'name');
+            const occupationResult = await processField(occupation, 'occupation');
+            const descriptionResult = await processField(description, 'text');
+            const locationResult = await processField(address.location, 'address');
+            const cityResult = await processField(address.city, 'address');
+            const districtResult = await processField(address.district, 'address');
+            const stateResult = await processField(address.state, 'address');
+
+            // Generate Soundex codes
+            const firstNameSoundex = getSoundex(firstNameResult.english, false, false);
+            const lastNameSoundex = getSoundex(lastNameResult.english, false, false);
+
+            // Process family details
+            const processedFamilyDetails = await Promise.all((familyDetails?.name || []).map(async (_, index) => {
+                const nameResult = await processField(familyDetails.name[index], 'name');
+                const relationResult = await processField(familyDetails.relation[index], 'text');
+                return {
+                    name: {
+                        english: nameResult.english,
+                        hindi: nameResult.hindi
+                    },
+                    relation: {
+                        english: relationResult.english,
+                        hindi: relationResult.hindi
+                    },
+                    contact: familyDetails.contact[index]
+                };
+            }));
+
+            // Create update object
+            const updateData = {
+                soundexCode: {
+                    firstName: firstNameSoundex,
+                    lastName: lastNameSoundex,
+                },
+                firstNameHindi: firstNameResult.hindi,
+                firstNameEnglish: firstNameResult.english,
+                lastNameHindi: lastNameResult.hindi,
+                lastNameEnglish: lastNameResult.english,
+                occupationHindi: occupationResult.hindi,
+                occupationEnglish: occupationResult.english,
+                dob,
+                gender,
+                role,
+                mNumber,
+                address: {
+                    locationHindi: locationResult.hindi,
+                    locationEnglish: locationResult.english,
+                    cityHindi: cityResult.hindi,
+                    cityEnglish: cityResult.english,
+                    districtHindi: districtResult.hindi,
+                    districtEnglish: districtResult.english,
+                    stateHindi: stateResult.hindi,
+                    stateEnglish: stateResult.english
+                },
+                descriptionHindi: descriptionResult.hindi,
+                descriptionEnglish: descriptionResult.english,
+                familyDetails: processedFamilyDetails,
+                appearance
+            };
+
+            // Only update images if new ones were uploaded
+            if (images.length > 0) {
+                // Get existing record to handle image cleanup
+                const existingRecord = await Profile.findOne({ id: req.params.id });
+                
+                // Delete old images from Cloudinary
+                if (existingRecord && existingRecord.images) {
+                    for (const image of existingRecord.images) {
+                        if (image.filename) {
+                            await cloudinary.uploader.destroy(image.filename);
+                        }
+                    }
+                }
+                
+                updateData.images = images;
+            }
+
+            // Update the record
             const updatedRecord = await Profile.findOneAndUpdate(
                 { id: req.params.id },
-                req.body,
+                updateData,
                 { new: true }
             );
+
+            if (!updatedRecord) {
+                req.flash('error', 'Record not found');
+                return res.redirect('/');
+            }
+
             req.flash('success', 'Record updated successfully');
             res.redirect(`/record/${updatedRecord.id}`);
         } catch (error) {
             console.error('Error updating record:', error);
-            req.flash('error', 'Error updating record');
+            req.flash('error', 'Error updating record: ' + error.message);
             res.redirect(`/record/${req.params.id}/edit`);
         }
-    },
+    }],
 
     deleteRecord: async (req, res) => {
         try {

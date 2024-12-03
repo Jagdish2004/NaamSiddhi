@@ -10,71 +10,74 @@
             </a>
         </div>
 
-        <form action="/record/<%= record.id %>?_method=PUT" method="POST" class="space-y-8">
+        <form action="/record/<%= record.id %>?_method=PUT" method="POST" enctype="multipart/form-data" class="space-y-8">
             <!-- Personal Information Section -->
             <div class="space-y-6">
                 <h2 class="text-xl font-nasa text-blue-400/80">Personal Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Name Fields -->
                     <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">First Name / पहला नाम</label>
                         <input type="text" 
                                name="firstName" 
-                               value="<%= record.firstNameEnglish %>"
-                               placeholder="First Name / पहला नाम" 
+                               value="<%= record.firstNameEnglish || record.firstNameHindi %>"
                                required
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
                     <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">Last Name / अंतिम नाम</label>
                         <input type="text" 
                                name="lastName" 
-                               value="<%= record.lastNameEnglish %>"
-                               placeholder="Last Name / अंतिम नाम" 
-                               required
+                               value="<%= record.lastNameEnglish || record.lastNameHindi %>"
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
 
                     <!-- Occupation & DOB -->
                     <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">Occupation / पेशा</label>
                         <input type="text" 
                                name="occupation" 
-                               value="<%= record.occupationEnglish %>"
-                               placeholder="Occupation / पेशा"
+                               value="<%= record.occupationEnglish || record.occupationHindi %>"
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
                     <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">Date of Birth</label>
                         <input type="date" 
                                name="dob" 
-                               value="<%= record.dob.toISOString().split('T')[0] %>"
+                               value="<%= record.dob?.toISOString().split('T')[0] %>"
                                required
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
 
                     <!-- Gender & Role -->
                     <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">Gender</label>
                         <select name="gender" 
                                 required
                                 class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                             <option value="male" <%= record.gender === 'male' ? 'selected' : '' %>>Male / पुरुष</option>
                             <option value="female" <%= record.gender === 'female' ? 'selected' : '' %>>Female / महिला</option>
+                            <option value="other" <%= record.gender === 'other' ? 'selected' : '' %>>Other / अन्य</option>
                         </select>
                     </div>
                     <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">Role</label>
                         <select name="role" 
                                 required
                                 class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                            <option value="criminal" <%= record.role === 'criminal' ? 'selected' : '' %>>Criminal / अपराधी</option>
+                            <option value="accused" <%= record.role === 'accused' ? 'selected' : '' %>>Accused / आरोपी</option>
                             <option value="victim" <%= record.role === 'victim' ? 'selected' : '' %>>Victim / पीड़ित</option>
                             <option value="witness" <%= record.role === 'witness' ? 'selected' : '' %>>Witness / गवाह</option>
+                            <option value="complainant" <%= record.role === 'complainant' ? 'selected' : '' %>>Complainant / शिकायतकर्ता</option>
                         </select>
                     </div>
 
-                    <!-- Mobile Number -->
+                    <!-- Contact Information -->
                     <div class="space-y-2">
-                        <input type="number" 
+                        <label class="block text-gray-400 mb-2">Mobile Number</label>
+                        <input type="text" 
                                name="mNumber" 
                                value="<%= record.mNumber %>"
-                               placeholder="Mobile Number / मोबाइल नंबर" 
-                               required
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
                 </div>
@@ -85,56 +88,203 @@
                 <h2 class="text-xl font-nasa text-blue-400/80">Address Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">Location / स्थान</label>
                         <input type="text" 
                                name="address[location]" 
-                               value="<%= record.address.locationEnglish %>"
-                               placeholder="Location / स्थान" 
+                               value="<%= record.address.locationEnglish || record.address.locationHindi %>"
                                required
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
                     <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">City / शहर</label>
                         <input type="text" 
                                name="address[city]" 
-                               value="<%= record.address.cityEnglish %>"
-                               placeholder="City / शहर" 
+                               value="<%= record.address.cityEnglish || record.address.cityHindi %>"
                                required
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
                     <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">District / जिला</label>
                         <input type="text" 
                                name="address[district]" 
-                               value="<%= record.address.districtEnglish %>"
-                               placeholder="District / जिला" 
+                               value="<%= record.address.districtEnglish || record.address.districtHindi %>"
                                required
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
                     <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">State / राज्य</label>
                         <input type="text" 
                                name="address[state]" 
-                               value="<%= record.address.stateEnglish %>"
-                               placeholder="State / राज्य" 
+                               value="<%= record.address.stateEnglish || record.address.stateHindi %>"
                                required
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
                 </div>
             </div>
 
-            <!-- Description Section -->
-            <div class="space-y-4">
-                <h2 class="text-xl font-nasa text-blue-400/80">Case Description</h2>
-                <textarea name="description" 
-                          rows="4" 
-                          placeholder="Enter case description / केस का विवरण दर्ज करें"
-                          class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"><%= record.descriptionEnglish %></textarea>
+            <!-- Physical Appearance -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-nasa text-blue-400/80">Physical Appearance</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">Height (cm)</label>
+                        <input type="number" 
+                               name="appearance[height]" 
+                               value="<%= record.appearance?.height %>"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">Weight (kg)</label>
+                        <input type="number" 
+                               name="appearance[weight]" 
+                               value="<%= record.appearance?.weight %>"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">Complexion</label>
+                        <select name="appearance[complexion]"
+                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <option value="fair" <%= record.appearance?.complexion === 'fair' ? 'selected' : '' %>>Fair / गोरा</option>
+                            <option value="medium" <%= record.appearance?.complexion === 'medium' ? 'selected' : '' %>>Medium / साँवला</option>
+                            <option value="dark" <%= record.appearance?.complexion === 'dark' ? 'selected' : '' %>>Dark / काला</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">Build</label>
+                        <select name="appearance[build]"
+                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <option value="slim" <%= record.appearance?.build === 'slim' ? 'selected' : '' %>>Slim / पतला</option>
+                            <option value="average" <%= record.appearance?.build === 'average' ? 'selected' : '' %>>Average / सामान्य</option>
+                            <option value="athletic" <%= record.appearance?.build === 'athletic' ? 'selected' : '' %>>Athletic / एथलेटिक</option>
+                            <option value="heavy" <%= record.appearance?.build === 'heavy' ? 'selected' : '' %>>Heavy / भारी</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Images Section -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-nasa text-blue-400/80">Update Images</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Profile Image -->
+                    <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">Profile Image</label>
+                        <div class="relative">
+                            <input type="file" 
+                                   name="profileImage" 
+                                   accept="image/*"
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <% if (record.images?.find(img => img.type === 'profile')) { %>
+                                <div class="mt-2">
+                                    <img src="<%= record.images.find(img => img.type === 'profile').url %>" 
+                                         alt="Current Profile Image"
+                                         class="w-32 h-32 object-cover rounded-lg">
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- ID Proof -->
+                    <div class="space-y-2">
+                        <label class="block text-gray-400 mb-2">ID Proof</label>
+                        <div class="relative">
+                            <input type="file" 
+                                   name="idProof" 
+                                   accept="image/*"
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <% if (record.images?.find(img => img.type === 'identification')) { %>
+                                <div class="mt-2">
+                                    <img src="<%= record.images.find(img => img.type === 'identification').url %>" 
+                                         alt="Current ID Proof"
+                                         class="w-32 h-32 object-cover rounded-lg">
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Family Details Section -->
+            <div class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-nasa text-blue-400/80">Family Details</h2>
+                    <button type="button" 
+                            onclick="addFamilyMember()"
+                            class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
+                        + Add Family Member
+                    </button>
+                </div>
+                <div id="familyMembers" class="space-y-4">
+                    <% record.familyDetails?.forEach((member, index) => { %>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 glass-effect rounded-lg">
+                            <input type="text" 
+                                   name="familyDetails[name][]" 
+                                   value="<%= member.name.english || member.name.hindi %>"
+                                   placeholder="Name / नाम"
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <input type="text" 
+                                   name="familyDetails[relation][]" 
+                                   value="<%= member.relation.english || member.relation.hindi %>"
+                                   placeholder="Relation / रिश्ता"
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <div class="flex items-center space-x-2">
+                                <input type="text" 
+                                       name="familyDetails[contact][]" 
+                                       value="<%= member.contact %>"
+                                       placeholder="Contact / संपर्क"
+                                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                                <button type="button" 
+                                        onclick="this.parentElement.parentElement.remove()"
+                                        class="bg-red-500/20 hover:bg-red-500/30 text-red-400 p-2 rounded-md transition-all">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
             </div>
 
             <!-- Submit Button -->
             <div class="flex justify-center pt-6">
                 <button type="submit" 
-                        class="bg-blue-500 hover:bg-blue-600 text-white font-nasa px-8 py-3 rounded-md transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20">
-                    Update Record / रिकॉर्ड अपडेट करें
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-nasa px-8 py-3 rounded-md transition-all transform hover:scale-105">
+                    Update Record
                 </button>
             </div>
         </form>
     </div>
-</div> 
+</div>
+
+<script>
+function addFamilyMember() {
+    const container = document.getElementById('familyMembers');
+    const memberDiv = document.createElement('div');
+    memberDiv.className = 'grid grid-cols-1 md:grid-cols-3 gap-4 p-4 glass-effect rounded-lg';
+    memberDiv.innerHTML = `
+        <input type="text" 
+               name="familyDetails[name][]" 
+               placeholder="Name / नाम"
+               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+        <input type="text" 
+               name="familyDetails[relation][]" 
+               placeholder="Relation / रिश्ता"
+               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+        <div class="flex items-center space-x-2">
+            <input type="text" 
+                   name="familyDetails[contact][]" 
+                   placeholder="Contact / संपर्क"
+                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+            <button type="button" 
+                    onclick="this.parentElement.parentElement.remove()"
+                    class="bg-red-500/20 hover:bg-red-500/30 text-red-400 p-2 rounded-md transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </button>
+        </div>
+    `;
+    container.appendChild(memberDiv);
+}
+</script> 
