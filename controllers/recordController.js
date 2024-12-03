@@ -181,9 +181,8 @@ module.exports = {
             });
             
             const savedProfile = await profile.save();
-            console.log('Saved profile with images:', JSON.stringify(savedProfile.images, null, 2));
 
-            req.flash('success', 'Profile created successfully with images');
+            req.flash('success', 'Profile created successfully');
             res.redirect(`/record/${savedProfile.id}`);
         } catch (error) {
             console.error('Error in submitRecord:', error);

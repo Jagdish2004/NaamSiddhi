@@ -17,13 +17,13 @@ function detectHindiScript(text) {
 async function translateToHindi(text) {
     if (!text) return '';
     try {
-        console.log('Translating to Hindi:', text);
+       
         const [translatedText] = await translate.translate(text, {
             to: 'hi',
             from: 'en',
             model: 'nmt'
         });
-        console.log('Translation result:', translatedText);
+          
         return translatedText;
     } catch (error) {
         console.error('Hindi translation error:', error);
@@ -35,13 +35,13 @@ async function translateToHindi(text) {
 async function translateToEnglish(text) {
     if (!text) return '';
     try {
-        console.log('Translating to English:', text);
+         
         const [translatedText] = await translate.translate(text, {
             to: 'en',
             from: 'hi',
             model: 'nmt'
         });
-        console.log('Translation result:', translatedText);
+      
         return translatedText;
     } catch (error) {
         console.error('English translation error:', error);
@@ -53,7 +53,7 @@ async function translateToEnglish(text) {
 async function transliterateToEnglish(text, fieldType = 'text') {
     if (!text) return '';
     try {
-        console.log('Transliterating to English:', text);
+         
         
         // For names and special fields, use Google Transliterate
         if (fieldType === 'name') {
@@ -63,7 +63,7 @@ async function transliterateToEnglish(text, fieldType = 'text') {
                         console.error('Transliteration error:', err);
                         reject(err);
                     } else {
-                        console.log('Transliteration results:', results);
+                           
                         
                         // Extract the first Hindi word suggestion
                         const firstResult = Array.isArray(results) && results.length > 0 && results[0].hws
@@ -76,7 +76,6 @@ async function transliterateToEnglish(text, fieldType = 'text') {
                             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                             .join(' ');
                             
-                        console.log('Selected result:', formattedResult);
                         resolve(formattedResult);
                     }
                 });
@@ -96,7 +95,6 @@ async function transliterateToEnglish(text, fieldType = 'text') {
 async function transliterateToHindi(text, fieldType = 'text') {
     if (!text) return '';
     try {
-        console.log('Transliterating to Hindi:', text);
         
         // For names and special fields, use Google Transliterate
         if (fieldType === 'name') {
@@ -106,14 +104,12 @@ async function transliterateToHindi(text, fieldType = 'text') {
                         console.error('Transliteration error:', err);
                         reject(err);
                     } else {
-                        console.log('Transliteration results:', results);
                         
                         // Extract the Hindi word suggestions
                         const selectedResult = Array.isArray(results) && results.length > 0 && results[0].hws
                             ? results[0].hws[0]  // Take first Hindi suggestion
                             : text;
                             
-                        console.log('Selected Hindi result:', selectedResult);
                         resolve(selectedResult);
                     }
                 });

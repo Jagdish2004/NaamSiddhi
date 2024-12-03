@@ -35,7 +35,6 @@ const storage = new CloudinaryStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-    console.log('Processing file:', file);
     if (file.mimetype.startsWith('image/')) {
         cb(null, true);
     } else {
@@ -76,8 +75,6 @@ const handleUpload = (req, res, next) => {
             req.processedFiles = {};
 
             if (req.files) {
-                console.log('Initial files object:', JSON.stringify(req.files, null, 2));
-                
                 // Process each file field
                 for (const fieldname in req.files) {
                     const files = req.files[fieldname];
@@ -97,18 +94,11 @@ const handleUpload = (req, res, next) => {
                             
                             // Store processed file
                             req.processedFiles[fieldname].push(processedFile);
-                            
-                            // Log the processed file
-                            console.log(`Processed ${fieldname}:`, processedFile);
                         } else {
                             console.error(`No path found for ${fieldname}:`, file);
                         }
                     }
                 }
-                
-                console.log('Final processed files:', JSON.stringify(req.processedFiles, null, 2));
-            } else {
-                console.log('No files received in request');
             }
             
             next();
