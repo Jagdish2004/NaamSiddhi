@@ -2,178 +2,211 @@
 
 <div class="pt-20">
     <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto">
-        <div class="flex justify-between items-start mb-8">
-            <h1 class="text-3xl font-nasa text-blue-400">Preview Record</h1>
-            <div class="flex space-x-4">
+        <!-- Preview Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-nasa text-blue-400">Preview Profile</h1>
+            <p class="text-gray-400 mt-2">Please review all information before submitting</p>
+            
+            <div class="flex justify-center space-x-4 mt-6">
                 <button onclick="history.back()" 
-                        class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
+                        class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-6 py-2 rounded-md transition-all flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
+                    </svg>
                     Edit Details
                 </button>
-                <form action="/newrecord/submit" method="POST" id="submitForm">
-                    <!-- Hidden inputs will be added here via JavaScript -->
+                <form action="/newrecord/submit" method="POST" id="submitForm" class="inline">
                     <button type="submit" 
-                            class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all">
+                            class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-6 py-2 rounded-md transition-all flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
                         Confirm & Submit
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- Personal Information -->
-        <div class="space-y-6 mb-8">
-            <h2 class="text-xl font-nasa text-blue-400/80">Personal Information</h2>
+        <!-- Preview Banner -->
+        <div class="bg-blue-500/10 border border-blue-400/20 rounded-lg p-4 mb-8 text-center">
+            <p class="text-blue-400">
+                <svg class="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Preview Mode - Review your information
+            </p>
+        </div>
+
+        <!-- Profile Header with Image -->
+        <div class="flex items-start space-x-8 mb-8">
+            <div class="relative w-48 h-48">
+                <div class="w-full h-full rounded-lg overflow-hidden glass-effect profile-image">
+                    <img src="<%= formData.uploadedFiles?.profileImage?.[0]?.path || '/images/default-profile.png' %>" 
+                         alt="Profile Photo"
+                         class="w-full h-full object-cover"
+                         onerror="this.src='/images/default-profile.png'">
+                </div>
+                <div class="absolute top-2 right-2 bg-blue-500/20 text-blue-400 rounded-full p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="flex-1">
+                <div class="space-y-4">
+                    <div>
+                        <h2 class="text-2xl font-nasa text-blue-400">
+                            <%= formData.firstName || '<No Name Provided>' %> <%= formData.lastName || '' %>
+                        </h2>
+                        <p class="text-gray-400"><%= formData.occupation || '<No Occupation Provided>' %></p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-gray-400">Date of Birth</p>
+                            <p class="text-white"><%= formData.dob ? new Date(formData.dob).toLocaleDateString() : '<No DOB Provided>' %></p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">Gender</p>
+                            <p class="text-white"><%= formData.gender || '<No Gender Specified>' %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="glass-effect p-6 rounded-lg mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-nasa text-blue-400/80">Contact Information</h3>
+                <span class="text-xs text-gray-400">Preview</span>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <p class="text-gray-400">Name:</p>
-                    <p class="text-white">
-                        <%= formData.firstName %> <%= formData.lastName %>
-                    </p>
+                <div>
+                    <p class="text-gray-400">Mobile Number</p>
+                    <p class="text-white"><%= formData.mNumber || '<No Mobile Number Provided>' %></p>
                 </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Occupation:</p>
-                    <p class="text-white"><%= formData.occupation %></p>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Date of Birth:</p>
-                    <p class="text-white"><%= new Date(formData.dob).toLocaleDateString() %></p>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Gender:</p>
-                    <p class="text-white"><%= formData.gender %></p>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Role:</p>
-                    <p class="text-white"><%= formData.role %></p>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Mobile Number:</p>
-                    <p class="text-white"><%= formData.mNumber %></p>
+                <div>
+                    <p class="text-gray-400">Role</p>
+                    <p class="text-white"><%= formData.role || '<No Role Specified>' %></p>
                 </div>
             </div>
         </div>
 
         <!-- Address Information -->
-        <div class="space-y-6 mb-8">
-            <h2 class="text-xl font-nasa text-blue-400/80">Address Information</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <p class="text-gray-400">Location:</p>
-                    <p class="text-white"><%= formData.address.location %></p>
+        <div class="glass-effect p-6 rounded-lg mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-nasa text-blue-400/80">Address Information</h3>
+                <span class="text-xs text-gray-400">Preview</span>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <p class="text-gray-400">Location</p>
+                    <p class="text-white"><%= formData.address?.location || '<No Location Provided>' %></p>
                 </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">City:</p>
-                    <p class="text-white"><%= formData.address.city %></p>
+                <div>
+                    <p class="text-gray-400">City</p>
+                    <p class="text-white"><%= formData.address?.city || '<No City Provided>' %></p>
                 </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">District:</p>
-                    <p class="text-white"><%= formData.address.district %></p>
+                <div>
+                    <p class="text-gray-400">District</p>
+                    <p class="text-white"><%= formData.address?.district || '<No District Provided>' %></p>
                 </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">State:</p>
-                    <p class="text-white"><%= formData.address.state %></p>
+                <div>
+                    <p class="text-gray-400">State</p>
+                    <p class="text-white"><%= formData.address?.state || '<No State Provided>' %></p>
                 </div>
             </div>
         </div>
 
         <!-- Appearance Details -->
-        <div class="space-y-6 mb-8">
-            <h2 class="text-xl font-nasa text-blue-400/80">Appearance Details</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <p class="text-gray-400">Height:</p>
-                    <p class="text-white"><%= formData.appearance.height %> cm</p>
+        <div class="glass-effect p-6 rounded-lg mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-nasa text-blue-400/80">Appearance Details</h3>
+                <span class="text-xs text-gray-400">Preview</span>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div>
+                    <p class="text-gray-400">Height</p>
+                    <p class="text-white"><%= formData.appearance?.height ? `${formData.appearance.height} cm` : '<No Height Provided>' %></p>
                 </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Weight:</p>
-                    <p class="text-white"><%= formData.appearance.weight %> kg</p>
+                <div>
+                    <p class="text-gray-400">Weight</p>
+                    <p class="text-white"><%= formData.appearance?.weight ? `${formData.appearance.weight} kg` : '<No Weight Provided>' %></p>
                 </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Complexion:</p>
-                    <p class="text-white"><%= formData.appearance.complexion %></p>
+                <div>
+                    <p class="text-gray-400">Build</p>
+                    <p class="text-white"><%= formData.appearance?.build || '<No Build Specified>' %></p>
                 </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Build:</p>
-                    <p class="text-white"><%= formData.appearance.build %></p>
+                <div>
+                    <p class="text-gray-400">Complexion</p>
+                    <p class="text-white"><%= formData.appearance?.complexion || '<No Complexion Specified>' %></p>
                 </div>
             </div>
-            <div class="space-y-4 mt-4">
-                <div class="space-y-2">
-                    <p class="text-gray-400">Facial Features:</p>
-                    <p class="text-white"><%= formData.appearance.facialFeatures %></p>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Scars/Marks:</p>
-                    <p class="text-white"><%= formData.appearance.scars %></p>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Tattoos:</p>
-                    <p class="text-white"><%= formData.appearance.tattoos %></p>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Other Features:</p>
-                    <p class="text-white"><%= formData.appearance.otherFeatures %></p>
+
+            <!-- Distinguishing Features -->
+            <div class="mt-6">
+                <h4 class="text-lg font-nasa text-blue-400/60 mb-4">Distinguishing Features</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-gray-400">Facial Features</p>
+                        <p class="text-white"><%= formData.appearance?.facialFeatures || '<No Facial Features Specified>' %></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400">Scars/Marks</p>
+                        <p class="text-white"><%= formData.appearance?.scars || '<No Scars/Marks Specified>' %></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400">Tattoos</p>
+                        <p class="text-white"><%= formData.appearance?.tattoos || '<No Tattoos Specified>' %></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400">Other Features</p>
+                        <p class="text-white"><%= formData.appearance?.otherFeatures || '<No Other Features Specified>' %></p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Family Details -->
-        <% if (formData.familyDetails && formData.familyDetails.name) { %>
-            <div class="space-y-6 mb-8">
-                <h2 class="text-xl font-nasa text-blue-400/80">Family Details</h2>
-                <div class="space-y-4">
-                    <% formData.familyDetails.name.forEach((name, index) => { %>
-                        <div class="glass-effect p-4 rounded-lg">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div class="space-y-2">
-                                    <p class="text-gray-400">Name:</p>
-                                    <p class="text-white"><%= name %></p>
-                                </div>
-                                <div class="space-y-2">
-                                    <p class="text-gray-400">Relation:</p>
-                                    <p class="text-white"><%= formData.familyDetails.relation[index] %></p>
-                                </div>
-                                <div class="space-y-2">
-                                    <p class="text-gray-400">Contact:</p>
-                                    <p class="text-white"><%= formData.familyDetails.contact[index] %></p>
-                                </div>
-                            </div>
-                        </div>
-                    <% }); %>
-                </div>
+        <!-- ID Documents -->
+        <div class="glass-effect p-6 rounded-lg mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-nasa text-blue-400/80">ID Documents</h3>
+                <span class="text-xs text-gray-400">Preview</span>
             </div>
-        <% } %>
+            <% if (formData.uploadedFiles?.idProof?.[0]) { %>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <img src="<%= formData.uploadedFiles.idProof[0].path %>" 
+                             alt="ID Proof"
+                             class="w-full h-48 object-cover rounded-lg"
+                             onerror="this.src='/images/default-document.png'">
+                        <p class="text-gray-400 mt-2 text-center">ID Proof</p>
+                    </div>
+                </div>
+            <% } else { %>
+                <p class="text-gray-400 italic">No ID documents uploaded</p>
+            <% } %>
+        </div>
 
-        <!-- Case Details -->
-        <% if (formData.caseDetails && formData.caseDetails.caseNumber) { %>
-            <div class="space-y-6 mb-8">
-                <h2 class="text-xl font-nasa text-blue-400/80">Case Details</h2>
-                <div class="space-y-4">
-                    <% formData.caseDetails.caseNumber.forEach((number, index) => { %>
-                        <div class="glass-effect p-4 rounded-lg">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="space-y-2">
-                                    <p class="text-gray-400">Case Number:</p>
-                                    <p class="text-white"><%= number %></p>
-                                </div>
-                                <div class="space-y-2">
-                                    <p class="text-gray-400">Section:</p>
-                                    <p class="text-white"><%= formData.caseDetails.section[index] %></p>
-                                </div>
-                                <div class="space-y-2 col-span-2">
-                                    <p class="text-gray-400">Details:</p>
-                                    <p class="text-white"><%= formData.caseDetails.details[index] %></p>
-                                </div>
-                            </div>
-                        </div>
-                    <% }); %>
-                </div>
+        <!-- Preview Footer -->
+        <div class="text-center mt-8">
+            <p class="text-gray-400 mb-4">Please review all information carefully before submitting</p>
+            <div class="flex justify-center space-x-4">
+                <button onclick="history.back()" 
+                        class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-6 py-2 rounded-md transition-all">
+                    Edit Details
+                </button>
+                <button type="submit" form="submitForm"
+                        class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-6 py-2 rounded-md transition-all">
+                    Confirm & Submit
+                </button>
             </div>
-        <% } %>
+        </div>
     </div>
 </div>
 
 <script>
-    // Transfer form data to hidden form
     document.addEventListener('DOMContentLoaded', () => {
         const formData = <%- JSON.stringify(formData) %>;
         const form = document.getElementById('submitForm');
@@ -189,18 +222,20 @@
 
         // Add all form data as hidden inputs
         Object.entries(formData).forEach(([key, value]) => {
-            if (typeof value === 'object') {
-                Object.entries(value).forEach(([subKey, subValue]) => {
-                    if (Array.isArray(subValue)) {
-                        subValue.forEach((item, index) => {
-                            form.appendChild(createHiddenInput(`${key}[${subKey}][]`, item));
-                        });
-                    } else {
-                        form.appendChild(createHiddenInput(`${key}[${subKey}]`, subValue));
-                    }
-                });
-            } else {
-                form.appendChild(createHiddenInput(key, value));
+            if (key !== 'uploadedFiles') { // Skip uploadedFiles as they're in session
+                if (typeof value === 'object') {
+                    Object.entries(value).forEach(([subKey, subValue]) => {
+                        if (Array.isArray(subValue)) {
+                            subValue.forEach((item, index) => {
+                                form.appendChild(createHiddenInput(`${key}[${subKey}][]`, item));
+                            });
+                        } else {
+                            form.appendChild(createHiddenInput(`${key}[${subKey}]`, subValue));
+                        }
+                    });
+                } else {
+                    form.appendChild(createHiddenInput(key, value));
+                }
             }
         });
     });

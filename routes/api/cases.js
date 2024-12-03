@@ -24,15 +24,12 @@ router.get('/search', async (req, res) => {
         if (status) searchQuery.status = status;
         if (priority) searchQuery.priority = priority;
 
-        console.log('Search Query:', searchQuery); // Debug log
-
         const cases = await Case.find(searchQuery)
             .select('_id caseNumber caseType status location description profiles')
             .populate('profiles.profile', 'firstNameEnglish lastNameEnglish')
             .sort('-createdAt')
             .limit(10);
 
-        console.log('Found Cases:', cases.length, 'cases'); // Debug log
         res.json({ cases });
     } catch (error) {
         console.error('Search error:', error);

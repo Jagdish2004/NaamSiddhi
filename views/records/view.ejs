@@ -20,502 +20,482 @@
             </div>
         </div>
 
-        <!-- Status Badge -->
-        <div class="mb-8">
-            <span class="px-3 py-1 rounded-full text-sm font-nasa
-                <%= record.status === 'active' ? 'bg-green-500/20 text-green-400' : 
-                   record.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 
-                   'bg-red-500/20 text-red-400' %>">
-                <%= record.status.charAt(0).toUpperCase() + record.status.slice(1) %>
-            </span>
-        </div>
-
-        <!-- Personal Information -->
-        <div class="space-y-6 mb-8">
-            <h2 class="text-xl font-nasa text-blue-400/80">Personal Information</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <p class="text-gray-400">Name:</p>
-                    <p class="text-white">
-                        <%= record.firstNameEnglish %> <%= record.lastNameEnglish %>
-                        <span class="text-sm text-gray-500">
-                            (<%= record.firstNameHindi %> <%= record.lastNameHindi %>)
-                        </span>
-                    </p>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Occupation:</p>
-                    <p class="text-white">
-                        <%= record.occupationEnglish %>
-                        <span class="text-sm text-gray-500">(<%= record.occupationHindi %>)</span>
-                    </p>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Date of Birth:</p>
-                    <p class="text-white"><%= new Date(record.dob).toLocaleDateString() %></p>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Gender:</p>
-                    <p class="text-white"><%= record.gender %></p>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">Mobile Number:</p>
-                    <p class="text-white"><%= record.mNumber %></p>
+        <!-- Profile Header with Image -->
+        <div class="flex items-start space-x-8 mb-8">
+            <div class="w-48 h-48 rounded-lg overflow-hidden glass-effect profile-image">
+                <img src="<%= record.images.find(img => img.type === 'profile')?.url || '/images/default-profile.png' %>" 
+                     alt="Profile Photo"
+                     class="w-full h-full object-cover"
+                     onerror="this.src='/images/default-profile.png'">
+            </div>
+            <div class="flex-1">
+                <div class="space-y-4">
+                    <div>
+                        <h2 class="text-2xl font-nasa text-blue-400">
+                            <%= record.firstNameEnglish %> <%= record.lastNameEnglish %>
+                            <span class="text-lg text-gray-400">
+                                (<%= record.firstNameHindi %> <%= record.lastNameHindi %>)
+                            </span>
+                        </h2>
+                        <p class="text-gray-400">
+                            <%= record.occupationEnglish || 'Not Specified' %>
+                            <% if (record.occupationHindi) { %>
+                                <span class="text-sm">(<%= record.occupationHindi %>)</span>
+                            <% } %>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Appearance Details -->
-        <div class="space-y-6 mb-8">
-            <h2 class="text-xl font-nasa text-blue-400/80">Appearance Details</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Physical Measurements -->
-                <div class="space-y-4">
-                    <h3 class="text-lg font-nasa text-blue-400/60">Physical Characteristics</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <p class="text-gray-400">Height:</p>
-                            <p class="text-white"><%= record.appearance.height %> cm</p>
-                        </div>
-                        <div class="space-y-2">
-                            <p class="text-gray-400">Weight:</p>
-                            <p class="text-white"><%= record.appearance.weight %> kg</p>
-                        </div>
-                    </div>
-                    <div class="space-y-2">
-                        <p class="text-gray-400">Complexion:</p>
-                        <p class="text-white"><%= record.appearance.complexion %></p>
-                    </div>
-                    <div class="space-y-2">
-                        <p class="text-gray-400">Build:</p>
-                        <p class="text-white"><%= record.appearance.build %></p>
-                    </div>
-                </div>
+        <!-- Status Badge -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <span class="px-3 py-1 rounded-full text-sm font-nasa
+                    <%= record.status === 'active' ? 'bg-green-500/20 text-green-400' : 
+                       record.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 
+                       'bg-red-500/20 text-red-400' %>">
+                    <%= record.status.charAt(0).toUpperCase() + record.status.slice(1) %>
+                </span>
+            </div>
 
-                <!-- Distinguishing Features -->
-                <div class="space-y-4">
-                    <h3 class="text-lg font-nasa text-blue-400/60">Distinguishing Features</h3>
-                    <div class="space-y-4">
-                        <div class="space-y-2">
-                            <p class="text-gray-400">Facial Features:</p>
-                            <p class="text-white">
-                                <%= record.appearance.facialFeatures.english %>
-                                <span class="text-sm text-gray-500">(<%= record.appearance.facialFeatures.hindi %>)</span>
-                            </p>
-                        </div>
-                        <div class="space-y-2">
-                            <p class="text-gray-400">Scars/Marks:</p>
-                            <p class="text-white">
-                                <%= record.appearance.scars.english %>
-                                <span class="text-sm text-gray-500">(<%= record.appearance.scars.hindi %>)</span>
-                            </p>
-                        </div>
-                        <div class="space-y-2">
-                            <p class="text-gray-400">Tattoos:</p>
-                            <p class="text-white">
-                                <%= record.appearance.tattoos.english %>
-                                <span class="text-sm text-gray-500">(<%= record.appearance.tattoos.hindi %>)</span>
-                            </p>
-                        </div>
-                        <div class="space-y-2">
-                            <p class="text-gray-400">Other Features:</p>
-                            <p class="text-white">
-                                <%= record.appearance.otherFeatures.english %>
-                                <span class="text-sm text-gray-500">(<%= record.appearance.otherFeatures.hindi %>)</span>
-                            </p>
-                        </div>
-                    </div>
+            <!-- Link Case Button -->
+            <button onclick="showLinkCaseModal()"
+                    class="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 font-nasa px-4 py-2 rounded-md transition-all flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                Link to Case
+            </button>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="glass-effect p-6 rounded-lg mb-8">
+            <h3 class="text-xl font-nasa text-blue-400/80 mb-4">Personal Information</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <div>
+                    <p class="text-gray-400">Date of Birth</p>
+                    <p class="text-white"><%= record.dob ? new Date(record.dob).toLocaleDateString() : 'Not Specified' %></p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Gender</p>
+                    <p class="text-white"><%= record.gender || 'Not Specified' %></p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Mobile Number</p>
+                    <p class="text-white"><%= record.mNumber || 'Not Specified' %></p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Role</p>
+                    <p class="text-white"><%= record.role || 'Not Specified' %></p>
                 </div>
             </div>
         </div>
 
         <!-- Address Information -->
-        <div class="space-y-6 mb-8">
-            <h2 class="text-xl font-nasa text-blue-400/80">Address Information</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <p class="text-gray-400">Location:</p>
+        <div class="glass-effect p-6 rounded-lg mb-8">
+            <h3 class="text-xl font-nasa text-blue-400/80 mb-4">Address Information</h3>
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <p class="text-gray-400">Location</p>
                     <p class="text-white">
-                        <%= record.address.locationEnglish %>
-                        <span class="text-sm text-gray-500">(<%= record.address.locationHindi %>)</span>
+                        <%= record.address?.locationEnglish || 'Not Specified' %>
+                        <% if (record.address?.locationHindi) { %>
+                            <span class="text-sm text-gray-400">(<%= record.address.locationHindi %>)</span>
+                        <% } %>
                     </p>
                 </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">City:</p>
+                <div>
+                    <p class="text-gray-400">City</p>
                     <p class="text-white">
-                        <%= record.address.cityEnglish %>
-                        <span class="text-sm text-gray-500">(<%= record.address.cityHindi %>)</span>
+                        <%= record.address?.cityEnglish || 'Not Specified' %>
+                        <% if (record.address?.cityHindi) { %>
+                            <span class="text-sm text-gray-400">(<%= record.address.cityHindi %>)</span>
+                        <% } %>
                     </p>
                 </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">District:</p>
+                <div>
+                    <p class="text-gray-400">District</p>
                     <p class="text-white">
-                        <%= record.address.districtEnglish %>
-                        <span class="text-sm text-gray-500">(<%= record.address.districtHindi %>)</span>
+                        <%= record.address?.districtEnglish || 'Not Specified' %>
+                        <% if (record.address?.districtHindi) { %>
+                            <span class="text-sm text-gray-400">(<%= record.address.districtHindi %>)</span>
+                        <% } %>
                     </p>
                 </div>
-                <div class="space-y-2">
-                    <p class="text-gray-400">State:</p>
+                <div>
+                    <p class="text-gray-400">State</p>
                     <p class="text-white">
-                        <%= record.address.stateEnglish %>
-                        <span class="text-sm text-gray-500">(<%= record.address.stateHindi %>)</span>
+                        <%= record.address?.stateEnglish || 'Not Specified' %>
+                        <% if (record.address?.stateHindi) { %>
+                            <span class="text-sm text-gray-400">(<%= record.address.stateHindi %>)</span>
+                        <% } %>
                     </p>
                 </div>
             </div>
         </div>
 
-        <!-- Case Details Section -->
-        <% if (record.caseDetails && record.caseDetails.length > 0) { %>
-            <div class="space-y-6 mb-8">
-                <h2 class="text-xl font-nasa text-blue-400/80">Case Details</h2>
-                <div class="space-y-4">
-                    <% record.caseDetails.forEach(caseDetail => { %>
-                        <div class="glass-effect p-4 rounded-lg">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="space-y-2">
-                                    <p class="text-gray-400">Case Number:</p>
-                                    <p class="text-white"><%= caseDetail.caseNumber %></p>
-                                </div>
-                                <div class="space-y-2">
-                                    <p class="text-gray-400">Section:</p>
-                                    <p class="text-white"><%= caseDetail.section %></p>
-                                </div>
-                                <div class="space-y-2">
-                                    <p class="text-gray-400">Role:</p>
-                                    <p class="text-white"><%= caseDetail.role %></p>
-                                </div>
-                            </div>
-                            <div class="mt-4">
-                                <p class="text-gray-400">Details:</p>
-                                <p class="text-white"><%= caseDetail.details.english %></p>
-                                <p class="text-sm text-gray-500"><%= caseDetail.details.hindi %></p>
-                            </div>
-                        </div>
-                    <% }); %>
+        <!-- Appearance Details -->
+        <div class="glass-effect p-6 rounded-lg mb-8">
+            <h3 class="text-xl font-nasa text-blue-400/80 mb-4">Appearance Details</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <div>
+                    <p class="text-gray-400">Height</p>
+                    <p class="text-white"><%= record.appearance?.height ? `${record.appearance.height} cm` : 'Not Specified' %></p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Weight</p>
+                    <p class="text-white"><%= record.appearance?.weight ? `${record.appearance.weight} kg` : 'Not Specified' %></p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Build</p>
+                    <p class="text-white"><%= record.appearance?.build || 'Not Specified' %></p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Complexion</p>
+                    <p class="text-white"><%= record.appearance?.complexion || 'Not Specified' %></p>
                 </div>
             </div>
-        <% } %>
 
-        <!-- Family Details Section -->
+            <!-- Distinguishing Features -->
+            <div class="mt-6">
+                <h4 class="text-lg font-nasa text-blue-400/60 mb-4">Distinguishing Features</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-gray-400">Facial Features</p>
+                        <p class="text-white"><%= record.appearance?.facialFeatures || 'Not Specified' %></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400">Scars/Marks</p>
+                        <p class="text-white"><%= record.appearance?.scars || 'Not Specified' %></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400">Tattoos</p>
+                        <p class="text-white"><%= record.appearance?.tattoos || 'Not Specified' %></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400">Other Features</p>
+                        <p class="text-white"><%= record.appearance?.otherFeatures || 'Not Specified' %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Family Details -->
         <% if (record.familyDetails && record.familyDetails.length > 0) { %>
-            <div class="space-y-6">
-                <h2 class="text-xl font-nasa text-blue-400/80">Family Details</h2>
+            <div class="glass-effect p-6 rounded-lg mb-8">
+                <h3 class="text-xl font-nasa text-blue-400/80 mb-4">Family Details</h3>
                 <div class="space-y-4">
                     <% record.familyDetails.forEach(member => { %>
                         <div class="glass-effect p-4 rounded-lg">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div class="space-y-2">
-                                    <p class="text-gray-400">Name:</p>
+                                <div>
+                                    <p class="text-gray-400">Name</p>
                                     <p class="text-white">
                                         <%= member.name.english %>
-                                        <span class="text-sm text-gray-500">(<%= member.name.hindi %>)</span>
+                                        <span class="text-sm text-gray-400">(<%= member.name.hindi %>)</span>
                                     </p>
                                 </div>
-                                <div class="space-y-2">
-                                    <p class="text-gray-400">Relation:</p>
+                                <div>
+                                    <p class="text-gray-400">Relation</p>
                                     <p class="text-white">
                                         <%= member.relation.english %>
-                                        <span class="text-sm text-gray-500">(<%= member.relation.hindi %>)</span>
+                                        <span class="text-sm text-gray-400">(<%= member.relation.hindi %>)</span>
                                     </p>
                                 </div>
-                                <div class="space-y-2">
-                                    <p class="text-gray-400">Contact:</p>
-                                    <p class="text-white"><%= member.contact %></p>
+                                <div>
+                                    <p class="text-gray-400">Contact</p>
+                                    <p class="text-white"><%= member.contact || 'Not Specified' %></p>
                                 </div>
                             </div>
                         </div>
                     <% }); %>
                 </div>
+            </div>
+        <% } else { %>
+            <div class="glass-effect p-6 rounded-lg mb-8">
+                <h3 class="text-xl font-nasa text-blue-400/80 mb-4">Family Details</h3>
+                <p class="text-gray-400 italic">No family details provided</p>
             </div>
         <% } %>
 
-        <!-- Add this section where you want to show connected cases -->
-        <div class="space-y-6 mb-8">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-nasa text-blue-400/80">Connected Cases</h2>
-                <button onclick="showCaseLinkModal()" 
-                        class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all">
-                    + Link Case
+        <!-- ID Documents -->
+        <div class="glass-effect p-6 rounded-lg mb-8">
+            <h3 class="text-xl font-nasa text-blue-400/80 mb-4">ID Documents</h3>
+            <% if (record.images.find(img => img.type === 'identification')) { %>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <img src="<%= record.images.find(img => img.type === 'identification').url %>" 
+                             alt="ID Document"
+                             class="w-full h-48 object-cover rounded-lg"
+                             onerror="this.src='/images/default-document.png'">
+                        <p class="text-gray-400 mt-2 text-center">ID Document</p>
+                    </div>
+                </div>
+            <% } else { %>
+                <p class="text-gray-400 italic">No ID documents uploaded</p>
+            <% } %>
+        </div>
+
+        <!-- Linked Cases -->
+        <div class="glass-effect p-6 rounded-lg mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-nasa text-blue-400/80">Linked Cases</h3>
+                <button onclick="showLinkCaseModal()"
+                        class="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 font-nasa px-4 py-2 rounded-md transition-all flex items-center text-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Link New Case
                 </button>
             </div>
-            
-            <div id="connectedCases" class="space-y-4">
-                <% if (record.cases && record.cases.length > 0) { %>
+
+            <% if (record.cases && record.cases.length > 0) { %>
+                <div class="space-y-4">
                     <% record.cases.forEach(caseLink => { %>
-                        <div class="glass-effect p-4 rounded-lg flex justify-between items-center">
-                            <div>
-                                <p class="text-white">Case #<%= caseLink.case.caseNumber %></p>
-                                <p class="text-sm text-gray-400">Role: <%= caseLink.role %></p>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <a href="/cases/<%= caseLink.case._id %>" 
-                                   class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
-                                    View Case
-                                </a>
-                                <button onclick="unlinkCase('<%= caseLink.case._id %>')"
-                                        class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1 rounded-md transition-all">
-                                    Unlink
-                                </button>
+                        <div class="glass-effect p-4 rounded-lg">
+                            <div class="flex justify-between items-start">
+                                <div class="space-y-2">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-lg text-blue-400 font-nasa">
+                                            Case #<%= caseLink.case.caseNumber %>
+                                        </span>
+                                        <span class="px-2 py-1 rounded-full text-xs
+                                            <%= caseLink.case.status === 'active' ? 'bg-green-500/20 text-green-400' : 
+                                               caseLink.case.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 
+                                               'bg-red-500/20 text-red-400' %>">
+                                            <%= caseLink.case.status.charAt(0).toUpperCase() + caseLink.case.status.slice(1) %>
+                                        </span>
+                                        <span class="px-2 py-1 rounded-full text-xs bg-blue-500/20 text-blue-400">
+                                            <%= caseLink.role.charAt(0).toUpperCase() + caseLink.role.slice(1) %>
+                                        </span>
+                                    </div>
+                                    <% if (caseLink.case.description) { %>
+                                        <p class="text-gray-400 text-sm">
+                                            <%= caseLink.case.description.english %>
+                                            <% if (caseLink.case.description.hindi) { %>
+                                                <span class="text-xs">(<%= caseLink.case.description.hindi %>)</span>
+                                            <% } %>
+                                        </p>
+                                    <% } %>
+                                    <% if (caseLink.case.location) { %>
+                                        <p class="text-gray-400 text-xs">
+                                            Location: <%= caseLink.case.location.district.english %>, 
+                                            <%= caseLink.case.location.state.english %>
+                                        </p>
+                                    <% } %>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <a href="/cases/<%= caseLink.case._id %>" 
+                                       class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md text-sm transition-all">
+                                        View Case
+                                    </a>
+                                    <button onclick="unlinkCase('<%= record.id %>', '<%= caseLink.case._id %>')"
+                                            class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1 rounded-md text-sm transition-all">
+                                        Unlink
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     <% }); %>
-                <% } else { %>
-                    <div class="text-gray-400 text-center py-4">
-                        No cases linked to this profile
-                    </div>
-                <% } %>
-            </div>
+                </div>
+            <% } else { %>
+                <p class="text-gray-400 italic">No cases linked to this profile</p>
+            <% } %>
+        </div>
+    </div>
+</div> 
+
+<!-- Link Case Modal -->
+<div id="linkCaseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-space-dark glass-effect rounded-lg p-8 max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-nasa text-blue-400">Link to Case</h3>
+            <button onclick="hideLinkCaseModal()" class="text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
 
-        <!-- Case Link Modal -->
-        <div id="caseLinkModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-            <div class="flex items-center justify-center min-h-screen px-4">
-                <div class="glass-effect rounded-lg p-8 max-w-2xl w-full">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-nasa text-blue-400">Link Case to Profile</h3>
-                        <button onclick="hideCaseLinkModal()" class="text-gray-400 hover:text-gray-200">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="mb-6">
-                        <input type="text" 
-                               id="caseSearch" 
-                               placeholder="Search by case number..."
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                    </div>
-
-                    <div id="caseSearchResults" class="max-h-60 overflow-y-auto space-y-2">
-                        <!-- Search results will appear here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <script>
-        // Add these functions to handle case linking
-        function showCaseLinkModal() {
-            document.getElementById('caseLinkModal').classList.remove('hidden');
-        }
-
-        function hideCaseLinkModal() {
-            document.getElementById('caseLinkModal').classList.add('hidden');
-        }
-
-        // Update the displayResults function
-        function displayResults(results) {
-            const resultsDiv = document.getElementById('caseSearchResults');
-            
-            console.log('Displaying results:', results); // Debug log
-
-            if (!results.cases || results.cases.length === 0) {
-                resultsDiv.innerHTML = `
-                    <div class="text-center text-gray-400 py-8">
-                        <p>No cases found matching your search criteria</p>
-                    </div>
-                `;
-                return;
-            }
-
-            resultsDiv.innerHTML = results.cases.map(case_ => `
-                <div class="glass-effect p-4 rounded-lg flex justify-between items-center mb-2">
-                    <div>
-                        <p class="text-white font-medium">Case #${case_.caseNumber || 'N/A'}</p>
-                        <p class="text-sm text-gray-400">${case_.caseType || 'N/A'} - ${case_.status || 'N/A'}</p>
-                        <p class="text-sm text-gray-400">${case_.location?.district?.english || 'Location not specified'}</p>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <select id="role-${case_._id}" 
-                                class="bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-1 text-gray-100 text-sm">
-                            <option value="accused">Accused</option>
-                            <option value="victim">Victim</option>
-                            <option value="witness">Witness</option>
-                            <option value="complainant">Complainant</option>
-                        </select>
-                        <button onclick="linkCase('${case_._id}')"
-                                id="link-button-${case_._id}"
-                                class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
-                            Link
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Update the case search functionality
-        document.getElementById('caseSearch').addEventListener('input', async function(e) {
-            const searchTerm = e.target.value.trim();
-            const resultsDiv = document.getElementById('caseSearchResults');
-            
-            if (searchTerm.length < 1) {
-                resultsDiv.innerHTML = '';
-                return;
-            }
-
-            try {
-                console.log('Searching for:', searchTerm);
-                const response = await fetch(`/api/cases/search?q=${encodeURIComponent(searchTerm)}`);
-                if (!response.ok) throw new Error('Search failed');
+        <form action="/record/<%= record.id %>/link-case" method="POST" class="space-y-6">
+            <div class="relative">
+                <input type="text" 
+                       id="caseNumberInput"
+                       name="caseNumber" 
+                       placeholder="Enter case number"
+                       autocomplete="off"
+                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                       required>
                 
-                const data = await response.json();
-                console.log('Search response:', data);
+                <!-- Add this suggestions container -->
+                <div id="caseSuggestions" 
+                     class="absolute z-50 w-full mt-1 bg-space-dark/95 border border-blue-400/30 rounded-md shadow-lg hidden max-h-60 overflow-y-auto">
+                </div>
+            </div>
 
-                displayResults(data);
-            } catch (error) {
-                console.error('Search error:', error);
-                resultsDiv.innerHTML = `
-                    <div class="text-center text-red-400 py-8">
-                        <p>Error searching cases: ${error.message}</p>
-                    </div>
-                `;
+            <div>
+                <label class="block text-gray-400 mb-2">Role in Case</label>
+                <select name="role"
+                        class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                        required>
+                    <option value="" disabled selected>Select role</option>
+                    <option value="accused">Accused</option>
+                    <option value="victim">Victim</option>
+                    <option value="witness">Witness</option>
+                    <option value="complainant">Complainant</option>
+                </select>
+            </div>
+
+            <div class="flex justify-end space-x-4">
+                <button type="button"
+                        onclick="hideLinkCaseModal()"
+                        class="bg-red-500/20 hover:bg-red-500/30 text-red-400 font-nasa px-4 py-2 rounded-md transition-all">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all">
+                    Link Case
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function showLinkCaseModal() {
+    const modal = document.getElementById('linkCaseModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function hideLinkCaseModal() {
+    const modal = document.getElementById('linkCaseModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+// Close modal when clicking outside
+document.getElementById('linkCaseModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideLinkCaseModal();
+    }
+});
+
+async function unlinkCase(profileId, caseId) {
+    if (!confirm('Are you sure you want to unlink this case?')) return;
+
+    try {
+        const response = await fetch(`/record/${profileId}/unlink-case/${caseId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
             }
         });
 
-        async function linkCase(caseId) {
-            try {
-                const role = document.getElementById(`role-${caseId}`).value;
-                const profileId = '<%= record._id %>';
+        const data = await response.json();
 
-                console.log('Attempting to link case:', { caseId, profileId, role });
-
-                // Show loading state
-                const button = document.getElementById(`link-button-${caseId}`);
-                if (button) {
-                    button.textContent = 'Linking...';
-                    button.disabled = true;
-                }
-
-                // First check if the case exists
-                const checkResponse = await fetch(`/api/cases/${caseId}`, {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (!checkResponse.ok) {
-                    const checkData = await checkResponse.json();
-                    throw new Error(checkData.error || 'Case not found');
-                }
-
-                // Proceed with linking
-                const response = await fetch(`/api/profiles/${profileId}/cases`, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ caseId, role })
-                });
-
-                const data = await response.json();
-                console.log('Link response:', data);
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to link case');
-                }
-
-                showNotification('Case linked successfully', 'success');
-                
-                // Hide modal and refresh after delay
-                if (typeof hideCaseLinkModal === 'function') {
-                    hideCaseLinkModal();
-                }
-                setTimeout(() => window.location.reload(), 1000);
-
-            } catch (error) {
-                console.error('Error linking case:', error);
-                showNotification(error.message || 'Failed to link case', 'error');
-            } finally {
-                // Reset button state
-                const button = document.getElementById(`link-button-${caseId}`);
-                if (button) {
-                    button.textContent = 'Link';
-                    button.disabled = false;
-                }
-            }
+        if (response.ok) {
+            // Show success message
+            showNotification('Case unlinked successfully', 'success');
+            // Reload the page to reflect changes
+            window.location.reload();
+        } else {
+            showNotification(data.error || 'Failed to unlink case', 'error');
         }
+    } catch (error) {
+        console.error('Error unlinking case:', error);
+        showNotification('Failed to unlink case', 'error');
+    }
+}
 
-        async function unlinkCase(caseId) {
-            if (!confirm('Are you sure you want to unlink this case?')) return;
+// Add notification function if not already present
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+    }`;
+    notification.textContent = message;
 
-            try {
-                const profileId = '<%= record._id %>';
-                console.log('Attempting to unlink case:', { caseId, profileId });
+    document.body.appendChild(notification);
 
-                const response = await fetch(`/api/cases/${caseId}/profiles/${profileId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                });
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
 
-                const data = await response.json();
-                console.log('Unlink response:', data);
+// Update the form submission handler
+document.querySelector('form[action*="/link-case"]').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const profileId = '<%= record.id %>';
 
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to unlink case');
-                }
+    try {
+        const response = await fetch(`/record/${profileId}/link-case`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                caseNumber: formData.get('caseNumber'),
+                role: formData.get('role')
+            })
+        });
 
-                showNotification('Case unlinked successfully', 'success');
-                
-                // Force a hard reload to ensure fresh data
-                window.location.href = window.location.href;
-            } catch (error) {
-                console.error('Error unlinking case:', error);
-                showNotification(error.message || 'Failed to unlink case', 'error');
-            }
+        const data = await response.json();
+
+        if (response.ok) {
+            showNotification('Case linked successfully', 'success');
+            // Stay on the same page and refresh
+            window.location.reload();
+        } else {
+            showNotification(data.error || 'Failed to link case', 'error');
         }
+    } catch (error) {
+        showNotification('Failed to link case', 'error');
+    }
+});
 
-        // Add this notification function if not already present
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-                type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-            }`;
-            notification.textContent = message;
+// Add case suggestion functionality
+document.getElementById('caseNumberInput').addEventListener('input', async function(e) {
+    const input = e.target.value;
+    const suggestionsContainer = document.getElementById('caseSuggestions');
+    
+    if (!input) {
+        suggestionsContainer.classList.add('hidden');
+        return;
+    }
 
-            document.body.appendChild(notification);
+    try {
+        const response = await fetch(`/api/cases/search?q=${encodeURIComponent(input)}`);
+        const data = await response.json();
 
-            // Remove notification after 3 seconds
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
+        if (data.cases && data.cases.length > 0) {
+            suggestionsContainer.innerHTML = data.cases.map(case_ => `
+                <div class="p-3 hover:bg-blue-400/10 cursor-pointer" 
+                     onclick="selectCase('${case_.caseNumber}')">
+                    <div class="flex justify-between">
+                        <span class="text-white">Case #${case_.caseNumber}</span>
+                        <span class="text-sm text-gray-400">${case_.status}</span>
+                    </div>
+                    <p class="text-sm text-gray-400 truncate">${case_.description?.english || ''}</p>
+                </div>
+            `).join('');
+            suggestionsContainer.classList.remove('hidden');
+        } else {
+            suggestionsContainer.innerHTML = `
+                <div class="p-3 text-gray-400">No cases found</div>
+            `;
+            suggestionsContainer.classList.remove('hidden');
         }
+    } catch (error) {
+        console.error('Error fetching suggestions:', error);
+    }
+});
 
-        async function unlinkProfile(profileId) {
-            if (!confirm('Are you sure you want to unlink this profile?')) {
-                return;
-            }
-
-            try {
-                const caseId = '<%= record._id %>';
-                const response = await fetch(`/api/profiles/${profileId}/cases/${caseId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-                console.log('Unlink response:', data);
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to unlink profile');
-                }
-
-                showNotification('Profile unlinked successfully', 'success');
-                
-                // Force reload the page to show updated data
-                window.location.href = window.location.href;
-            } catch (error) {
-                console.error('Error unlinking profile:', error);
-                showNotification(error.message || 'Failed to unlink profile', 'error');
-            }
-        }
-        </script>
-    </div>
-</div> 
+function selectCase(caseNumber) {
+    document.getElementById('caseNumberInput').value = caseNumber;
+    document.getElementById('caseSuggestions').classList.add('hidden');
+}
+</script> 

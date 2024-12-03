@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Profile = require('../models/profileSchema');
 const { getSoundex } = require('../utils/soundex');
+const { handleUpload } = require('../utils/cloudinary');
 const { 
     detectHindiScript, 
     transliterateToHindi, 
@@ -33,7 +34,6 @@ async function processField(text, fieldType = 'text') {
             }
         }
 
-        console.log(`Processed ${fieldType}:`, { english, hindi });
         return {
             english: english.trim(),
             hindi: hindi.trim()
@@ -52,22 +52,63 @@ module.exports = {
         res.render('records/new.ejs');
     },
 
-    saveRecord: async (req, res) => {
+    saveRecord: [handleUpload, async (req, res) => {
         try {
-            res.render('records/preview', { formData: req.body });
+            // Store uploaded files in session
+            if (req.processedFiles) {
+                req.session.uploadedFiles = req.processedFiles;
+            }
+
+            const formData = {
+                ...req.body,
+                uploadedFiles: req.processedFiles
+            };
+            res.render('records/preview', { formData });
         } catch (err) {
             console.error('Error processing preview:', err);
             req.flash('error', 'Error processing form data');
             res.redirect('/newrecord');
         }
-    },
+    }],
 
-    submitRecord: async (req, res) => {
+    submitRecord: [handleUpload, async (req, res) => {
         try {
+            
             const {
                 firstName, lastName, occupation, dob, gender, role, mNumber,
                 address, description, familyDetails, caseDetails, appearance
             } = req.body;
+
+            // Process uploaded files first
+            const images = [];
+            
+            // Get files from session
+            const uploadedFiles = req.session.uploadedFiles;
+            
+            if (uploadedFiles?.profileImage?.[0]) {
+                const profileImage = uploadedFiles.profileImage[0];
+                
+                images.push({
+                    url: profileImage.cloudinaryUrl,
+                    filename: profileImage.filename,
+                    type: 'profile',
+                    uploadedAt: new Date()
+                });
+            }
+            
+            if (uploadedFiles?.idProof?.[0]) {
+                const idProof = uploadedFiles.idProof[0];
+                
+                images.push({
+                    url: idProof.cloudinaryUrl,
+                    filename: idProof.filename,
+                    type: 'identification',
+                    uploadedAt: new Date()
+                });
+            }
+
+            // Clear the session files after using them
+            delete req.session.uploadedFiles;
 
             // Process name fields with new transliteration
             const firstNameResult = await processField(firstName, 'name');
@@ -107,7 +148,7 @@ module.exports = {
                 };
             }));
 
-            // Create new profile
+            // Create new profile with images
             const profile = new Profile({
                 soundexCode: {
                     firstName: firstNameSoundex,
@@ -136,20 +177,21 @@ module.exports = {
                 descriptionHindi: descriptionResult.hindi,
                 descriptionEnglish: descriptionResult.english,
                 familyDetails: processedFamilyDetails,
-                appearance
+                appearance,
+                images: images.length > 0 ? images : []
             });
+            
+            const savedProfile = await profile.save();
+            console.log('Saved profile with images:', JSON.stringify(savedProfile.images, null, 2));
 
-            await profile.save();
-            console.log('Profile saved successfully:', profile.id);
-
-            req.flash('success', 'Profile created successfully');
-            res.redirect(`/record/${profile.id}`);
+            req.flash('success', 'Profile created successfully with images');
+            res.redirect(`/record/${savedProfile.id}`);
         } catch (error) {
-            console.error('Error creating profile:', error);
-            req.flash('error', 'Failed to create profile');
+            console.error('Error in submitRecord:', error);
+            req.flash('error', 'Failed to create profile: ' + error.message);
             res.redirect('/newrecord');
         }
-    },
+    }],
 
     editRecordForm: async (req, res) => {
         try {
@@ -166,7 +208,7 @@ module.exports = {
         }
     },
 
-    updateRecord: async (req, res) => {
+    updateRecord: [handleUpload, async (req, res) => {
         try {
             let record;
             const { id } = req.params;
@@ -289,10 +331,10 @@ module.exports = {
             res.redirect(`/record/${record.id}`);
         } catch (error) {
             console.error('Error updating record:', error);
-            req.flash('error', 'Error updating record');
+            req.flash('error', 'Error updating record: ' + error.message);
             res.redirect(`/record/${req.params.id}/edit`);
         }
-    },
+    }],
 
     deleteRecord: async (req, res) => {
         try {

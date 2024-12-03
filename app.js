@@ -49,17 +49,12 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Session configuration
-const sessionConfig = {
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
+app.use(session({
+    secret: 'your-secret-key',
     resave: false,
     saveUninitialized: true,
-    cookie: {
-        httpOnly: true,
-        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-        maxAge: 1000 * 60 * 60 * 24 * 7
-    }
-};
-app.use(session(sessionConfig));
+    cookie: { secure: false } // set to true if using https
+}));
 
 // Flash messages
 app.use(flash());
