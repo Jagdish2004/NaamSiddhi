@@ -52,14 +52,18 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             <!-- Monthly Trend -->
             <div class="glass-effect p-6 rounded-lg">
-                <h3 class="text-xl font-nasa text-blue-400 mb-6">Monthly Trend</h3>
-                <canvas id="monthlyChart"></canvas>
+                <h3 class="text-xl font-nasa text-blue-400 mb-6 text-center">Monthly Trend</h3>
+                <div class="flex items-center justify-center">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
             </div>
 
             <!-- Location Distribution -->
             <div class="glass-effect p-6 rounded-lg">
-                <h3 class="text-xl font-nasa text-blue-400 mb-6">Top Locations</h3>
-                <canvas id="locationChart"></canvas>
+                <h3 class="text-xl font-nasa text-blue-400 mb-6 text-center">Top Locations</h3>
+                <div class="flex items-center justify-center">
+                    <canvas id="locationChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -67,14 +71,18 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Gender Distribution -->
             <div class="glass-effect p-6 rounded-lg">
-                <h3 class="text-xl font-nasa text-blue-400 mb-6">Gender Distribution</h3>
-                <canvas id="genderChart"></canvas>
+                <h3 class="text-xl font-nasa text-blue-400 mb-6 text-center">Gender Distribution</h3>
+                <div class="h-[300px] flex items-center justify-center">
+                    <canvas id="genderChart"></canvas>
+                </div>
             </div>
 
             <!-- Age Distribution -->
             <div class="glass-effect p-6 rounded-lg">
-                <h3 class="text-xl font-nasa text-blue-400 mb-6">Age Distribution</h3>
-                <canvas id="ageChart"></canvas>
+                <h3 class="text-xl font-nasa text-blue-400 mb-6 text-center">Age Distribution</h3>
+                <div class="h-[300px] flex items-center justify-center">
+                    <canvas id="ageChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -176,10 +184,13 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
             plugins: {
                 legend: {
+                    position: 'bottom',
                     labels: {
-                        color: '#9CA3AF'
+                        color: '#9CA3AF',
+                        padding: 20
                     }
                 }
             }
@@ -198,10 +209,13 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
             plugins: {
                 legend: {
+                    position: 'bottom',
                     labels: {
-                        color: '#9CA3AF'
+                        color: '#9CA3AF',
+                        padding: 20
                     }
                 }
             }

@@ -1,6 +1,150 @@
 const Case = require('../models/caseSchema');
 const Profile = require('../models/profileSchema');
-const { translateText } = require('../utils/translator');
+const { 
+    detectHindiScript,
+    transliterateToHindi,
+    transliterateToEnglish,
+    translateToHindi,
+    translateToEnglish
+} = require('../utils/translator');
+
+// Helper function to process bilingual fields
+async function processField(text, fieldType = 'text') {
+    if (!text) return { english: '', hindi: '' };
+    
+    try {
+        const isHindi = detectHindiScript(text);
+        let english, hindi;
+
+        if (isHindi) {
+            hindi = text;
+            if (fieldType === 'name') {
+                english = await transliterateToEnglish(text, 'name');
+            } else {
+                english = await translateToEnglish(text);
+            }
+        } else {
+            english = text;
+            if (fieldType === 'name') {
+                hindi = await transliterateToHindi(text, 'name');
+            } else {
+                hindi = await translateToHindi(text);
+            }
+        }
+
+        console.log(`Processed ${fieldType}:`, { english, hindi });
+        return {
+            english: english.trim(),
+            hindi: hindi.trim()
+        };
+    } catch (error) {
+        console.error(`Error processing field ${fieldType}:`, error);
+        return {
+            english: text.trim(),
+            hindi: text.trim()
+        };
+    }
+}
+
+// Helper function to check if a word is likely a name
+function isLikelyName(word) {
+    // Check if word starts with capital letter (for English)
+    if (/^[A-Z]/.test(word)) return true;
+    
+    // For Hindi, check if it's followed by common name indicators
+    const nameIndicators = ['ने', 'को', 'की', 'का', 'के'];
+    return nameIndicators.some(indicator => word.endsWith(indicator));
+}
+
+// Helper function to process description
+async function processDescription(text) {
+    if (!text) return { english: '', hindi: '' };
+    
+    try {
+        const isHindi = detectHindiScript(text);
+        let english, hindi;
+
+        if (isHindi) {
+            hindi = text;
+            // First translate the entire text
+            english = await translateToEnglish(text);
+
+            // Then find and replace names with transliterated versions
+            const words = text.split(/\s+/);
+            const transliteratedNames = await Promise.all(words.map(async (word) => {
+                if (isLikelyName(word)) {
+                    // Remove common postfixes before transliteration
+                    const nameIndicators = ['ने', 'को', 'की', 'का', 'के'];
+                    let baseName = word;
+                    let postfix = '';
+                    
+                    for (const indicator of nameIndicators) {
+                        if (word.endsWith(indicator)) {
+                            baseName = word.slice(0, -indicator.length);
+                            postfix = indicator;
+                            break;
+                        }
+                    }
+
+                    const transliteratedName = await transliterateToEnglish(baseName, 'name');
+                    // Replace the translated name in the English text with the transliterated version
+                    const translatedWord = await translateToEnglish(word);
+                    english = english.replace(translatedWord, transliteratedName + (postfix ? ' ' + await translateToEnglish(postfix) : ''));
+                }
+            }));
+        } else {
+            english = text;
+            // First translate the entire text
+            hindi = await translateToHindi(text);
+
+            // Then find and replace names with transliterated versions
+            const words = text.split(/\s+/);
+            const transliteratedNames = await Promise.all(words.map(async (word) => {
+                if (isLikelyName(word)) {
+                    const transliteratedName = await transliterateToHindi(word, 'name');
+                    // Replace the translated name in the Hindi text with the transliterated version
+                    const translatedWord = await translateToHindi(word);
+                    hindi = hindi.replace(translatedWord, transliteratedName);
+                }
+            }));
+        }
+
+        console.log('Processed description:', { english, hindi });
+        return {
+            english: english.trim(),
+            hindi: hindi.trim()
+        };
+    } catch (error) {
+        console.error('Error processing description:', error);
+        return {
+            english: text.trim(),
+            hindi: text.trim()
+        };
+    }
+}
+
+// Function to generate unique case number
+async function generateUniqueCaseNumber(district) {
+    const year = new Date().getFullYear();
+    const districtCode = district?.substring(0, 3).toUpperCase() || 'DEL';
+    
+    // Find the highest case number for this district and year
+    const latestCase = await Case.findOne({
+        caseNumber: new RegExp(`^${districtCode}/${year}/`)
+    }).sort({ caseNumber: -1 });
+
+    let nextNumber = 1;
+    if (latestCase) {
+        // Extract the number from the latest case number
+        const match = latestCase.caseNumber.match(/\/(\d+)$/);
+        if (match) {
+            nextNumber = parseInt(match[1]) + 1;
+        }
+    }
+
+    // Format the case number
+    return `${districtCode}/${year}/${nextNumber.toString().padStart(6, '0')}`;
+}
 
 module.exports.renderNewCaseForm = async (req, res) => {
     try {
@@ -41,69 +185,81 @@ module.exports.createCase = async (req, res) => {
             connectedProfiles
         } = req.body;
 
+        // Process description with special handling for names
+        const descriptionResult = await processDescription(description);
+
+        // Process other fields
+        const locationResult = await processField(location, 'text');
+        const cityResult = await processField(city, 'text');
+        const districtResult = await processField(district, 'text');
+        const stateResult = await processField(state, 'text');
+        const reporterNameResult = await processField(reporterName, 'name');
+        const reporterAddressResult = await processField(reporterAddress, 'text');
+        const reporterCityResult = await processField(reporterCity, 'text');
+        const reporterDistrictResult = await processField(reporterDistrict, 'text');
+        const reporterStateResult = await processField(reporterState, 'text');
+
+        // Generate unique case number
+        const caseNumber = await generateUniqueCaseNumber(districtResult.english);
+
         // Create new case object
         const newCase = new Case({
+            caseNumber,
             caseType,
             priority,
             status: 'active',
             incidentDate: new Date(incidentDate),
             description: {
-                english: description,
-                hindi: await translateText(description)
+                english: descriptionResult.english,
+                hindi: descriptionResult.hindi
             },
             location: {
                 address: {
-                    english: location,
-                    hindi: await translateText(location)
+                    english: locationResult.english,
+                    hindi: locationResult.hindi
                 },
                 city: {
-                    english: city,
-                    hindi: await translateText(city)
+                    english: cityResult.english,
+                    hindi: cityResult.hindi
                 },
                 district: {
-                    english: district,
-                    hindi: await translateText(district)
+                    english: districtResult.english,
+                    hindi: districtResult.hindi
                 },
                 state: {
-                    english: state,
-                    hindi: await translateText(state)
+                    english: stateResult.english,
+                    hindi: stateResult.hindi
                 }
             },
             reporter: {
                 name: {
-                    english: reporterName,
-                    hindi: await translateText(reporterName)
+                    english: reporterNameResult.english,
+                    hindi: reporterNameResult.hindi
                 },
                 contact: reporterContact,
                 email: reporterEmail,
                 address: {
                     location: {
-                        english: reporterAddress,
-                        hindi: await translateText(reporterAddress)
+                        english: reporterAddressResult.english,
+                        hindi: reporterAddressResult.hindi
                     },
                     city: {
-                        english: reporterCity,
-                        hindi: await translateText(reporterCity)
+                        english: reporterCityResult.english,
+                        hindi: reporterCityResult.hindi
                     },
                     district: {
-                        english: reporterDistrict,
-                        hindi: await translateText(reporterDistrict)
+                        english: reporterDistrictResult.english,
+                        hindi: reporterDistrictResult.hindi
                     },
                     state: {
-                        english: reporterState,
-                        hindi: await translateText(reporterState)
+                        english: reporterStateResult.english,
+                        hindi: reporterStateResult.hindi
                     }
                 },
                 idType: reporterIdType,
                 idNumber: reporterIdNumber
             }
         });
-
-        // Generate case number before saving
-        const count = await Case.countDocuments();
-        const year = new Date().getFullYear();
-        const districtCode = district?.substring(0, 3).toUpperCase() || 'DEL';
-        newCase.caseNumber = `${districtCode}/${year}/${(count + 1).toString().padStart(6, '0')}`;
 
         // Handle connected profiles
         if (connectedProfiles && connectedProfiles !== '[]') {
@@ -235,28 +391,81 @@ module.exports.handleFormSubmission = async (req, res) => {
 
 module.exports.searchCases = async (req, res) => {
     try {
-        const { q: query, caseType, status, priority } = req.query;
+        console.log('Received search request with query params:', req.query);
         
+        const { query, district, caseType, status, priority } = req.query;
         let searchQuery = {};
 
-        if (query) {
+        // Handle district search
+        if (district && district.trim()) {
+            const districtQuery = district.trim();
+            
+            // Check if the district name is in Hindi
+            const isHindi = detectHindiScript(districtQuery);
+            let englishDistrict = districtQuery;
+            
+            if (isHindi) {
+                // Transliterate Hindi district name to English
+                englishDistrict = await transliterateToEnglish(districtQuery, 'name');
+                console.log('Transliterated district from Hindi:', districtQuery, 'to English:', englishDistrict);
+            }
+
+            // Create regex patterns for both original and transliterated versions
+            const englishPattern = new RegExp(`^${englishDistrict}$`, 'i');
+            const hindiPattern = new RegExp(`^${districtQuery}$`, 'i');
+
             searchQuery.$or = [
-                { caseNumber: new RegExp(query, 'i') },
-                { 'description.english': new RegExp(query, 'i') },
-                { 'location.district.english': new RegExp(query, 'i') }
+                { 'location.district.english': englishPattern },
+                { 'location.district.hindi': hindiPattern }
+            ];
+            
+            console.log('Searching for district:', { 
+                original: districtQuery, 
+                transliterated: englishDistrict 
+            });
+        }
+        // Handle general search
+        else if (query && query.trim()) {
+            const searchRegex = new RegExp(query.trim(), 'i');
+            searchQuery.$or = [
+                // Case number search
+                { caseNumber: searchRegex },
+                
+                // Description search
+                { 'description.english': searchRegex },
+                { 'description.hindi': searchRegex },
+                
+                // Location search
+                { 'location.address.english': searchRegex },
+                { 'location.address.hindi': searchRegex },
+                { 'location.city.english': searchRegex },
+                { 'location.city.hindi': searchRegex },
+                { 'location.district.english': searchRegex },
+                { 'location.district.hindi': searchRegex },
+                { 'location.state.english': searchRegex },
+                { 'location.state.hindi': searchRegex },
+                
+                // Reporter search
+                { 'reporter.name.english': searchRegex },
+                { 'reporter.name.hindi': searchRegex }
             ];
         }
 
+        // Add other filters if provided
         if (caseType) searchQuery.caseType = caseType;
         if (status) searchQuery.status = status;
         if (priority) searchQuery.priority = priority;
 
-        const cases = await Case.find(searchQuery)
-            .select('_id caseNumber caseType status location description profiles')
-            .populate('profiles.profile', 'firstNameEnglish lastNameEnglish')
-            .sort('-createdAt')
-            .limit(10);
+        console.log('Final search query:', JSON.stringify(searchQuery, null, 2));
 
+        // Execute search
+        const cases = await Case.find(searchQuery)
+            .select('_id caseNumber caseType status location description profiles createdAt')
+            .populate('profiles.profile', 'firstNameEnglish lastNameEnglish firstNameHindi lastNameHindi')
+            .sort({ createdAt: -1 });
+
+        console.log(`Found ${cases.length} cases matching the criteria`);
+        
         res.json({ cases });
     } catch (error) {
         console.error('Search error:', error);
