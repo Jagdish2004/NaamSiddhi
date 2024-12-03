@@ -391,28 +391,81 @@ module.exports.handleFormSubmission = async (req, res) => {
 
 module.exports.searchCases = async (req, res) => {
     try {
-        const { q: query, caseType, status, priority } = req.query;
+        console.log('Received search request with query params:', req.query);
         
+        const { query, district, caseType, status, priority } = req.query;
         let searchQuery = {};
 
-        if (query) {
+        // Handle district search
+        if (district && district.trim()) {
+            const districtQuery = district.trim();
+            
+            // Check if the district name is in Hindi
+            const isHindi = detectHindiScript(districtQuery);
+            let englishDistrict = districtQuery;
+            
+            if (isHindi) {
+                // Transliterate Hindi district name to English
+                englishDistrict = await transliterateToEnglish(districtQuery, 'name');
+                console.log('Transliterated district from Hindi:', districtQuery, 'to English:', englishDistrict);
+            }
+
+            // Create regex patterns for both original and transliterated versions
+            const englishPattern = new RegExp(`^${englishDistrict}$`, 'i');
+            const hindiPattern = new RegExp(`^${districtQuery}$`, 'i');
+
             searchQuery.$or = [
-                { caseNumber: new RegExp(query, 'i') },
-                { 'description.english': new RegExp(query, 'i') },
-                { 'location.district.english': new RegExp(query, 'i') }
+                { 'location.district.english': englishPattern },
+                { 'location.district.hindi': hindiPattern }
+            ];
+            
+            console.log('Searching for district:', { 
+                original: districtQuery, 
+                transliterated: englishDistrict 
+            });
+        }
+        // Handle general search
+        else if (query && query.trim()) {
+            const searchRegex = new RegExp(query.trim(), 'i');
+            searchQuery.$or = [
+                // Case number search
+                { caseNumber: searchRegex },
+                
+                // Description search
+                { 'description.english': searchRegex },
+                { 'description.hindi': searchRegex },
+                
+                // Location search
+                { 'location.address.english': searchRegex },
+                { 'location.address.hindi': searchRegex },
+                { 'location.city.english': searchRegex },
+                { 'location.city.hindi': searchRegex },
+                { 'location.district.english': searchRegex },
+                { 'location.district.hindi': searchRegex },
+                { 'location.state.english': searchRegex },
+                { 'location.state.hindi': searchRegex },
+                
+                // Reporter search
+                { 'reporter.name.english': searchRegex },
+                { 'reporter.name.hindi': searchRegex }
             ];
         }
 
+        // Add other filters if provided
         if (caseType) searchQuery.caseType = caseType;
         if (status) searchQuery.status = status;
         if (priority) searchQuery.priority = priority;
 
-        const cases = await Case.find(searchQuery)
-            .select('_id caseNumber caseType status location description profiles')
-            .populate('profiles.profile', 'firstNameEnglish lastNameEnglish')
-            .sort('-createdAt')
-            .limit(10);
+        console.log('Final search query:', JSON.stringify(searchQuery, null, 2));
 
+        // Execute search
+        const cases = await Case.find(searchQuery)
+            .select('_id caseNumber caseType status location description profiles createdAt')
+            .populate('profiles.profile', 'firstNameEnglish lastNameEnglish firstNameHindi lastNameHindi')
+            .sort({ createdAt: -1 });
+
+        console.log(`Found ${cases.length} cases matching the criteria`);
+        
         res.json({ cases });
     } catch (error) {
         console.error('Search error:', error);
