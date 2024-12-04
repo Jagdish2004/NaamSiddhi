@@ -1,30 +1,60 @@
-(function (Setup) {
-    "use strict";
-    Setup(function (str, scale, mysql) {
-      var split = String(str).toUpperCase().replace(/[^A-Z]/g, '').split('');
-      var map = { BFPV: 1, CGJKQSXZ: 2, DT: 3, L: 4, MN: 5, R: 6 };
-      var keys = Object.keys(map).reverse();
-  
-      var build = split.map(function (letter, index, array) {
+/*
+  Soundex - v0.2.1 - Node.js & Browser
+  Modified for नामसिद्धि project
+*/
+
+function getSoundex(str, scale, mysql) {
+    scale = scale || false;
+    mysql = mysql || false;
+    
+    if (!str) return '';
+
+    var split = String(str).toUpperCase().replace(/[^A-Z]/g, '').split('');
+    var map = {
+        BFPV: 1,
+        CGJKQSXZ: 2,
+        DT: 3,
+        L: 4,
+        MN: 5,
+        R: 6
+    };
+    
+    var keys = Object.keys(map).reverse();
+    var build = split.map(function(letter) {
         for (var num in keys) {
-          if (keys[num].indexOf(letter) !== -1) {
-            return map[keys[num]];
-          }
+            if (keys[num].indexOf(letter) !== -1) {
+                return map[keys[num]];
+            }
         }
-      });
-  
-      if (mysql) {
-        build = build.filter(function (key) { return key; });
-      }
-  
-      var first = build.splice(0, 1)[0];
-      build = build.filter(function (num, index, array) {
-        return ((index === 0) ? num !== first : num !== array[index - 1]);
-      });
-  
-      var len = build.length,
-        max = (scale ? ((max = ~~((mysql ? len : len * 2 / 3.5))) > 3 ? max : 3) : 3);
-      return split[0] + (build.join('') + (new Array(max + 1).join('0'))).slice(0, max);
+        return null;
     });
-  })((typeof exports !== 'undefined' ? function (fn) { module.exports.getSoundex = fn; } : function (fn) { this['Soundex'] = fn; }));
+
+    if (mysql) {
+        build = build.filter(function(key) {
+            return key;
+        });
+    }
+
+    var first = build.splice(0, 1)[0];
+    build = build.filter(function(num, index, array) {
+        return (index === 0) ? num !== first : num !== array[index - 1];
+    });
+
+    var len = build.length;
+    var maxLength = 6;
+    var max = scale ? 
+        Math.min(Math.max(~~((mysql ? len : len * 2 / 3.5)), maxLength), maxLength) : 
+        maxLength;
+
+    var soundexCode = split[0] + build.join('');
+    return soundexCode.slice(0, max).replace(/0+$/, '');
+}
+
+if (typeof exports !== 'undefined') {
+    module.exports = {
+        getSoundex: getSoundex
+    };
+} else {
+    this['Soundex'] = getSoundex;
+}
   

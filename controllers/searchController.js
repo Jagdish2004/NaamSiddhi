@@ -17,26 +17,25 @@ module.exports.resultRecord = async (req, res) => {
 
         // Define weights for different attributes
         const weights = {
-            // Primary identifiers (45% total)
+            // Primary identifiers (35% total)
             name: {
-                firstName: 0.20,     // 20% for first name (reduced from 30%)
-                lastName: 0.15       // 15% for last name (reduced from 20%)
+                firstName: 0.22,     // 22% for first name (reduced from 30%)
+                lastName: 0.16       // 16% for last name (reduced from 20%)
             },
             
-            // Secondary identifiers (35% total)
+            // Secondary identifiers (45% total)
             personal: {
-                gender: 0.10,        // 10% for gender
-                dob: 0.10,          // 10% for date of birth
-                role: 0.10,         // 10% for role
-                mNumber: 0.10,      // 10% for mobile number (new)
-                occupation: 0.05    // 5% for occupation (new)
+                gender: 0.05,        // 10% for gender
+                dob: 0.15,          // 10% for date of birth        // 10% for role
+                mNumber: 0.15,      // 10% for mobile number (new)
+                occupation: 0.10   // 5% for occupation (new)
             },
             
             // Location details (10% total)
             address: {
-                district: 0.04,      // 4% for district
+                district: 0.02,      // 2% for district
                 city: 0.03,         // 3% for city
-                state: 0.03         // 3% for state
+                state: 0.02         // 2 %for state
             },
             
             // Physical attributes (10% total)
