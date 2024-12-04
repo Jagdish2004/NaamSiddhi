@@ -67,56 +67,96 @@
             </a>
         </div>
 
-        <!-- Recent Records -->
-        <div class="space-y-6">
-            <h2 class="text-2xl font-nasa text-blue-400 mb-6">Recent Records</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="text-left border-b border-blue-400/20">
-                            <th class="pb-3 font-nasa text-blue-400">ID</th>
-                            <th class="pb-3 font-nasa text-blue-400">Name</th>
-                            <th class="pb-3 font-nasa text-blue-400">Role</th>
-                            <th class="pb-3 font-nasa text-blue-400">Location</th>
-                            <th class="pb-3 font-nasa text-blue-400">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-gray-300">
-                        <% if (recentRecords && recentRecords.length > 0) { %>
-                            <% recentRecords.forEach(record => { %>
-                                <tr class="border-b border-blue-400/10 hover:bg-blue-400/5">
-                                    <td class="py-3">#<%= record.id %></td>
-                                    <td class="py-3">
-                                        <%= record.firstNameEnglish %> <%= record.lastNameEnglish %>
-                                        <span class="text-sm text-gray-500">
-                                            (<%= record.firstNameHindi %> <%= record.lastNameHindi %>)
-                                        </span>
-                                    </td>
-                                    <td class="py-3"><%= record.role %></td>
-                                    <td class="py-3"><%= record.address.cityEnglish %></td>
-                                    <td class="py-3">
-                                        <div class="flex space-x-2">
-                                            <a href="/record/<%= record.id %>" 
-                                               class="text-blue-400 hover:text-blue-300 transition-colors">
-                                                View
-                                            </a>
-                                            <a href="/record/<%= record.id %>/edit" 
-                                               class="text-blue-400 hover:text-blue-300 transition-colors">
-                                                Edit
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <% }); %>
-                        <% } else { %>
-                            <tr>
-                                <td colspan="5" class="py-4 text-center text-gray-500">
-                                    No records found
-                                </td>
+        <!-- Recent Records & Cases Section -->
+        <div class="space-y-8">
+            <!-- Recent Records Table -->
+            <div class="glass-effect p-6 rounded-lg">
+                <h2 class="text-2xl font-nasa text-blue-400 mb-6">Recent Records</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left border-b border-blue-400/20">
+                                <th class="pb-3 font-nasa text-blue-400">ID</th>
+                                <th class="pb-3 font-nasa text-blue-400">Name</th>
+                                <th class="pb-3 font-nasa text-blue-400">Location</th>
+                                <th class="pb-3 font-nasa text-blue-400">Actions</th>
                             </tr>
-                        <% } %>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="text-gray-300">
+                            <% if (recentRecords && recentRecords.length > 0) { %>
+                                <% recentRecords.forEach(record => { %>
+                                    <tr class="border-b border-blue-400/10 hover:bg-blue-400/5">
+                                        <td class="py-3">#<%= record.id %></td>
+                                        <td class="py-3">
+                                            <%= record.firstNameEnglish %> <%= record.lastNameEnglish %>
+                                            <span class="text-sm text-gray-500">
+                                                (<%= record.firstNameHindi %> <%= record.lastNameHindi %>)
+                                            </span>
+                                        </td>
+                                        <td class="py-3"><%= record.address.cityEnglish %></td>
+                                        <td class="py-3">
+                                            <div class="flex space-x-2">
+                                                <a href="/record/<%= record.id %>" 
+                                                   class="text-blue-400 hover:text-blue-300 transition-colors">View</a>
+                                                <a href="/record/<%= record.id %>/edit" 
+                                                   class="text-blue-400 hover:text-blue-300 transition-colors">Edit</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="4" class="py-4 text-center text-gray-500">No records found</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Cases Table -->
+            <div class="glass-effect p-6 rounded-lg">
+                <h2 class="text-2xl font-nasa text-blue-400 mb-6">Recent Cases</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left border-b border-blue-400/20">
+                                <th class="pb-3 font-nasa text-blue-400">Case #</th>
+                                <th class="pb-3 font-nasa text-blue-400">Type</th>
+                                <th class="pb-3 font-nasa text-blue-400">Status</th>
+                                <th class="pb-3 font-nasa text-blue-400">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-300">
+                            <% if (recentCases && recentCases.length > 0) { %>
+                                <% recentCases.forEach(case_ => { %>
+                                    <tr class="border-b border-blue-400/10 hover:bg-blue-400/5">
+                                        <td class="py-3">#<%= case_.caseNumber %></td>
+                                        <td class="py-3"><%= case_.caseType %></td>
+                                        <td class="py-3">
+                                            <span class="px-2 py-1 rounded-full text-xs
+                                                <%= case_.status === 'active' ? 'bg-green-500/20 text-green-400' : 
+                                                    case_.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 
+                                                    'bg-red-500/20 text-red-400' %>">
+                                                <%= case_.status %>
+                                            </span>
+                                        </td>
+                                        <td class="py-3">
+                                            <div class="flex space-x-2">
+                                                <a href="/cases/<%= case_._id %>" 
+                                                   class="text-blue-400 hover:text-blue-300 transition-colors">View</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="4" class="py-4 text-center text-gray-500">No cases found</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
