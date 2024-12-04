@@ -1,9 +1,15 @@
 const Profile = require('../models/profileSchema');
+const Case = require('../models/caseSchema');
 
 module.exports.getDashboard = async (req, res) => {
     try {
         // Get recent records
         const recentRecords = await Profile.find()
+            .sort({ _id: -1 })
+            .limit(5);
+
+        // Get recent cases
+        const recentCases = await Case.find()
             .sort({ _id: -1 })
             .limit(5);
 
@@ -19,7 +25,7 @@ module.exports.getDashboard = async (req, res) => {
             activeCases: await Profile.countDocuments({ status: 'active' })
         };
 
-        res.render('records/index', { recentRecords, stats });
+        res.render('records/index', { recentRecords, recentCases, stats });
     } catch (error) {
         console.error('Error:', error);
         req.flash('error', 'Failed to load dashboard');
