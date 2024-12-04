@@ -33,8 +33,19 @@
             class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md mt-1 absolute max-h-60 overflow-y-auto"
             style="display: none;"></ul>
     </div>
-                    <input type="date" name="dob"
-                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
+                    <div class="relative">
+                        <input type="date" 
+                               name="dob"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 [&::-webkit-calendar-picker-indicator]:opacity-0"
+                               onclick="this.nextElementSibling.click()">
+                        <input type="button"
+                               class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                               onclick="this.previousElementSibling.showPicker()"
+                               style="border:none; background:transparent;">
+                        <svg class="w-5 h-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
                     <select name="gender"
                             class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
                         <option value="">Gender / लिंग</option>
