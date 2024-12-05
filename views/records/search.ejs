@@ -10,34 +10,35 @@
             <div class="space-y-4">
                 <h2 class="text-xl font-nasa text-blue-400/80">Basic Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- <input id="firstName" type="text" name="firstName" 
-       class="..." placeholder="First Name / पहला नाम">
-<input id="lastName" type="text" name="lastName" 
-       class="..." placeholder="Last Name / अंतिम नाम"> -->
-       <div class="relative">
-        <input type="text" name="firstName" id="firstNameInput"
-            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-            placeholder="First Name / पहला नाम" oninput="fetchSuggestions('firstName')">
-        
-        <ul id="firstNameSuggestionsList"
-            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md mt-1 absolute max-h-60 overflow-y-auto z-50"
-            style="display: none;"></ul>
-    </div>
-    
-    <div class="relative">
-        <input type="text" name="lastName" id="lastNameInput"
-            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-            placeholder="Last Name / अंतिम नाम" oninput="fetchSuggestions('lastName')">
-        
-        <ul id="lastNameSuggestionsList"
-            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md mt-1 absolute max-h-60 overflow-y-auto z-50"
-            style="display: none;"></ul>
-    </div>
+                    <div class="relative">
+                        <input type="text" name="firstName" id="firstNameInput"
+                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                            placeholder="First Name / पहला नाम" 
+                            oninput="fetchSuggestions('firstName')"
+                            value="<%= typeof searchParams !== 'undefined' ? searchParams.firstName || '' : '' %>">
+                        
+                        <ul id="firstNameSuggestionsList"
+                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md mt-1 absolute max-h-60 overflow-y-auto z-50"
+                            style="display: none;"></ul>
+                    </div>
+                    
+                    <div class="relative">
+                        <input type="text" name="lastName" id="lastNameInput"
+                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                            placeholder="Last Name / अंतिम नाम" 
+                            oninput="fetchSuggestions('lastName')"
+                            value="<%= typeof searchParams !== 'undefined' ? searchParams.lastName || '' : '' %>">
+                        
+                        <ul id="lastNameSuggestionsList"
+                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md mt-1 absolute max-h-60 overflow-y-auto z-50"
+                            style="display: none;"></ul>
+                    </div>
                     <div class="relative">
                         <input type="date" 
                                name="dob"
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 [&::-webkit-calendar-picker-indicator]:opacity-0"
-                               onclick="this.nextElementSibling.click()">
+                               onclick="this.nextElementSibling.click()"
+                               value="<%= typeof searchParams !== 'undefined' ? searchParams.dob || '' : '' %>">
                         <input type="button"
                                class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
                                onclick="this.previousElementSibling.showPicker()"
@@ -49,13 +50,14 @@
                     <select name="gender"
                             class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
                         <option value="">Gender / लिंग</option>
-                        <option value="male">Male / पुरुष</option>
-                        <option value="female">Female / महिला</option>
-                        <option value="other">Others / अन्य</option>
+                        <option value="male" <%= typeof searchParams !== 'undefined' && searchParams.gender === 'male' ? 'selected' : '' %>>Male / पुरुष</option>
+                        <option value="female" <%= typeof searchParams !== 'undefined' && searchParams.gender === 'female' ? 'selected' : '' %>>Female / महिला</option>
+                        <option value="other" <%= typeof searchParams !== 'undefined' && searchParams.gender === 'other' ? 'selected' : '' %>>Others / अन्य</option>
                     </select>
                     <input type="text" name="occupation"
                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-                           placeholder="Occupation / पेशा">
+                           placeholder="Occupation / पेशा"
+                           value="<%= typeof searchParams !== 'undefined' ? searchParams.occupation || '' : '' %>">
                     <div class="relative">
                         <input type="tel" 
                                name="mNumber"
@@ -63,7 +65,8 @@
                                placeholder="Mobile Number / मोबाइल नंबर"
                                pattern="[0-9]{10}"
                                oninput="validateMobile(this)"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                               value="<%= typeof searchParams !== 'undefined' ? searchParams.mNumber || '' : '' %>">
                         <p id="mobileFeedback" class="text-sm text-red-400 mt-1 hidden"></p>
                     </div>
                     <div class="relative">
@@ -73,7 +76,8 @@
                                placeholder="Aadhar Number / आधार नंबर"
                                pattern="[0-9]{12}"
                                oninput="validateAadhar(this)"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                               value="<%= typeof searchParams !== 'undefined' ? searchParams.aadharNumber || '' : '' %>">
                         <p id="aadharFeedback" class="text-sm text-red-400 mt-1 hidden"></p>
                     </div>
                 </div>
@@ -85,24 +89,26 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="number" name="appearance[height]"
                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-                           placeholder="Height (cm) / ऊंचाई">
+                           placeholder="Height (cm) / ऊंचाई"
+                           value="<%= typeof searchParams !== 'undefined' && searchParams.appearance ? searchParams.appearance.height || '' : '' %>">
                     <input type="number" name="appearance[weight]"
                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-                           placeholder="Weight (kg) / वजन">
+                           placeholder="Weight (kg) / वजन"
+                           value="<%= typeof searchParams !== 'undefined' && searchParams.appearance ? searchParams.appearance.weight || '' : '' %>">
                     <select name="appearance[complexion]"
                             class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
                         <option value="">Complexion / रंग</option>
-                        <option value="fair">Fair / गरा</option>
-                        <option value="medium">Medium / साँवला</option>
-                        <option value="dark">Dark / काला</option>
+                        <option value="fair" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.complexion === 'fair' ? 'selected' : '' %>>Fair / गरा</option>
+                        <option value="medium" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.complexion === 'medium' ? 'selected' : '' %>>Medium / साँवला</option>
+                        <option value="dark" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.complexion === 'dark' ? 'selected' : '' %>>Dark / काला</option>
                     </select>
                     <select name="appearance[build]"
                             class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
                         <option value="">Build / शारीरिक बनावट</option>
-                        <option value="slim">Slim / पतला</option>
-                        <option value="average">Average / सामान्य</option>
-                        <option value="athletic">Athletic / एथलेटिक</option>
-                        <option value="heavy">Heavy / भारी</option>
+                        <option value="slim" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.build === 'slim' ? 'selected' : '' %>>Slim / पतला</option>
+                        <option value="average" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.build === 'average' ? 'selected' : '' %>>Average / सामान्य</option>
+                        <option value="athletic" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.build === 'athletic' ? 'selected' : '' %>>Athletic / एथलेटिक</option>
+                        <option value="heavy" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.build === 'heavy' ? 'selected' : '' %>>Heavy / भारी</option>
                     </select>
                 </div>
             </div>
@@ -113,16 +119,20 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" name="address[location]"
                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-                           placeholder="Location / स्थान">
+                           placeholder="Location / स्थान"
+                           value="<%= typeof searchParams !== 'undefined' && searchParams.address ? searchParams.address.location || '' : '' %>">
                     <input type="text" name="address[city]"
                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-                           placeholder="City / शहर">
+                           placeholder="City / शहर"
+                           value="<%= typeof searchParams !== 'undefined' && searchParams.address ? searchParams.address.city || '' : '' %>">
                     <input type="text" name="address[district]"
                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-                           placeholder="District / जि���ा">
+                           placeholder="District / जिला"
+                           value="<%= typeof searchParams !== 'undefined' && searchParams.address ? searchParams.address.district || '' : '' %>">
                     <input type="text" name="address[state]"
                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-                           placeholder="State / राज्य">
+                           placeholder="State / राज्य"
+                           value="<%= typeof searchParams !== 'undefined' && searchParams.address ? searchParams.address.state || '' : '' %>">
                 </div>
             </div>
 
@@ -136,7 +146,7 @@
 
         <!-- Results Section -->
         <% if (profiles && profiles.length > 0) { %>
-            <div class="mt-12 space-y-6">
+            <div id="searchResults" class="mt-12 space-y-6">
                 <% profiles.forEach(profile => { %>
                     <div class="glass-effect rounded-lg p-6 hover:border-blue-400/50 transition-all">
                         <div class="flex justify-between items-start">
@@ -181,7 +191,7 @@
                 <% }); %>
             </div>
         <% } else if (profiles) { %>
-            <div class="mt-8 text-center text-gray-400">
+            <div id="searchResults" class="mt-8 text-center text-gray-400">
                 No profiles found. Please adjust your search criteria.
             </div>
         <% } %>
@@ -337,4 +347,14 @@
             input.classList.add('border-green-400');
         }
     }
+
+    // Add auto-scroll to results when they are present
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('searchResults')) {
+            document.getElementById('searchResults').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
 </script>
