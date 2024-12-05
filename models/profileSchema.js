@@ -27,6 +27,12 @@ const profileSchema = new mongoose.Schema({
     occupationHindi: String,
     occupationEnglish: String,
     mNumber: String,
+    aadharNumber: {
+        type: String,
+        match: [/^\d{12}$/, 'Please enter a valid 12-digit Aadhar number'],
+        unique: true,
+        sparse: true // This allows null/undefined values to pass the unique constraint
+    },
     email: String,
     
     // Address Information

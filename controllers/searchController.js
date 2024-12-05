@@ -12,8 +12,17 @@ module.exports.searchRecord = (req, res) => {
 
 module.exports.resultRecord = async (req, res) => {
     try {
-        const { firstName, lastName, dob, gender, role, address, appearance, mNumber, occupation } = req.body;
+        const { firstName, lastName, dob, gender, role, address, appearance, mNumber, occupation, aadharNumber } = req.body;
         let conditions = [];
+
+        // If Aadhar number is provided, it takes precedence as it's a unique identifier
+        if (aadharNumber) {
+            const profile = await Profile.findOne({ aadharNumber });
+            return res.render('records/search.ejs', { 
+                profiles: profile ? [{ ...profile.toObject(), matchPercentage: 100 }] : [],
+                searchParams: req.body
+            });
+        }
 
         // Define weights for different attributes
         const weights = {

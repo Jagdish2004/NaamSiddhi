@@ -72,11 +72,19 @@ module.exports = {
 
     submitRecord: [handleUpload, async (req, res) => {
         try {
-            
             const {
-                firstName, lastName, occupation, dob, gender, role, mNumber,
+                firstName, lastName, occupation, dob, gender, role, mNumber, aadharNumber,
                 address, description, familyDetails, caseDetails, appearance
             } = req.body;
+
+            // Check if Aadhar number already exists
+            if (aadharNumber) {
+                const existingProfile = await Profile.findOne({ aadharNumber });
+                if (existingProfile) {
+                    req.flash('error', 'A profile with this Aadhar number already exists');
+                    return res.redirect('/newrecord');
+                }
+            }
 
             // Process uploaded files first
             const images = [];
@@ -163,6 +171,7 @@ module.exports = {
                 gender,
                 role,
                 mNumber,
+                aadharNumber,
                 address: {
                     locationHindi: locationResult.hindi,
                     locationEnglish: locationResult.english,

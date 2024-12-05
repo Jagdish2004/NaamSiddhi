@@ -51,13 +51,31 @@
                         <option value="">Gender / लिंग</option>
                         <option value="male">Male / पुरुष</option>
                         <option value="female">Female / महिला</option>
+                        <option value="other">Others / अन्य</option>
                     </select>
                     <input type="text" name="occupation"
                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
                            placeholder="Occupation / पेशा">
-                    <input type="text" name="mNumber"
-                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-                           placeholder="Mobile Number / मोबाइल नंबर">
+                    <div class="relative">
+                        <input type="tel" 
+                               name="mNumber"
+                               id="mobileNumber"
+                               placeholder="Mobile Number / मोबाइल नंबर"
+                               pattern="[0-9]{10}"
+                               oninput="validateMobile(this)"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
+                        <p id="mobileFeedback" class="text-sm text-red-400 mt-1 hidden"></p>
+                    </div>
+                    <div class="relative">
+                        <input type="text" 
+                               name="aadharNumber"
+                               id="aadharNumber"
+                               placeholder="Aadhar Number / आधार नंबर"
+                               pattern="[0-9]{12}"
+                               oninput="validateAadhar(this)"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
+                        <p id="aadharFeedback" class="text-sm text-red-400 mt-1 hidden"></p>
+                    </div>
                 </div>
             </div>
 
@@ -74,7 +92,7 @@
                     <select name="appearance[complexion]"
                             class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
                         <option value="">Complexion / रंग</option>
-                        <option value="fair">Fair / गोरा</option>
+                        <option value="fair">Fair / गरा</option>
                         <option value="medium">Medium / साँवला</option>
                         <option value="dark">Dark / काला</option>
                     </select>
@@ -101,7 +119,7 @@
                            placeholder="City / शहर">
                     <input type="text" name="address[district]"
                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-                           placeholder="District / जिला">
+                           placeholder="District / जि���ा">
                     <input type="text" name="address[state]"
                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
                            placeholder="State / राज्य">
@@ -263,4 +281,60 @@
             lastNameSuggestions.style.display = 'none';
         }
     });
+
+    function validateAadhar(input) {
+        const feedback = document.getElementById('aadharFeedback');
+        const value = input.value.replace(/\D/g, ''); // Remove non-digits
+        input.value = value; // Update input to show only digits
+
+        if (value.length === 0) {
+            feedback.classList.add('hidden');
+            input.classList.remove('border-red-400', 'border-green-400');
+            return;
+        }
+
+        if (value.length !== 12) {
+            feedback.textContent = `Please enter 12 digits. Current length: ${value.length} digits`;
+            feedback.classList.remove('hidden');
+            feedback.classList.remove('text-green-400');
+            feedback.classList.add('text-red-400');
+            input.classList.add('border-red-400');
+            input.classList.remove('border-green-400');
+        } else {
+            feedback.textContent = 'Valid Aadhar number format';
+            feedback.classList.remove('hidden');
+            feedback.classList.remove('text-red-400');
+            feedback.classList.add('text-green-400');
+            input.classList.remove('border-red-400');
+            input.classList.add('border-green-400');
+        }
+    }
+
+    function validateMobile(input) {
+        const feedback = document.getElementById('mobileFeedback');
+        const value = input.value.replace(/\D/g, ''); // Remove non-digits
+        input.value = value; // Update input to show only digits
+
+        if (value.length === 0) {
+            feedback.classList.add('hidden');
+            input.classList.remove('border-red-400', 'border-green-400');
+            return;
+        }
+
+        if (value.length !== 10) {
+            feedback.textContent = `Please enter 10 digits. Current length: ${value.length} digits`;
+            feedback.classList.remove('hidden');
+            feedback.classList.remove('text-green-400');
+            feedback.classList.add('text-red-400');
+            input.classList.add('border-red-400');
+            input.classList.remove('border-green-400');
+        } else {
+            feedback.textContent = 'Valid mobile number format';
+            feedback.classList.remove('hidden');
+            feedback.classList.remove('text-red-400');
+            feedback.classList.add('text-green-400');
+            input.classList.remove('border-red-400');
+            input.classList.add('border-green-400');
+        }
+    }
 </script>
