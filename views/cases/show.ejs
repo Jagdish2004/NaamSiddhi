@@ -6,8 +6,10 @@
             <h1 class="text-2xl font-nasa text-blue-400">Case Details: <%= caseData.caseNumber %></h1>
             <div class="space-x-4">
                 <a href="/" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">Back to Dashboard</a>
-                <% if (caseData.status !== 'closed') { %>
-                    <button class="bg-red-500/20 hover:bg-red-500/30 text-red-400 font-nasa px-4 py-2 rounded-md transition-all">Close Case</button>
+                <% if (caseData.status === 'closed') { %>
+                    <button onclick="updateCaseStatus('active')" class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all">Reopen Case</button>
+                <% } else { %>
+                    <button onclick="updateCaseStatus('closed')" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 font-nasa px-4 py-2 rounded-md transition-all">Close Case</button>
                 <% } %>
             </div>
         </div>
@@ -341,5 +343,54 @@ async function unlinkProfile(profileId) {
         console.error('Error unlinking profile:', error);
         showNotification(error.message || 'Failed to unlink profile', 'error');
     }
+}
+
+async function updateCaseStatus(newStatus) {
+    const confirmMessage = newStatus === 'closed' ? 
+        'Are you sure you want to close this case?' : 
+        'Are you sure you want to reopen this case?';
+    
+    if (!confirm(confirmMessage)) {
+        return;
+    }
+
+    try {
+        const caseId = '<%= caseData._id %>';
+        const response = await fetch(`/cases/${caseId}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || `Failed to ${newStatus === 'closed' ? 'close' : 'reopen'} case`);
+        }
+
+        showNotification(`Case ${newStatus === 'closed' ? 'closed' : 'reopened'} successfully`, 'success');
+        // Refresh the page to show updated status
+        window.location.reload();
+    } catch (error) {
+        console.error('Error updating case status:', error);
+        showNotification(error.message || `Failed to ${newStatus === 'closed' ? 'close' : 'reopen'} case`, 'error');
+    }
+}
+
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+    }`;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
 }
 </script> 

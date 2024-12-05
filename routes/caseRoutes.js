@@ -65,4 +65,32 @@ router.delete('/:caseId/unlink-profile/:profileId', async (req, res) => {
     }
 });
 
+// Update case status
+router.patch('/:caseId/status', async (req, res) => {
+    try {
+        const { caseId } = req.params;
+        const { status } = req.body;
+
+        const case_ = await Case.findById(caseId);
+        if (!case_) {
+            return res.status(404).json({ error: 'Case not found' });
+        }
+
+        case_.status = status;
+        case_.timeline.push({
+            action: 'STATUS_UPDATED',
+            description: {
+                english: `Case status updated to ${status}`,
+                hindi: `केस की स्थिति ${status} में अपडेट की गई`
+            }
+        });
+
+        await case_.save();
+        res.json({ success: true, message: 'Case status updated successfully' });
+    } catch (error) {
+        console.error('Error updating case status:', error);
+        res.status(500).json({ error: 'Failed to update case status' });
+    }
+});
+
 module.exports = router; 

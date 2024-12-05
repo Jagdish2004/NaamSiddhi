@@ -155,6 +155,15 @@ module.exports = {
                 };
             }));
 
+            // Process appearance fields
+            const processedAppearance = {
+                ...appearance,
+                facialFeatures: await processField(appearance.facialFeatures, 'text'),
+                scars: await processField(appearance.scars, 'text'),
+                tattoos: await processField(appearance.tattoos, 'text'),
+                otherFeatures: await processField(appearance.otherFeatures, 'text')
+            };
+
             // Create new profile with images
             const profile = new Profile({
                 soundexCode: {
@@ -185,7 +194,7 @@ module.exports = {
                 descriptionHindi: descriptionResult.hindi,
                 descriptionEnglish: descriptionResult.english,
                 familyDetails: processedFamilyDetails,
-                appearance,
+                appearance: processedAppearance,
                 images: images.length > 0 ? images : []
             });
             
