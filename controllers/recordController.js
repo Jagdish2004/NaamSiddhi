@@ -73,12 +73,12 @@ module.exports = {
     submitRecord: [handleUpload, async (req, res) => {
         try {
             const {
-                firstName, lastName, occupation, dob, gender, role, mNumber, aadharNumber,
+                firstName, middleName, lastName, occupation, dob, gender, role, mNumber, aadharNumber,
                 address, description, familyDetails, caseDetails, appearance
             } = req.body;
 
-            // Check if Aadhar number already exists
-            if (aadharNumber) {
+            // Check if Aadhar number already exists (only if provided)
+            if (aadharNumber && aadharNumber.trim()) {
                 const existingProfile = await Profile.findOne({ aadharNumber });
                 if (existingProfile) {
                     req.flash('error', 'A profile with this Aadhar number already exists');
@@ -119,6 +119,7 @@ module.exports = {
 
             // Process name fields with new transliteration
             const firstNameResult = await processField(firstName, 'name');
+            const middleNameResult = await processField(middleName, 'name');
             const lastNameResult = await processField(lastName, 'name');
             
             // Process occupation
@@ -135,6 +136,7 @@ module.exports = {
 
             // Generate Soundex codes from English versions
             const firstNameSoundex = getSoundex(firstNameResult.english, false, false);
+            const middleNameSoundex = getSoundex(middleNameResult.english, false, false);
             const lastNameSoundex = getSoundex(lastNameResult.english, false, false);
 
             // Process family details
@@ -168,10 +170,13 @@ module.exports = {
             const profile = new Profile({
                 soundexCode: {
                     firstName: firstNameSoundex,
+                    middleName: middleNameSoundex,
                     lastName: lastNameSoundex,
                 },
                 firstNameHindi: firstNameResult.hindi,
                 firstNameEnglish: firstNameResult.english,
+                middleNameHindi: middleNameResult.hindi,
+                middleNameEnglish: middleNameResult.english,
                 lastNameHindi: lastNameResult.hindi,
                 lastNameEnglish: lastNameResult.english,
                 occupationHindi: occupationResult.hindi,
@@ -180,7 +185,7 @@ module.exports = {
                 gender,
                 role,
                 mNumber,
-                aadharNumber,
+                aadharNumber: aadharNumber && aadharNumber.trim() ? aadharNumber.trim() : undefined,
                 address: {
                     locationHindi: locationResult.hindi,
                     locationEnglish: locationResult.english,
@@ -228,7 +233,7 @@ module.exports = {
     updateRecord: [handleUpload, async (req, res) => {
         try {
             const {
-                firstName, lastName, occupation, dob, gender, role, mNumber,
+                firstName, middleName, lastName, occupation, dob, gender, role, mNumber,
                 address, description, familyDetails, appearance
             } = req.body;
 
@@ -255,6 +260,7 @@ module.exports = {
 
             // Process bilingual fields
             const firstNameResult = await processField(firstName, 'name');
+            const middleNameResult = await processField(middleName, 'name');
             const lastNameResult = await processField(lastName, 'name');
             const occupationResult = await processField(occupation, 'occupation');
             const descriptionResult = await processField(description, 'text');
@@ -265,6 +271,7 @@ module.exports = {
 
             // Generate Soundex codes
             const firstNameSoundex = getSoundex(firstNameResult.english, false, false);
+            const middleNameSoundex = getSoundex(middleNameResult.english, false, false);
             const lastNameSoundex = getSoundex(lastNameResult.english, false, false);
 
             // Process family details
@@ -288,10 +295,13 @@ module.exports = {
             const updateData = {
                 soundexCode: {
                     firstName: firstNameSoundex,
+                    middleName: middleNameSoundex,
                     lastName: lastNameSoundex,
                 },
                 firstNameHindi: firstNameResult.hindi,
                 firstNameEnglish: firstNameResult.english,
+                middleNameHindi: middleNameResult.hindi,
+                middleNameEnglish: middleNameResult.english,
                 lastNameHindi: lastNameResult.hindi,
                 lastNameEnglish: lastNameResult.english,
                 occupationHindi: occupationResult.hindi,

@@ -9,6 +9,7 @@ const profileSchema = new mongoose.Schema({
     },
     soundexCode: {
         firstName: String,
+        middleName: String,
         lastName: String,
     },
     // Personal Information
@@ -17,6 +18,8 @@ const profileSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    middleNameHindi: String,
+    middleNameEnglish: String,
     lastNameHindi: String,
     lastNameEnglish: String,
     dob: Date,
@@ -31,7 +34,8 @@ const profileSchema = new mongoose.Schema({
         type: String,
         match: [/^\d{12}$/, 'Please enter a valid 12-digit Aadhar number'],
         unique: true,
-        sparse: true // This allows null/undefined values to pass the unique constraint
+        sparse: true, // This allows null/undefined values to pass the unique constraint
+        set: v => v === '' ? undefined : v // Convert empty strings to undefined
     },
     email: String,
     
@@ -178,11 +182,11 @@ profileSchema.index({ 'cases.case': 1 });
 
 // Virtual for full name
 profileSchema.virtual('fullNameEnglish').get(function() {
-    return `${this.firstNameEnglish} ${this.lastNameEnglish}`.trim();
+    return `${this.firstNameEnglish} ${this.middleNameEnglish || ''} ${this.lastNameEnglish || ''}`.trim().replace(/\s+/g, ' ');
 });
 
 profileSchema.virtual('fullNameHindi').get(function() {
-    return `${this.firstNameHindi} ${this.lastNameHindi}`.trim();
+    return `${this.firstNameHindi} ${this.middleNameHindi || ''} ${this.lastNameHindi || ''}`.trim().replace(/\s+/g, ' ');
 });
 
 // Pre-save middleware for data validation
