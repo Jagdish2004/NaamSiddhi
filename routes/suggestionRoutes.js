@@ -12,7 +12,6 @@ router.get('/', async (req, res) => {
         }
   
         const regex = new RegExp(query, 'i');
-
         let results;
 
         if (type === 'caseNumber') {
@@ -30,6 +29,13 @@ router.get('/', async (req, res) => {
                         { 'firstNameHindi': regex }
                     ]
                 };
+            } else if (type === 'middleName') {
+                filter = {
+                    $or: [
+                        { 'middleNameEnglish': regex },
+                        { 'middleNameHindi': regex }
+                    ]
+                };
             } else if (type === 'lastName') {
                 filter = {
                     $or: [
@@ -43,7 +49,7 @@ router.get('/', async (req, res) => {
 
             results = await Profile.find(filter)
                 .limit(4)
-                .select('firstNameEnglish firstNameHindi lastNameEnglish lastNameHindi');
+                .select('firstNameEnglish firstNameHindi middleNameEnglish middleNameHindi lastNameEnglish lastNameHindi');
         }
 
         res.json(results);

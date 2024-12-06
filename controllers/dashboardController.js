@@ -16,13 +16,23 @@ module.exports.getDashboard = async (req, res) => {
         // Get statistics
         const stats = {
             totalRecords: await Profile.countDocuments(),
-            criminalRecords: await Profile.countDocuments({ role: 'criminal' }),
+            totalCases: await Case.countDocuments(),
+            activeCases: await Case.countDocuments({ status: 'active' }),
             monthlyRecords: await Profile.countDocuments({
                 createdAt: {
                     $gte: new Date(new Date().setDate(1)) // First day of current month
                 }
             }),
-            activeCases: await Profile.countDocuments({ status: 'active' })
+            monthlyCases: await Case.countDocuments({
+                createdAt: {
+                    $gte: new Date(new Date().setDate(1)) // First day of current month
+                }
+            }),
+            pendingCases: await Case.countDocuments({ status: 'pending' }),
+            closedCases: await Case.countDocuments({ status: 'closed' }),
+            profilesWithAadhar: await Profile.countDocuments({ 
+                aadharNumber: { $exists: true, $ne: '' } 
+            })
         };
 
         res.render('records/index', { recentRecords, recentCases, stats });
@@ -38,7 +48,7 @@ module.exports.getTotalRecords = async (req, res) => {
     try {
         const records = await Profile.find()
             .sort({ createdAt: -1 })
-            .select('nameEnglish role caseNumber createdAt');
+            .select('firstNameEnglish middleNameEnglish lastNameEnglish aadharNumber createdAt');
 
         res.render('records/totalRecords', {
             title: 'Total Records',
@@ -53,9 +63,9 @@ module.exports.getTotalRecords = async (req, res) => {
 
 module.exports.getActiveCases = async (req, res) => {
     try {
-        const activeCases = await Profile.find({ status: 'active' })
+        const activeCases = await Case.find({ status: 'active' })
             .sort({ createdAt: -1 })
-            .select('nameEnglish role caseNumber status createdAt');
+            .select('caseNumber description status createdAt');
 
         res.render('records/activeCases', {
             title: 'Active Cases',
@@ -73,11 +83,11 @@ module.exports.getCurrentMonthCases = async (req, res) => {
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
         
-        const monthlyRecords = await Profile.find({
+        const monthlyRecords = await Case.find({
             createdAt: { $gte: startOfMonth }
         })
         .sort({ createdAt: -1 })
-        .select('nameEnglish role caseNumber createdAt');
+        .select('caseNumber description status createdAt');
 
         res.render('records/monthlyRecords', {
             title: 'Cases This Month',
@@ -92,17 +102,17 @@ module.exports.getCurrentMonthCases = async (req, res) => {
 
 module.exports.getCriminalRecords = async (req, res) => {
     try {
-        const criminalRecords = await Profile.find({ role: 'criminal' })
+        const pendingCases = await Case.find({ status: 'pending' })
             .sort({ createdAt: -1 })
-            .select('nameEnglish caseNumber createdAt');
+            .select('caseNumber description status createdAt');
 
         res.render('records/criminalRecords', {
-            title: 'Criminal Records',
-            records: criminalRecords
+            title: 'Pending Cases',
+            records: pendingCases
         });
     } catch (error) {
         console.error('Error:', error);
-        req.flash('error', 'Failed to load criminal records');
+        req.flash('error', 'Failed to load pending cases');
         res.redirect('/');
     }
 }; 

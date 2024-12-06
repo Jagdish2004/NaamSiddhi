@@ -121,5 +121,95 @@ document.addEventListener('DOMContentLoaded', function() {
             suggestionsList.innerHTML = '';
         }
     });
+
+    // Add input event listeners for all name fields
+    const firstNameInput = document.getElementById('firstNameInput');
+    const middleNameInput = document.getElementById('middleNameInput');
+    const lastNameInput = document.getElementById('lastNameInput');
+
+    firstNameInput.addEventListener('input', () => {
+        console.log('First name input changed:', firstNameInput.value);
+        fetchSuggestions('firstName');
+    });
+
+    middleNameInput.addEventListener('input', () => {
+        console.log('Middle name input changed:', middleNameInput.value);
+        fetchSuggestions('middleName');
+    });
+
+    lastNameInput.addEventListener('input', () => {
+        console.log('Last name input changed:', lastNameInput.value);
+        fetchSuggestions('lastName');
+    });
+
+    // Update fetchSuggestions function with debugging
+    async function fetchSuggestions(type) {
+        const input = document.getElementById(`${type}Input`).value;
+        console.log(`Fetching suggestions for ${type}:`, input);
+        
+        const suggestionsList = document.getElementById(`${type}SuggestionsList`);
+        const otherTypes = ['firstName', 'middleName', 'lastName'].filter(t => t !== type);
+        
+        // Hide other suggestion lists
+        otherTypes.forEach(otherType => {
+            const otherList = document.getElementById(`${otherType}SuggestionsList`);
+            if (otherList) otherList.style.display = 'none';
+        });
+
+        if (input.trim().length < 2) {
+            console.log('Input too short, hiding suggestions');
+            suggestionsList.style.display = 'none';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/suggestions?type=${type}&query=${encodeURIComponent(input)}`);
+            if (!response.ok) throw new Error('Failed to fetch suggestions');
+            
+            const suggestions = await response.json();
+            console.log(`Received suggestions for ${type}:`, suggestions);
+
+            if (suggestions.length === 0) {
+                suggestionsList.style.display = 'none';
+                return;
+            }
+
+            suggestionsList.innerHTML = suggestions.map(suggestion => {
+                const nameField = type === 'firstName' ? 'firstNameEnglish' :
+                                type === 'middleName' ? 'middleNameEnglish' : 'lastNameEnglish';
+                const hindiField = type === 'firstName' ? 'firstNameHindi' :
+                                 type === 'middleName' ? 'middleNameHindi' : 'lastNameHindi';
+                
+                return `
+                    <li class="px-4 py-2 hover:bg-blue-400/20 cursor-pointer transition-all"
+                        onclick="selectSuggestion('${type}', '${suggestion[nameField]}')">
+                        ${suggestion[nameField]}
+                        <span class="text-sm text-gray-400">(${suggestion[hindiField] || ''})</span>
+                    </li>
+                `;
+            }).join('');
+
+            suggestionsList.style.display = 'block';
+        } catch (error) {
+            console.error('Error fetching suggestions:', error);
+            suggestionsList.style.display = 'none';
+        }
+    }
+
+    // Update click handler to hide all suggestion lists
+    document.addEventListener('click', function(e) {
+        const suggestionLists = ['firstName', 'middleName', 'lastName'].map(type => 
+            document.getElementById(`${type}SuggestionsList`)
+        );
+        const inputs = ['firstName', 'middleName', 'lastName'].map(type => 
+            document.getElementById(`${type}Input`)
+        );
+
+        if (!inputs.includes(e.target)) {
+            suggestionLists.forEach(list => {
+                if (list) list.style.display = 'none';
+            });
+        }
+    });
 });
   

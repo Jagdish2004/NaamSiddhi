@@ -21,6 +21,18 @@
                             class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md mt-1 absolute max-h-60 overflow-y-auto z-50"
                             style="display: none;"></ul>
                     </div>
+
+                    <div class="relative">
+                        <input type="text" name="middleName" id="middleNameInput"
+                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
+                            placeholder="Middle Name / मध्य नाम" 
+                            oninput="fetchSuggestions('middleName')"
+                            value="<%= typeof searchParams !== 'undefined' ? searchParams.middleName || '' : '' %>">
+                        
+                        <ul id="middleNameSuggestionsList"
+                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md mt-1 absolute max-h-60 overflow-y-auto z-50"
+                            style="display: none;"></ul>
+                    </div>
                     
                     <div class="relative">
                         <input type="text" name="lastName" id="lastNameInput"
@@ -99,7 +111,7 @@
                             class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
                         <option value="">Complexion / रंग</option>
                         <option value="fair" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.complexion === 'fair' ? 'selected' : '' %>>Fair / गरा</option>
-                        <option value="medium" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.complexion === 'medium' ? 'selected' : '' %>>Medium / साँवला</option>
+                        <option value="medium" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.complexion === 'medium' ? 'selected' : '' %>>Medium / साँ���</option>
                         <option value="dark" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.complexion === 'dark' ? 'selected' : '' %>>Dark / काला</option>
                     </select>
                     <select name="appearance[build]"
@@ -149,43 +161,112 @@
             <div id="searchResults" class="mt-12 space-y-6">
                 <% profiles.forEach(profile => { %>
                     <div class="glass-effect rounded-lg p-6 hover:border-blue-400/50 transition-all">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-xl font-nasa text-blue-400">
-                                <%= profile.firstNameEnglish %> <%= profile.lastNameEnglish %>
-                                <span class="text-sm text-gray-400">(<%= profile.firstNameHindi %> <%= profile.lastNameHindi %>)</span>
-                            </h3>
-                            <span class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm">
-                                <%= profile.matchPercentage %>% Match
-                            </span>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <div class="space-y-2">
-                                <p><span class="text-gray-400">Role:</span> <%= profile.role %></p>
-                                <p><span class="text-gray-400">Gender:</span> <%= profile.gender %></p>
-                                <p><span class="text-gray-400">DOB:</span> <%= new Date(profile.dob).toLocaleDateString() %></p>
+                        <div class="flex items-start space-x-6">
+                            <div class="w-24 h-24 rounded-lg overflow-hidden glass-effect profile-image">
+                                <img src="<%= profile.images?.find(img => img.type === 'profile')?.url || '/images/default-profile.png' %>" 
+                                     alt="Profile Photo"
+                                     class="w-full h-full object-cover"
+                                     onerror="this.src='/images/default-profile.png'">
                             </div>
-                            <div class="space-y-2">
-                                <p><span class="text-gray-400">Mobile:</span> <%= profile.mNumber %></p>
-                                <p><span class="text-gray-400">ID:</span> <%= profile.id %></p>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="text-xl font-nasa text-blue-400">
+                                            <%= profile.firstNameEnglish %> <%= profile.middleNameEnglish ? profile.middleNameEnglish + ' ' : '' %><%= profile.lastNameEnglish %>
+                                            <span class="text-sm text-gray-400">(<%= profile.firstNameHindi %> <%= profile.middleNameHindi ? profile.middleNameHindi + ' ' : '' %><%= profile.lastNameHindi %>)</span>
+                                        </h3>
+                                        <p class="text-gray-400 mt-1">
+                                            <%= profile.occupationEnglish || 'Occupation not specified' %>
+                                            <% if (profile.occupationHindi) { %>
+                                                <span class="text-sm">(<%= profile.occupationHindi %>)</span>
+                                            <% } %>
+                                        </p>
+                                    </div>
+                                    <span class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm">
+                                        <%= profile.matchPercentage %>% Match
+                                    </span>
+                                </div>
+
+                                <!-- Matching Attributes Tags -->
+                                <div class="flex flex-wrap gap-2 mt-3">
+                                   
+                                    <% if (profile.scores?.personal?.dob > 0) { %>
+                                        <span class="bg-blue-500/10 text-blue-400 text-xs px-2 py-1 rounded-full">
+                                            DOB
+                                        </span>
+                                    <% } %>
+                                    <% if (profile.scores?.personal?.mNumber > 0) { %>
+                                        <span class="bg-blue-500/10 text-blue-400 text-xs px-2 py-1 rounded-full">
+                                            Mobile No.
+                                        </span>
+                                    <% } %>
+                                    <% if (profile.scores?.personal?.occupation > 0) { %>
+                                        <span class="bg-blue-500/10 text-blue-400 text-xs px-2 py-1 rounded-full">
+                                            Occupation
+                                        </span>
+                                    <% } %>
+                                    <% if (profile.scores?.address?.district > 0) { %>
+                                        <span class="bg-purple-500/10 text-purple-400 text-xs px-2 py-1 rounded-full">
+                                            District
+                                        </span>
+                                    <% } %>
+                                    <% if (profile.scores?.address?.city > 0) { %>
+                                        <span class="bg-purple-500/10 text-purple-400 text-xs px-2 py-1 rounded-full">
+                                            City
+                                        </span>
+                                    <% } %>
+                                    
+                                    <% if (profile.scores?.appearance?.height > 0) { %>
+                                        <span class="bg-yellow-500/10 text-yellow-400 text-xs px-2 py-1 rounded-full">
+                                            Height
+                                        </span>
+                                    <% } %>
+                                    <% if (profile.scores?.appearance?.weight > 0) { %>
+                                        <span class="bg-yellow-500/10 text-yellow-400 text-xs px-2 py-1 rounded-full">
+                                            Weight
+                                        </span>
+                                    <% } %>
+                                    <% if (profile.scores?.appearance?.complexion > 0) { %>
+                                        <span class="bg-yellow-500/10 text-yellow-400 text-xs px-2 py-1 rounded-full">
+                                            Complexion
+                                        </span>
+                                    <% } %>
+                                    <% if (profile.scores?.appearance?.build > 0) { %>
+                                        <span class="bg-yellow-500/10 text-yellow-400 text-xs px-2 py-1 rounded-full">
+                                            Build
+                                        </span>
+                                    <% } %>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                    <div class="space-y-2">
+                                        <p><span class="text-gray-400">Gender:</span> <%= profile.gender %></p>
+                                        <p><span class="text-gray-400">DOB:</span> <%= new Date(profile.dob).toLocaleDateString() %></p>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <p><span class="text-gray-400">Mobile:</span> <%= profile.mNumber %></p>
+                                        <p><span class="text-gray-400">ID:</span> <%= profile.id %></p>
+                                    </div>
+                                </div>
+                                <!-- Add Action Buttons -->
+                                <div class="flex justify-end mt-4 space-x-3">
+                                    <a href="/record/<%= profile.id %>" 
+                                       class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        View Details
+                                    </a>
+                                    <a href="/record/<%= profile.id %>/edit"
+                                       class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                        Edit
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                        <!-- Add Action Buttons -->
-                        <div class="flex justify-end mt-4 space-x-3">
-                            <a href="/record/<%= profile.id %>" 
-                               class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                </svg>
-                                View Details
-                            </a>
-                            <a href="/record/<%= profile.id %>/edit"
-                               class="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-nasa px-4 py-2 rounded-md transition-all flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                                Edit
-                            </a>
                         </div>
                     </div>
                 <% }); %>
@@ -201,13 +282,19 @@
 <script>
     console.log('Search page script loaded');
 
-    // Add input event listeners for both fields
+    // Add input event listeners for all name fields
     const firstNameInput = document.getElementById('firstNameInput');
+    const middleNameInput = document.getElementById('middleNameInput');
     const lastNameInput = document.getElementById('lastNameInput');
 
     firstNameInput.addEventListener('input', () => {
         console.log('First name input changed:', firstNameInput.value);
         fetchSuggestions('firstName');
+    });
+
+    middleNameInput.addEventListener('input', () => {
+        console.log('Middle name input changed:', middleNameInput.value);
+        fetchSuggestions('middleName');
     });
 
     lastNameInput.addEventListener('input', () => {
@@ -221,11 +308,13 @@
         console.log(`Fetching suggestions for ${type}:`, input);
         
         const suggestionsList = document.getElementById(`${type}SuggestionsList`);
-        const otherType = type === 'firstName' ? 'lastName' : 'firstName';
-        const otherSuggestionsList = document.getElementById(`${otherType}SuggestionsList`);
-
-        // Hide the other suggestion list
-        otherSuggestionsList.style.display = 'none';
+        const otherTypes = ['firstName', 'middleName', 'lastName'].filter(t => t !== type);
+        
+        // Hide other suggestion lists
+        otherTypes.forEach(otherType => {
+            const otherList = document.getElementById(`${otherType}SuggestionsList`);
+            if (otherList) otherList.style.display = 'none';
+        });
 
         if (input.trim().length < 2) {
             console.log('Input too short, hiding suggestions');
@@ -247,11 +336,13 @@
             
             if (suggestions.length > 0) {
                 suggestionsList.innerHTML = suggestions.map(suggestion => {
-                    const displayName = type === 'firstName' ? 
-                        `${suggestion.firstNameEnglish || ''} / ${suggestion.firstNameHindi || ''}` :
-                        `${suggestion.lastNameEnglish || ''} / ${suggestion.lastNameHindi || ''}`;
-                    const selectValue = type === 'firstName' ? 
-                        suggestion.firstNameEnglish : suggestion.lastNameEnglish;
+                    const nameField = type === 'firstName' ? 'firstNameEnglish' :
+                                    type === 'middleName' ? 'middleNameEnglish' : 'lastNameEnglish';
+                    const hindiField = type === 'firstName' ? 'firstNameHindi' :
+                                     type === 'middleName' ? 'middleNameHindi' : 'lastNameHindi';
+                    
+                    const displayName = `${suggestion[nameField] || ''} / ${suggestion[hindiField] || ''}`;
+                    const selectValue = suggestion[nameField];
                         
                     return `
                         <li class="px-4 py-2 cursor-pointer hover:bg-blue-400/10 transition-all text-white"
@@ -281,14 +372,17 @@
 
     // Add click event listener to document to hide suggestions when clicking outside
     document.addEventListener('click', function(e) {
-        const firstNameSuggestions = document.getElementById('firstNameSuggestionsList');
-        const lastNameSuggestions = document.getElementById('lastNameSuggestionsList');
-        const firstNameInput = document.getElementById('firstNameInput');
-        const lastNameInput = document.getElementById('lastNameInput');
+        const suggestionLists = ['firstName', 'middleName', 'lastName'].map(type => 
+            document.getElementById(`${type}SuggestionsList`)
+        );
+        const inputs = ['firstName', 'middleName', 'lastName'].map(type => 
+            document.getElementById(`${type}Input`)
+        );
 
-        if (e.target !== firstNameInput && e.target !== lastNameInput) {
-            firstNameSuggestions.style.display = 'none';
-            lastNameSuggestions.style.display = 'none';
+        if (!inputs.includes(e.target)) {
+            suggestionLists.forEach(list => {
+                if (list) list.style.display = 'none';
+            });
         }
     });
 

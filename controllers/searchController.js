@@ -12,7 +12,7 @@ module.exports.searchRecord = (req, res) => {
 
 module.exports.resultRecord = async (req, res) => {
     try {
-        const { firstName, lastName, dob, gender, role, address, appearance, mNumber, occupation, aadharNumber } = req.body;
+        const { firstName, middleName, lastName, dob, gender, role, address, appearance, mNumber, occupation, aadharNumber } = req.body;
         let conditions = [];
 
         // If Aadhar number is provided, it takes precedence as it's a unique identifier
@@ -26,39 +26,33 @@ module.exports.resultRecord = async (req, res) => {
 
         // Define weights for different attributes
         const weights = {
-            // Primary identifiers (35% total)
             name: {
-                firstName: 0.22,     // 22% for first name (reduced from 30%)
-                lastName: 0.16       // 16% for last name (reduced from 20%)
+                firstName: 0.18,
+                middleName: 0.07,
+                lastName: 0.13
             },
-            
-            // Secondary identifiers (45% total)
             personal: {
-                gender: 0.05,        // 10% for gender
-                dob: 0.15,          // 10% for date of birth        // 10% for role
-                mNumber: 0.15,      // 10% for mobile number (new)
-                occupation: 0.10   // 5% for occupation (new)
+                gender: 0.05,
+                dob: 0.15,
+                mNumber: 0.15,
+                occupation: 0.10
             },
-            
-            // Location details (10% total)
             address: {
-                district: 0.02,      // 2% for district
-                city: 0.03,         // 3% for city
-                state: 0.02         // 2 %for state
+                district: 0.02,
+                city: 0.03,
+                state: 0.02
             },
-            
-            // Physical attributes (10% total)
             appearance: {
-                height: 0.025,       // 2.5% for height
-                weight: 0.025,       // 2.5% for weight
-                complexion: 0.025,   // 2.5% for complexion
-                build: 0.025        // 2.5% for build
+                height: 0.025,
+                weight: 0.025,
+                complexion: 0.025,
+                build: 0.025
             }
         };
 
         // First stage: Soundex-based filtering
         let soundexQuery = {};
-        if (firstName || lastName) {
+        if (firstName || middleName || lastName) {
             let soundexConditions = [];
             
             if (firstName) {
@@ -73,6 +67,18 @@ module.exports.resultRecord = async (req, res) => {
                 soundexConditions.push({ 'soundexCode.firstName': firstNameSoundex });
             }
 
+            if (middleName) {
+                const isHindiMiddle = detectHindiScript(middleName);
+                let middleNameForSearch = middleName;
+                
+                if (isHindiMiddle) {
+                    middleNameForSearch = await transliterateToEnglish(middleName, 'name');
+                }
+                
+                const middleNameSoundex = getSoundex(middleNameForSearch, false, false);
+                soundexConditions.push({ 'soundexCode.middleName': middleNameSoundex });
+            }
+
             if (lastName) {
                 const isHindiLast = detectHindiScript(lastName);
                 let lastNameForSearch = lastName;
@@ -85,7 +91,6 @@ module.exports.resultRecord = async (req, res) => {
                 soundexConditions.push({ 'soundexCode.lastName': lastNameSoundex });
             }
 
-            // Use $or to match either firstName or lastName Soundex
             soundexQuery = { $or: soundexConditions };
         }
 
@@ -96,19 +101,18 @@ module.exports.resultRecord = async (req, res) => {
         const profilesWithMatches = profiles.map(profile => {
             let totalScore = 0;
             let scores = {
-                name: { firstName: 0, lastName: 0 },
+                name: { firstName: 0, middleName: 0, lastName: 0 },
                 personal: { 
                     gender: 0, 
-                    dob: 0, 
-                    role: 0,
-                    mNumber: 0,      // Added mobile number
-                    occupation: 0    // Added occupation
+                    dob: 0,
+                    mNumber: 0,
+                    occupation: 0
                 },
                 address: { district: 0, city: 0, state: 0 },
                 appearance: { height: 0, weight: 0, complexion: 0, build: 0 }
             };
 
-            // Name matching (50%)
+            // Name matching
             if (firstName) {
                 const isHindiInput = detectHindiScript(firstName);
                 const fieldToCompare = isHindiInput ? 'firstNameHindi' : 'firstNameEnglish';
@@ -116,7 +120,17 @@ module.exports.resultRecord = async (req, res) => {
                     firstName.toLowerCase(),
                     (profile[fieldToCompare] || '').toLowerCase()
                 ) * weights.name.firstName;
-                totalScore += scores.name.firstName;
+                totalScore += scores.name.firstName || 0;
+            }
+
+            if (middleName) {
+                const isHindiInput = detectHindiScript(middleName);
+                const fieldToCompare = isHindiInput ? 'middleNameHindi' : 'middleNameEnglish';
+                scores.name.middleName = calculateMatchPercentage(
+                    middleName.toLowerCase(),
+                    (profile[fieldToCompare] || '').toLowerCase()
+                ) * weights.name.middleName;
+                totalScore += scores.name.middleName || 0;
             }
 
             if (lastName) {
@@ -126,29 +140,24 @@ module.exports.resultRecord = async (req, res) => {
                     lastName.toLowerCase(),
                     (profile[fieldToCompare] || '').toLowerCase()
                 ) * weights.name.lastName;
-                totalScore += scores.name.lastName;
+                totalScore += scores.name.lastName || 0;
             }
 
-            // Personal information matching (30%)
+            // Personal information matching
             if (gender) {
                 scores.personal.gender = (profile.gender === gender ? 100 : 0) * weights.personal.gender;
-                totalScore += scores.personal.gender;
+                totalScore += scores.personal.gender || 0;
             }
 
             if (dob) {
                 scores.personal.dob = (profile.dob && profile.dob.toISOString().split('T')[0] === dob ? 100 : 0) 
                     * weights.personal.dob;
-                totalScore += scores.personal.dob;
-            }
-
-            if (role) {
-                scores.personal.role = (profile.role === role ? 100 : 0) * weights.personal.role;
-                totalScore += scores.personal.role;
+                totalScore += scores.personal.dob || 0;
             }
 
             if (mNumber) {
                 scores.personal.mNumber = (profile.mNumber === mNumber ? 100 : 0) * weights.personal.mNumber;
-                totalScore += scores.personal.mNumber;
+                totalScore += scores.personal.mNumber || 0;
             }
 
             if (occupation) {
@@ -158,95 +167,119 @@ module.exports.resultRecord = async (req, res) => {
                     occupation.toLowerCase(),
                     (profile[fieldToCompare] || '').toLowerCase()
                 ) * weights.personal.occupation;
-                totalScore += scores.personal.occupation;
+                totalScore += scores.personal.occupation || 0;
             }
 
-            // Address matching (10%)
+            // Address matching
             if (address) {
-                ['district', 'city', 'state'].forEach(component => {
-                    if (address[component]) {
-                        const isHindi = detectHindiScript(address[component]);
-                        const field = isHindi ? `${component}Hindi` : `${component}English`;
-                        scores.address[component] = calculateMatchPercentage(
-                            address[component].toLowerCase(),
-                            (profile.address[field] || '').toLowerCase()
-                        ) * weights.address[component];
-                        totalScore += scores.address[component];
-                    }
-                });
+                if (address.district) {
+                    const isHindiInput = detectHindiScript(address.district);
+                    const fieldToCompare = isHindiInput ? 'districtHindi' : 'districtEnglish';
+                    scores.address.district = calculateMatchPercentage(
+                        address.district.toLowerCase(),
+                        ((profile.address && profile.address[fieldToCompare]) || '').toLowerCase()
+                    ) * weights.address.district;
+                    totalScore += scores.address.district || 0;
+                }
+
+                if (address.city) {
+                    const isHindiInput = detectHindiScript(address.city);
+                    const fieldToCompare = isHindiInput ? 'cityHindi' : 'cityEnglish';
+                    scores.address.city = calculateMatchPercentage(
+                        address.city.toLowerCase(),
+                        ((profile.address && profile.address[fieldToCompare]) || '').toLowerCase()
+                    ) * weights.address.city;
+                    totalScore += scores.address.city || 0;
+                }
+
+                if (address.state) {
+                    const isHindiInput = detectHindiScript(address.state);
+                    const fieldToCompare = isHindiInput ? 'stateHindi' : 'stateEnglish';
+                    scores.address.state = calculateMatchPercentage(
+                        address.state.toLowerCase(),
+                        ((profile.address && profile.address[fieldToCompare]) || '').toLowerCase()
+                    ) * weights.address.state;
+                    totalScore += scores.address.state || 0;
+                }
             }
 
-            // Appearance matching (10%)
+            // Appearance matching
             if (appearance) {
                 if (appearance.height) {
                     const heightDiff = Math.abs(profile.appearance?.height - appearance.height);
-                    scores.appearance.height = (heightDiff <= 5 ? (100 - heightDiff * 20) : 0) 
-                        * weights.appearance.height;
-                    totalScore += scores.appearance.height;
+                    scores.appearance.height = Math.max(0, 100 - (heightDiff * 2)) * weights.appearance.height;
+                    totalScore += scores.appearance.height || 0;
                 }
 
                 if (appearance.weight) {
                     const weightDiff = Math.abs(profile.appearance?.weight - appearance.weight);
-                    scores.appearance.weight = (weightDiff <= 5 ? (100 - weightDiff * 20) : 0) 
-                        * weights.appearance.weight;
-                    totalScore += scores.appearance.weight;
+                    scores.appearance.weight = Math.max(0, 100 - (weightDiff * 2)) * weights.appearance.weight;
+                    totalScore += scores.appearance.weight || 0;
                 }
 
                 if (appearance.complexion) {
                     scores.appearance.complexion = (profile.appearance?.complexion === appearance.complexion ? 100 : 0) 
                         * weights.appearance.complexion;
-                    totalScore += scores.appearance.complexion;
+                    totalScore += scores.appearance.complexion || 0;
                 }
 
                 if (appearance.build) {
                     scores.appearance.build = (profile.appearance?.build === appearance.build ? 100 : 0) 
                         * weights.appearance.build;
-                    totalScore += scores.appearance.build;
+                    totalScore += scores.appearance.build || 0;
                 }
             }
+
+            // Convert scores to percentages and round to 2 decimal places
+            const roundedScores = {
+                name: {
+                    firstName: parseFloat((scores.name.firstName || 0).toFixed(2)),
+                    middleName: parseFloat((scores.name.middleName || 0).toFixed(2)),
+                    lastName: parseFloat((scores.name.lastName || 0).toFixed(2))
+                },
+                personal: {
+                    gender: parseFloat((scores.personal.gender || 0).toFixed(2)),
+                    dob: parseFloat((scores.personal.dob || 0).toFixed(2)),
+                    mNumber: parseFloat((scores.personal.mNumber || 0).toFixed(2)),
+                    occupation: parseFloat((scores.personal.occupation || 0).toFixed(2))
+                },
+                address: {
+                    district: parseFloat((scores.address.district || 0).toFixed(2)),
+                    city: parseFloat((scores.address.city || 0).toFixed(2)),
+                    state: parseFloat((scores.address.state || 0).toFixed(2))
+                },
+                appearance: {
+                    height: parseFloat((scores.appearance.height || 0).toFixed(2)),
+                    weight: parseFloat((scores.appearance.weight || 0).toFixed(2)),
+                    complexion: parseFloat((scores.appearance.complexion || 0).toFixed(2)),
+                    build: parseFloat((scores.appearance.build || 0).toFixed(2))
+                }
+            };
 
             return {
                 ...profile.toObject(),
                 matchPercentage: parseFloat(totalScore.toFixed(2)),
-                scores: {
-                    name: {
-                        firstName: parseFloat(scores.name.firstName.toFixed(2)),
-                        lastName: parseFloat(scores.name.lastName.toFixed(2))
-                    },
-                    personal: {
-                        gender: parseFloat(scores.personal.gender.toFixed(2)),
-                        dob: parseFloat(scores.personal.dob.toFixed(2)),
-                        role: parseFloat(scores.personal.role.toFixed(2)),
-                        mNumber: parseFloat(scores.personal.mNumber.toFixed(2)),      // Added
-                        occupation: parseFloat(scores.personal.occupation.toFixed(2)) // Added
-                    },
-                    address: {
-                        district: parseFloat(scores.address.district.toFixed(2)),
-                        city: parseFloat(scores.address.city.toFixed(2)),
-                        state: parseFloat(scores.address.state.toFixed(2))
-                    },
-                    appearance: {
-                        height: parseFloat(scores.appearance.height.toFixed(2)),
-                        weight: parseFloat(scores.appearance.weight.toFixed(2)),
-                        complexion: parseFloat(scores.appearance.complexion.toFixed(2)),
-                        build: parseFloat(scores.appearance.build.toFixed(2))
-                    }
-                }
+                scores: roundedScores
             };
         });
 
-        // Sort all profiles by match percentage
-        const sortedProfiles = profilesWithMatches.sort((a, b) => b.matchPercentage - a.matchPercentage);
+        // Sort by match percentage and filter out low matches
+        const matchedProfiles = profilesWithMatches
+            .filter(p => p.matchPercentage > 0)
+            .sort((a, b) => b.matchPercentage - a.matchPercentage);
 
         res.render('records/search.ejs', { 
-            profiles: sortedProfiles,
+            profiles: matchedProfiles,
             searchParams: req.body
         });
 
-    } catch (err) {
-        console.error('Error searching profiles:', err);
-        req.flash('error', 'An error occurred while searching profiles');
-        res.redirect('/search');
+    } catch (error) {
+        console.error('Search error:', error);
+        res.render('records/search.ejs', { 
+            profiles: [],
+            searchParams: req.body,
+            error: 'An error occurred while searching'
+        });
     }
 };
 
