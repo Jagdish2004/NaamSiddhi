@@ -56,7 +56,7 @@
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
 
-                    <!-- Gender & Role -->
+                    <!-- Gender & Aadhar Number -->
                     <div class="space-y-2">
                         <label class="block text-gray-400 mb-2">Gender</label>
                         <select name="gender" 
@@ -68,15 +68,14 @@
                         </select>
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-gray-400 mb-2">Role</label>
-                        <select name="role" 
-                                required
-                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                            <option value="accused" <%= record.role === 'accused' ? 'selected' : '' %>>Accused / आरोपी</option>
-                            <option value="victim" <%= record.role === 'victim' ? 'selected' : '' %>>Victim / पीड़ित</option>
-                            <option value="witness" <%= record.role === 'witness' ? 'selected' : '' %>>Witness / गवाह</option>
-                            <option value="complainant" <%= record.role === 'complainant' ? 'selected' : '' %>>Complainant / शिकायतकर्ता</option>
-                        </select>
+                        <label class="block text-gray-400 mb-2">Aadhar Number / आधार नंबर</label>
+                        <input type="text" 
+                               name="aadharNumber" 
+                               value="<%= record.aadharNumber %>"
+                               pattern="[0-9]{12}"
+                               maxlength="12"
+                               placeholder="Enter 12-digit Aadhar number"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
 
                     <!-- Contact Information -->

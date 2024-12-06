@@ -155,97 +155,72 @@
                 </div>
             </div>
 
-            <!-- Case Details Section -->
+            <!-- Appearance Details / उपस्थिति विवरण -->
             <div class="space-y-6">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-nasa text-blue-400/80">Case Details</h2>
-                    <button type="button" 
-                            id="toggleCaseDetails"
-                            class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all flex items-center">
-                        <svg class="w-4 h-4 mr-2 transform transition-transform" id="caseIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
-                        Add Case Details
-                    </button>
-                </div>
-                <div id="caseDetailsContainer" class="hidden space-y-4">
-                    <div id="caseEntries" class="space-y-4">
-                        <!-- Case entries will be added here -->
+                <h2 class="text-xl font-nasa text-blue-400/80">Appearance Details / उपस्थिति विवरण</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Physical Characteristics -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-nasa text-blue-400/60">Physical Characteristics / शारीरिक विशेषताएं</h3>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="number" 
+                                       name="appearance[height]" 
+                                       placeholder="Height (cm) / ऊचाई"
+                                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                                
+                                <input type="number" 
+                                       name="appearance[weight]" 
+                                       placeholder="Weight (kg) / वजन"
+                                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            </div>
+                            
+                            <select name="appearance[complexion]"
+                                    class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                                <option value="" disabled selected>Complexion / रंग</option>
+                                <option value="fair">Fair / गोरा</option>
+                                <option value="medium">Medium / साँवला</option>
+                                <option value="dark">Dark / काला</option>
+                            </select>
+
+                            <select name="appearance[build]"
+                                    class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                                <option value="" disabled selected>Build / शारीरिक बनावट</option>
+                                <option value="slim">Slim / पतला</option>
+                                <option value="average">Average / सामान्य</option>
+                                <option value="athletic">Athletic / एथलेटिक</option>
+                                <option value="heavy">Heavy / भारी</option>
+                            </select>
+                        </div>
                     </div>
-                    <button type="button" 
-                            onclick="addCaseEntry()"
-                            class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-nasa px-4 py-2 rounded-md transition-all">
-                        + Add Another Case Entry
-                    </button>
+
+                    <!-- Distinguishing Features -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-nasa text-blue-400/60">Distinguishing Features / विशेष पहचान</h3>
+                        <div class="space-y-4">
+                            <input type="text" 
+                                   name="appearance[facialFeatures]" 
+                                   placeholder="Facial Features / चेहरे की विशेषताएं"
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+
+                            <input type="text" 
+                                   name="appearance[scars]" 
+                                   placeholder="Scars/Marks / निशान"
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+
+                            <input type="text" 
+                                   name="appearance[tattoos]" 
+                                   placeholder="Tattoos / टैटू"
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+
+                            <textarea name="appearance[otherFeatures]" 
+                                    placeholder="Other Distinguishing Features / अन्य विशेष पहचान"
+                                    rows="2"
+                                    class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-        <!-- Replace the Description Section with this Appearance Section -->
-<div class="space-y-6">
-  <h2 class="text-xl font-nasa text-blue-400/80">Appearance Details / उपस्थिति विवरण</h2>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Physical Characteristics -->
-      <div class="space-y-4">
-          <h3 class="text-lg font-nasa text-blue-400/60">Physical Characteristics / शारीरिक विशेषताएं</h3>
-          <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-4">
-                  <input type="number" 
-                         name="appearance[height]" 
-                         placeholder="Height (cm) / ऊचाई"
-                         class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                  
-                  <input type="number" 
-                         name="appearance[weight]" 
-                         placeholder="Weight (kg) / वजन"
-                         class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-              </div>
-              
-              <select name="appearance[complexion]"
-                      class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                  <option value="" disabled selected>Complexion / रंग</option>
-                  <option value="fair">Fair / गोरा</option>
-                  <option value="medium">Medium / साँवला</option>
-                  <option value="dark">Dark / काला</option>
-              </select>
-
-              <select name="appearance[build]"
-                      class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                  <option value="" disabled selected>Build / शारीरिक बनावट</option>
-                  <option value="slim">Slim / पतला</option>
-                  <option value="average">Average / सामान्य</option>
-                  <option value="athletic">Athletic / एथलेटिक</option>
-                  <option value="heavy">Heavy / भारी</option>
-              </select>
-          </div>
-      </div>
-
-      <!-- Distinguishing Features -->
-      <div class="space-y-4">
-          <h3 class="text-lg font-nasa text-blue-400/60">Distinguishing Features / विशेष पहचान</h3>
-          <div class="space-y-4">
-              <input type="text" 
-                     name="appearance[facialFeatures]" 
-                     placeholder="Facial Features / चेहरे की विशेषताएं"
-                     class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-
-              <input type="text" 
-                     name="appearance[scars]" 
-                     placeholder="Scars/Marks / निशान"
-                     class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-
-              <input type="text" 
-                     name="appearance[tattoos]" 
-                     placeholder="Tattoos / टैटू"
-                     class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-
-              <textarea name="appearance[otherFeatures]" 
-                        placeholder="Other Distinguishing Features / अन्य विशेष पहचान"
-                        rows="2"
-                        class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"></textarea>
-          </div>
-      </div>
-  </div>
-</div>
 
             <!-- Profile Images Section -->
             <div class="space-y-6">
@@ -312,8 +287,6 @@
 
 <script src="/js/suggestions.js"></script>
 <script>
-   
-
     // Toggle sections
     document.getElementById('toggleFamilyDetails').addEventListener('click', function() {
         const container = document.getElementById('familyDetailsContainer');
@@ -322,16 +295,6 @@
         icon.style.transform = container.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(45deg)';
         if (!container.classList.contains('hidden') && container.children.length === 1) {
             addFamilyMember();
-        }
-    });
-
-    document.getElementById('toggleCaseDetails').addEventListener('click', function() {
-        const container = document.getElementById('caseDetailsContainer');
-        const icon = document.getElementById('caseIcon');
-        container.classList.toggle('hidden');
-        icon.style.transform = container.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(45deg)';
-        if (!container.classList.contains('hidden') && container.children.length === 1) {
-            addCaseEntry();
         }
     });
 
@@ -366,76 +329,12 @@
         container.appendChild(memberDiv);
     }
 
-    // Add case entry
-    function addCaseEntry() {
-        const container = document.getElementById('caseEntries');
-        const entryDiv = document.createElement('div');
-        entryDiv.className = 'grid grid-cols-1 md:grid-cols-2 gap-4 p-4 glass-effect rounded-lg';
-        entryDiv.innerHTML = `
-            <div class="space-y-2">
-                <input type="text" 
-                       name="caseDetails[caseNumber][]" 
-                       placeholder="Case Number / केस नंबर"
-                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                <input type="text" 
-                       name="caseDetails[section][]" 
-                       placeholder="Section / धारा"
-                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                <select name="caseDetails[role][]" 
-                        required
-                        class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                    <option value="" disabled selected>Select Role / भूमिका चुनें</option>
-                    <option value="criminal">Criminal / अपराध</option>
-                    <option value="victim">Victim / पीड़ित</option>
-                    <option value="witness">Witness / गवाह</option>
-                </select>
-            </div>
-            <div class="space-y-2">
-                <textarea name="caseDetails[details][]" 
-                          placeholder="Case Details / केस विवरण"
-                          class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
-                          rows="4"></textarea>
-                <div class="flex justify-end">
-                    <button type="button" 
-                            onclick="this.parentElement.parentElement.parentElement.remove()"
-                            class="bg-red-500/20 hover:bg-red-500/30 text-red-400 p-2 rounded-md transition-all">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        `;
-        container.appendChild(entryDiv);
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Check if we're creating a profile for a case
-        const urlParams = new URLSearchParams(window.location.search);
-        const returnTo = urlParams.get('returnTo');
-        const caseId = urlParams.get('caseId');
-
-        if (returnTo === 'case' && caseId) {
-            // Modify the form submission
-            const form = document.querySelector('form');
-            form.action = `/newrecord/case/${caseId}`;
-            
-            // Add a hidden input for the case context
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'caseContext';
-            hiddenInput.value = 'true';
-            form.appendChild(hiddenInput);
-        }
-    });
-
     function previewImage(input, previewId) {
         const preview = document.getElementById(previewId);
         const placeholder = document.getElementById(previewId.replace('Preview', 'Placeholder'));
         
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            
             reader.onload = function(e) {
                 preview.src = e.target.result;
                 preview.classList.remove('hidden');
