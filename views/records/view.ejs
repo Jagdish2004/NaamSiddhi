@@ -315,7 +315,7 @@
 
 <!-- Link Case Modal -->
 <div id="linkCaseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-space-dark glass-effect rounded-lg p-8 max-w-md w-full mx-4">
+    <div class="bg-space-dark glass-effect rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl font-nasa text-blue-400">Link to Case</h3>
             <button onclick="hideLinkCaseModal()" class="text-gray-400 hover:text-white">
@@ -335,7 +335,6 @@
                        class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
                        required>
                 
-                <!-- Add this suggestions container -->
                 <div id="caseSuggestions" 
                      class="absolute z-50 w-full mt-1 bg-space-dark/95 border border-blue-400/30 rounded-md shadow-lg hidden max-h-60 overflow-y-auto">
                 </div>
@@ -343,7 +342,7 @@
 
             <div>
                 <label class="block text-gray-400 mb-2">Role in Case</label>
-                <select name="role"
+                <select name="role" id="roleSelect"
                         class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
                         required>
                     <option value="" disabled selected>Select role</option>
@@ -352,6 +351,72 @@
                     <option value="witness">Witness</option>
                     <option value="complainant">Complainant</option>
                 </select>
+            </div>
+
+            <div>
+                <label class="block text-gray-400 mb-2">Case Details</label>
+                <textarea name="details"
+                          class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 h-24"
+                          placeholder="Enter additional details about the person's involvement in the case"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-gray-400 mb-2">Articles/Sections</label>
+                <div class="space-y-2" id="articlesContainer">
+                    <div class="flex space-x-2">
+                        <input type="text" name="articles[]"
+                               class="flex-1 bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               placeholder="Enter article/section">
+                        <button type="button" onclick="addArticleField()"
+                                class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-2 rounded-md">
+                            +
+                        </button>
+                    </div>
+                </div>
+            </div>
+                 
+
+            <!-- Court Details -->
+            <div class="space-y-4">
+                <h4 class="text-lg font-nasa text-blue-400">Court Details</h4>
+                <div>
+                    <label class="block text-gray-400 mb-2">Court Name</label>
+                    <input type="text" name="courtName"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                           placeholder="Enter court name">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-400 mb-2">Court Case Number</label>
+                    <input type="text" name="courtCaseNumber"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                           placeholder="Enter court case number">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-400 mb-2">Next Hearing Date</label>
+                    <input type="date" name="nextHearingDate"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-400 mb-2">Judge Name</label>
+                    <input type="text" name="judgeName"
+                           class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                           placeholder="Enter judge's name">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-400 mb-2">Court Status</label>
+                    <select name="courtStatus"
+                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                        <option value="" disabled selected>Select status</option>
+                        <option value="pending">Pending</option>
+                        <option value="ongoing">Ongoing</option>
+                        <option value="completed">Completed</option>
+                        <option value="appealed">Appealed</option>
+                    </select>
+                </div>
             </div>
 
             <div class="flex justify-end space-x-4">
@@ -438,6 +503,31 @@ document.querySelector('form[action*="/link-case"]').addEventListener('submit', 
     const formData = new FormData(this);
     const profileId = '<%= record.id %>';
 
+    // Collect articles
+    const articles = Array.from(formData.getAll('articles[]'))
+        .filter(article => article.trim() !== '')
+        .map(article => ({ section: article }));
+
+    // Build arrest details object
+    const arrestDetails = formData.get('isArrested') ? {
+        isArrested: true,
+        arrestDate: formData.get('arrestDate'),
+        arrestLocation: {
+            english: formData.get('arrestLocation'),
+            hindi: ''  // You might want to add Hindi transliteration here
+        },
+        arrestingOfficer: formData.get('arrestingOfficer')
+    } : null;
+
+    // Build court details object
+    const courtDetails = {
+        courtName: formData.get('courtName'),
+        caseNumber: formData.get('courtCaseNumber'),
+        nextHearingDate: formData.get('nextHearingDate'),
+        judgeName: formData.get('judgeName'),
+        status: formData.get('courtStatus')
+    };
+
     try {
         const response = await fetch(`/record/${profileId}/link-case`, {
             method: 'POST',
@@ -446,7 +536,11 @@ document.querySelector('form[action*="/link-case"]').addEventListener('submit', 
             },
             body: JSON.stringify({
                 caseNumber: formData.get('caseNumber'),
-                role: formData.get('role')
+                role: formData.get('role'),
+                details: formData.get('details'),
+                articles: articles,
+                arrestDetails: arrestDetails,
+                courtDetails: courtDetails
             })
         });
 
@@ -454,12 +548,12 @@ document.querySelector('form[action*="/link-case"]').addEventListener('submit', 
 
         if (response.ok) {
             showNotification('Case linked successfully', 'success');
-            // Stay on the same page and refresh
             window.location.reload();
         } else {
             showNotification(data.error || 'Failed to link case', 'error');
         }
     } catch (error) {
+        console.error('Error:', error);
         showNotification('Failed to link case', 'error');
     }
 });
@@ -505,4 +599,41 @@ function selectCase(caseNumber) {
     document.getElementById('caseNumberInput').value = caseNumber;
     document.getElementById('caseSuggestions').classList.add('hidden');
 }
+
+// Add these new functions for the enhanced form
+function addArticleField() {
+    const container = document.getElementById('articlesContainer');
+    const newField = document.createElement('div');
+    newField.className = 'flex space-x-2';
+    newField.innerHTML = `
+        <input type="text" name="articles[]"
+               class="flex-1 bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+               placeholder="Enter article/section">
+        <button type="button" onclick="this.parentElement.remove()"
+                class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-2 rounded-md">
+            -
+        </button>
+    `;
+    container.appendChild(newField);
+}
+
+// Show/hide arrest details based on role
+document.getElementById('roleSelect').addEventListener('change', function(e) {
+    const arrestDetailsSection = document.getElementById('arrestDetailsSection');
+    if (e.target.value === 'accused') {
+        arrestDetailsSection.classList.remove('hidden');
+    } else {
+        arrestDetailsSection.classList.add('hidden');
+    }
+});
+
+// Show/hide arrest fields based on checkbox
+document.getElementById('isArrested').addEventListener('change', function(e) {
+    const arrestFields = document.getElementById('arrestFields');
+    if (e.target.checked) {
+        arrestFields.classList.remove('hidden');
+    } else {
+        arrestFields.classList.add('hidden');
+    }
+});
 </script> 

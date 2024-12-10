@@ -141,10 +141,10 @@ router.patch('/cases/:id/status', async (req, res) => {
 // Add profile to case
 router.post('/:caseId/profiles', async (req, res) => {
     try {
-        const { profileId, role } = req.body;
+        const { profileId, role, details, articles, arrestDetails, courtDetails } = req.body;
         const { caseId } = req.params;
 
-        console.log('Linking profile:', { profileId, caseId, role });
+        console.log('Linking profile:', { profileId, caseId, role, details });
 
         // Validate IDs
         if (!mongoose.Types.ObjectId.isValid(caseId) || !mongoose.Types.ObjectId.isValid(profileId)) {
@@ -163,14 +163,18 @@ router.post('/:caseId/profiles', async (req, res) => {
             return res.status(400).json({ error: 'Profile already connected to this case' });
         }
 
-        // Add profile to case
+        // Add profile to case with all details
         case_.profiles.push({
             profile: profileId,
             role,
+            details,
+            articles: articles || [],
+            arrestDetails: role === 'accused' ? arrestDetails : undefined,
+            courtDetails,
             addedAt: new Date()
         });
 
-        // Add timeline entry with profile name
+        // Add timeline entry with profile name and role
         case_.timeline.push({
             action: 'PROFILE_ADDED',
             description: {

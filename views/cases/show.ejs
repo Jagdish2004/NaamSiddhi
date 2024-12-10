@@ -47,23 +47,113 @@
                         <% if (caseData.profiles && caseData.profiles.length > 0) { %>
                             <% caseData.profiles.forEach(profile => { %>
                                 <div class="py-4">
-                                    <div class="flex justify-between items-center">
-                                        <div>
-                                            <h3 class="font-medium text-white">
-                                                <%= profile.profile.firstNameEnglish %> <%= profile.profile.lastNameEnglish %>
-                                            </h3>
-                                            <p class="text-sm text-gray-400">Role: <%= profile.role %></p>
+                                    <div class="flex flex-col space-y-4">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h3 class="font-medium text-white">
+                                                    <%= profile.profile.firstNameEnglish %> <%= profile.profile.lastNameEnglish %>
+                                                </h3>
+                                                <p class="text-sm text-gray-400">Role: <%= profile.role %></p>
+                                            </div>
+                                            <div class="flex space-x-2">
+                                                <a href="/record/<%= profile.profile._id %>" 
+                                                   class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
+                                                    View Profile
+                                                </a>
+                                                <button onclick="unlinkProfile('<%= profile.profile._id %>')"
+                                                        class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1 rounded-md transition-all">
+                                                    Unlink
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="flex space-x-2">
-                                            <a href="/record/<%= profile.profile._id %>" 
-                                               class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
-                                                View Profile
-                                            </a>
-                                            <button onclick="unlinkProfile('<%= profile.profile._id %>')"
-                                                    class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1 rounded-md transition-all">
-                                                Unlink
-                                            </button>
-                                        </div>
+
+                                        <% if (profile.details) { %>
+                                            <div class="bg-blue-400/10 rounded-lg p-3">
+                                                <h4 class="text-sm font-medium text-blue-400 mb-1">Case Details</h4>
+                                                <p class="text-sm text-gray-300"><%= profile.details %></p>
+                                            </div>
+                                        <% } %>
+
+                                        <% if (profile.articles && profile.articles.length > 0) { %>
+                                            <div class="bg-blue-400/10 rounded-lg p-3">
+                                                <h4 class="text-sm font-medium text-blue-400 mb-2">Articles/Sections</h4>
+                                                <div class="flex flex-wrap gap-2">
+                                                    <% profile.articles.forEach(article => { %>
+                                                        <span class="text-sm text-gray-300 bg-blue-400/20 px-2 py-1 rounded">
+                                                            <%= article.section %>
+                                                        </span>
+                                                    <% }) %>
+                                                </div>
+                                            </div>
+                                        <% } %>
+
+                                        <% if (profile.role === 'accused' && profile.arrestDetails && profile.arrestDetails.isArrested) { %>
+                                            <div class="bg-blue-400/10 rounded-lg p-3">
+                                                <h4 class="text-sm font-medium text-blue-400 mb-2">Arrest Details</h4>
+                                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                                    <div>
+                                                        <p class="text-gray-400">Arrest Date</p>
+                                                        <p class="text-gray-300">
+                                                            <%= new Date(profile.arrestDetails.arrestDate).toLocaleDateString() %>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-gray-400">Location</p>
+                                                        <p class="text-gray-300">
+                                                            <%= profile.arrestDetails.arrestLocation.english %>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-gray-400">Arresting Officer</p>
+                                                        <p class="text-gray-300">
+                                                            <%= profile.arrestDetails.arrestingOfficer %>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% } %>
+
+                                        <% if (profile.courtDetails) { %>
+                                            <div class="bg-blue-400/10 rounded-lg p-3">
+                                                <h4 class="text-sm font-medium text-blue-400 mb-2">Court Details</h4>
+                                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                                    <div>
+                                                        <p class="text-gray-400">Court Name</p>
+                                                        <p class="text-gray-300">
+                                                            <%= profile.courtDetails.courtName || 'Not specified' %>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-gray-400">Case Number</p>
+                                                        <p class="text-gray-300">
+                                                            <%= profile.courtDetails.caseNumber || 'Not specified' %>
+                                                        </p>
+                                                    </div>
+                                                    <% if (profile.courtDetails.nextHearingDate) { %>
+                                                        <div>
+                                                            <p class="text-gray-400">Next Hearing</p>
+                                                            <p class="text-gray-300">
+                                                                <%= new Date(profile.courtDetails.nextHearingDate).toLocaleDateString() %>
+                                                            </p>
+                                                        </div>
+                                                    <% } %>
+                                                    <% if (profile.courtDetails.judgeName) { %>
+                                                        <div>
+                                                            <p class="text-gray-400">Judge</p>
+                                                            <p class="text-gray-300">
+                                                                <%= profile.courtDetails.judgeName %>
+                                                            </p>
+                                                        </div>
+                                                    <% } %>
+                                                    <div>
+                                                        <p class="text-gray-400">Status</p>
+                                                        <p class="text-gray-300 capitalize">
+                                                            <%= profile.courtDetails.status %>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% } %>
                                     </div>
                                 </div>
                             <% }); %>
@@ -198,24 +288,138 @@ document.getElementById('profileSearch').addEventListener('input', async functio
         }
 
         resultsDiv.innerHTML = data.profiles.map(profile => `
-            <div class="glass-effect p-4 rounded-lg flex justify-between items-center mb-2">
-                <div>
-                    <p class="text-white font-medium">${profile.firstNameEnglish} ${profile.lastNameEnglish}</p>
-                    <p class="text-sm text-gray-400">ID: ${profile.id}</p>
+            <div class="glass-effect p-4 rounded-lg flex flex-col space-y-4 mb-2">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-white font-medium">${profile.firstNameEnglish} ${profile.lastNameEnglish}</p>
+                        <p class="text-sm text-gray-400">ID: ${profile.id}</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="toggleAdditionalDetails('${profile._id}')"
+                                id="toggle-details-${profile._id}"
+                                class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
+                            Show Details
+                        </button>
+                        <button onclick="validateAndLink('${profile._id}')"
+                                id="link-button-${profile._id}"
+                                class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
+                            Link
+                        </button>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-2">
+
+                <!-- Basic Role Selection - Always Visible -->
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Role <span class="text-red-400">*</span></label>
                     <select id="role-${profile._id}" 
-                            class="bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-1 text-gray-100 text-sm">
+                            required
+                            class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-2 text-gray-100 text-sm">
+                        <option value="">Select Role</option>
                         <option value="accused">Accused</option>
                         <option value="victim">Victim</option>
                         <option value="witness">Witness</option>
                         <option value="complainant">Complainant</option>
                     </select>
-                    <button onclick="linkProfile('${profile._id}')"
-                            id="link-button-${profile._id}"
-                            class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
-                        Link
-                    </button>
+                </div>
+
+                <!-- Additional Details Section - Hidden by Default -->
+                <div id="additional-details-${profile._id}" class="hidden space-y-4">
+                    <!-- Case Details -->
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Case Details <span class="text-red-400">*</span></label>
+                        <textarea id="details-${profile._id}"
+                                required
+                                placeholder="Enter case details..."
+                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-2 text-gray-100 text-sm h-20 resize-none"></textarea>
+                    </div>
+
+                    <!-- Articles/Sections -->
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Articles/Sections <span class="text-red-400">*</span></label>
+                        <div class="flex space-x-2">
+                            <input type="text" 
+                                   id="article-${profile._id}"
+                                   placeholder="e.g., IPC 302"
+                                   class="flex-1 bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-2 text-gray-100 text-sm">
+                            <button onclick="addArticle('${profile._id}')"
+                                    class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md">
+                                Add
+                            </button>
+                        </div>
+                        <div id="articles-list-${profile._id}" class="mt-2 space-y-1">
+                            <!-- Articles will be added here -->
+                        </div>
+                        <p id="articles-error-${profile._id}" class="hidden text-red-400 text-sm mt-1">
+                            At least one article/section is required
+                        </p>
+                    </div>
+
+                    <!-- Arrest Details (Only shown for accused) -->
+                    <div id="arrest-details-${profile._id}" class="hidden">
+                        <label class="block text-sm text-gray-400 mb-1">Arrest Details <span class="text-red-400">*</span></label>
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <input type="checkbox" 
+                                       id="is-arrested-${profile._id}"
+                                       class="mr-2">
+                                <label class="text-sm text-gray-400">Is Arrested</label>
+                            </div>
+                            <div id="arrest-fields-${profile._id}" class="space-y-2">
+                                <input type="date" 
+                                       id="arrest-date-${profile._id}"
+                                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-2 text-gray-100 text-sm"
+                                       disabled
+                                       required>
+                                <input type="text"
+                                       id="arrest-location-${profile._id}"
+                                       placeholder="Arrest Location"
+                                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-2 text-gray-100 text-sm"
+                                       disabled
+                                       required>
+                                <input type="text"
+                                       id="arresting-officer-${profile._id}"
+                                       placeholder="Arresting Officer"
+                                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-2 text-gray-100 text-sm"
+                                       disabled
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Court Details -->
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Court Details <span class="text-red-400">*</span></label>
+                        <div class="space-y-2">
+                            <input type="text"
+                                   id="court-name-${profile._id}"
+                                   placeholder="Court Name"
+                                   required
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-2 text-gray-100 text-sm">
+                            <input type="text"
+                                   id="court-case-number-${profile._id}"
+                                   placeholder="Court Case Number"
+                                   required
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-2 text-gray-100 text-sm">
+                            <input type="date"
+                                   id="next-hearing-${profile._id}"
+                                   required
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-2 text-gray-100 text-sm">
+                            <input type="text"
+                                   id="judge-name-${profile._id}"
+                                   placeholder="Judge Name"
+                                   required
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-2 text-gray-100 text-sm">
+                            <select id="court-status-${profile._id}"
+                                    required
+                                    class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-3 py-2 text-gray-100 text-sm">
+                                <option value="">Select Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="ongoing">Ongoing</option>
+                                <option value="disposed">Disposed</option>
+                                <option value="appealed">Appealed</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
         `).join('');
@@ -229,10 +433,177 @@ document.getElementById('profileSearch').addEventListener('input', async functio
     }
 });
 
+// Function to validate form fields
+function validateFields(profileId) {
+    const role = document.getElementById(`role-${profileId}`).value;
+    const detailsSection = document.getElementById(`additional-details-${profileId}`);
+    const errors = [];
+
+    // Validate role
+    if (!role) {
+        errors.push('Role is required');
+    }
+
+    // Only validate additional fields if they are visible
+    if (!detailsSection.classList.contains('hidden')) {
+        // Validate case details
+        const details = document.getElementById(`details-${profileId}`).value;
+        if (!details.trim()) {
+            errors.push('Case details are required');
+        }
+
+        // Validate articles
+        const articles = document.getElementById(`articles-list-${profileId}`).children;
+        if (articles.length === 0) {
+            errors.push('At least one article/section is required');
+            document.getElementById(`articles-error-${profileId}`).classList.remove('hidden');
+        } else {
+            document.getElementById(`articles-error-${profileId}`).classList.add('hidden');
+        }
+
+        // Validate court details
+        const courtFields = [
+            { id: `court-name-${profileId}`, label: 'Court name' },
+            { id: `court-case-number-${profileId}`, label: 'Court case number' },
+            { id: `next-hearing-${profileId}`, label: 'Next hearing date' },
+            { id: `judge-name-${profileId}`, label: 'Judge name' },
+            { id: `court-status-${profileId}`, label: 'Court status' }
+        ];
+
+        courtFields.forEach(field => {
+            const value = document.getElementById(field.id).value;
+            if (!value) {
+                errors.push(`${field.label} is required`);
+            }
+        });
+
+        // Validate arrest details for accused
+        if (role === 'accused') {
+            const isArrested = document.getElementById(`is-arrested-${profileId}`).checked;
+            if (isArrested) {
+                const arrestFields = [
+                    { id: `arrest-date-${profileId}`, label: 'Arrest date' },
+                    { id: `arrest-location-${profileId}`, label: 'Arrest location' },
+                    { id: `arresting-officer-${profileId}`, label: 'Arresting officer' }
+                ];
+
+                arrestFields.forEach(field => {
+                    const value = document.getElementById(field.id).value;
+                    if (!value) {
+                        errors.push(`${field.label} is required`);
+                    }
+                });
+            }
+        }
+    }
+
+    return errors;
+}
+
+// Function to validate and link profile
+async function validateAndLink(profileId) {
+    const errors = validateFields(profileId);
+    
+    if (errors.length > 0) {
+        alert('Please fill in all required fields:\n\n' + errors.join('\n'));
+        return;
+    }
+
+    await linkProfile(profileId);
+}
+
+// Function to toggle additional details
+function toggleAdditionalDetails(profileId) {
+    const detailsSection = document.getElementById(`additional-details-${profileId}`);
+    const toggleButton = document.getElementById(`toggle-details-${profileId}`);
+    
+    if (detailsSection.classList.contains('hidden')) {
+        detailsSection.classList.remove('hidden');
+        toggleButton.textContent = 'Hide Details';
+    } else {
+        detailsSection.classList.add('hidden');
+        toggleButton.textContent = 'Show Details';
+    }
+}
+
+// Add event listeners for role changes
+document.querySelectorAll('[id^="role-"]').forEach(select => {
+    select.addEventListener('change', function() {
+        const profileId = this.id.split('-')[1];
+        const arrestDetails = document.getElementById(`arrest-details-${profileId}`);
+        const additionalDetails = document.getElementById(`additional-details-${profileId}`);
+        
+        if (this.value === 'accused' && !additionalDetails.classList.contains('hidden')) {
+            arrestDetails.classList.remove('hidden');
+        } else {
+            arrestDetails.classList.add('hidden');
+        }
+    });
+});
+
+// Add event listeners for arrest checkbox
+document.querySelectorAll('[id^="is-arrested-"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const profileId = this.id.split('-')[2];
+        const inputs = [
+            document.getElementById(`arrest-date-${profileId}`),
+            document.getElementById(`arrest-location-${profileId}`),
+            document.getElementById(`arresting-officer-${profileId}`)
+        ];
+        inputs.forEach(input => {
+            input.disabled = !this.checked;
+            if (this.checked) {
+                input.setAttribute('required', '');
+            } else {
+                input.removeAttribute('required');
+            }
+        });
+    });
+});
+
+// Function to add articles
+function addArticle(profileId) {
+    const articleInput = document.getElementById(`article-${profileId}`);
+    const articlesList = document.getElementById(`articles-list-${profileId}`);
+    const article = articleInput.value.trim();
+    
+    if (article) {
+        const articleElement = document.createElement('div');
+        articleElement.className = 'flex justify-between items-center text-sm text-gray-100 bg-blue-400/10 rounded px-2 py-1';
+        articleElement.innerHTML = `
+            <span>${article}</span>
+            <button onclick="this.parentElement.remove()" 
+                    class="text-red-400 hover:text-red-300">×</button>
+        `;
+        articlesList.appendChild(articleElement);
+        articleInput.value = '';
+    }
+}
+
+// Update the linkProfile function to include new fields
 async function linkProfile(profileId) {
     try {
         const role = document.getElementById(`role-${profileId}`).value;
-        const caseId = '<%= caseData._id %>';
+        const details = document.getElementById(`details-${profileId}`).value;
+        const articles = Array.from(document.getElementById(`articles-list-${profileId}`).children)
+            .map(el => ({ section: el.querySelector('span').textContent }));
+        
+        const arrestDetails = role === 'accused' && document.getElementById(`is-arrested-${profileId}`).checked ? {
+            isArrested: true,
+            arrestDate: document.getElementById(`arrest-date-${profileId}`).value,
+            arrestLocation: {
+                english: document.getElementById(`arrest-location-${profileId}`).value
+            },
+            arrestingOfficer: document.getElementById(`arresting-officer-${profileId}`).value
+        } : undefined;
+
+        const courtDetails = {
+            courtName: document.getElementById(`court-name-${profileId}`).value,
+            caseNumber: document.getElementById(`court-case-number-${profileId}`).value,
+            nextHearingDate: document.getElementById(`next-hearing-${profileId}`).value,
+            judgeName: document.getElementById(`judge-name-${profileId}`).value,
+            status: document.getElementById(`court-status-${profileId}`).value
+        };
 
         const button = document.getElementById(`link-button-${profileId}`);
         if (button) {
@@ -240,64 +611,31 @@ async function linkProfile(profileId) {
             button.disabled = true;
         }
 
-        const response = await fetch(`/api/cases/${caseId}/profiles`, {
+        const response = await fetch(`/api/cases/<%= caseData._id %>/profiles`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ 
-                profileId: profileId,
-                role: role 
+                profileId,
+                role,
+                details,
+                articles,
+                arrestDetails,
+                courtDetails
             })
         });
 
-        const data = await response.json();
-
         if (!response.ok) {
-            throw new Error(data.error || 'Failed to link profile');
+            throw new Error('Failed to link profile');
         }
 
-        // Get profile details from the search result
-        const profileDiv = document.getElementById(`link-button-${profileId}`).closest('.glass-effect');
-        const profileName = profileDiv.querySelector('p.text-white').textContent;
-
-        // Create new profile element
-        const profilesContainer = document.querySelector('.divide-y.divide-blue-400\\/20');
-        const noProfilesMessage = profilesContainer.querySelector('p.text-gray-400');
-        if (noProfilesMessage) {
-            noProfilesMessage.remove();
-        }
-
-        const newProfileElement = document.createElement('div');
-        newProfileElement.className = 'py-4';
-        newProfileElement.innerHTML = `
-            <div class="flex justify-between items-center">
-                <div>
-                    <h3 class="font-medium text-white">${profileName}</h3>
-                    <p class="text-sm text-gray-400">Role: ${role}</p>
-                </div>
-                <div class="flex space-x-2">
-                    <a href="/record/${profileId}" 
-                       class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
-                        View Profile
-                    </a>
-                    <button onclick="unlinkProfile('${profileId}')"
-                            class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1 rounded-md transition-all">
-                        Unlink
-                    </button>
-                </div>
-            </div>
-        `;
-
-        profilesContainer.insertBefore(newProfileElement, profilesContainer.firstChild);
-        showNotification('Profile linked successfully', 'success');
-        hideProfileLinkModal();
+        location.reload(); // Reload to show updated data
 
     } catch (error) {
         console.error('Error linking profile:', error);
-        showNotification(error.message || 'Failed to link profile', 'error');
-    } finally {
+        alert('Failed to link profile: ' + error.message);
         const button = document.getElementById(`link-button-${profileId}`);
         if (button) {
             button.textContent = 'Link';

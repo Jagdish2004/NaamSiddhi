@@ -106,6 +106,40 @@ const profileSchema = new mongoose.Schema({
             type: String,
             enum: ['accused', 'victim', 'witness', 'complainant']
         },
+        details: {
+            type: String,
+            default: ''
+        },
+        articles: [{
+            section: String,
+            description: {
+                english: String,
+                hindi: String
+            }
+        }],
+        arrestDetails: {
+            isArrested: {
+                type: Boolean,
+                default: false
+            },
+            arrestDate: Date,
+            arrestLocation: {
+                english: String,
+                hindi: String
+            },
+            arrestingOfficer: String
+        },
+        courtDetails: {
+            courtName: String,
+            caseNumber: String,
+            nextHearingDate: Date,
+            judgeName: String,
+            status: {
+                type: String,
+                enum: ['pending', 'ongoing', 'disposed', 'appealed'],
+                default: 'pending'
+            }
+        },
         addedAt: {
             type: Date,
             default: Date.now

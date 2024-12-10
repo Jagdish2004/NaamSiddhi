@@ -13,7 +13,7 @@ router.get('/:id', async (req, res, next) => {
 
         const populateOptions = {
             path: 'cases.case',
-            select: 'caseNumber status description location',
+            select: 'caseNumber status description location profiles',
             populate: [
                 {
                     path: 'location.district',
@@ -27,14 +27,33 @@ router.get('/:id', async (req, res, next) => {
         };
 
         if (mongoose.Types.ObjectId.isValid(id)) {
-            record = await Profile.findById(id).populate(populateOptions);
+            record = await Profile.findById(id)
+                .populate(populateOptions)
+                .lean();
         } else if (!isNaN(id)) {
-            record = await Profile.findOne({ id: Number(id) }).populate(populateOptions);
+            record = await Profile.findOne({ id: Number(id) })
+                .populate(populateOptions)
+                .lean();
         }
 
         if (!record) {
             req.flash('error', 'Record not found');
             return res.redirect('/');
+        }
+
+        // Ensure all case details are properly populated
+        if (record.cases) {
+            record.cases = record.cases.map(caseLink => {
+                const caseData = caseLink.case;
+                return {
+                    ...caseLink,
+                    case: {
+                        ...caseData,
+                        description: caseData.description || { english: '', hindi: '' },
+                        location: caseData.location || {}
+                    }
+                };
+            });
         }
 
         res.render('records/view', { record });
@@ -57,7 +76,14 @@ router.delete('/:id', recordController.deleteRecord);
 router.post('/:id/link-case', async (req, res) => {
     try {
         const { id } = req.params;
-        const { caseNumber, role } = req.body;
+        const { 
+            caseNumber, 
+            role, 
+            details,
+            articles,
+            arrestDetails,
+            courtDetails 
+        } = req.body;
 
         // Find the profile
         const profile = await Profile.findOne({ id });
@@ -87,21 +113,83 @@ router.post('/:id/link-case', async (req, res) => {
             date: new Date()
         });
 
-        // Add profile to case's profiles array
-        case_.profiles.push({
+        // Prepare profile data for case
+        const profileData = {
             profile: profile._id,
             role,
             addedAt: new Date()
-        });
+        };
 
-        // Link profile to case
+        // Add additional fields if they exist
+        if (details) profileData.details = details;
+        if (articles && articles.length > 0) profileData.articles = articles;
+        if (arrestDetails && arrestDetails.isArrested) {
+            profileData.arrestDetails = {
+                isArrested: true,
+                arrestDate: arrestDetails.arrestDate,
+                arrestLocation: {
+                    english: typeof arrestDetails.arrestLocation === 'string' 
+                        ? arrestDetails.arrestLocation 
+                        : arrestDetails.arrestLocation.english || '',
+                    hindi: typeof arrestDetails.arrestLocation === 'string'
+                        ? ''
+                        : arrestDetails.arrestLocation.hindi || ''
+                },
+                arrestingOfficer: arrestDetails.arrestingOfficer
+            };
+        }
+        if (courtDetails) {
+            profileData.courtDetails = {
+                courtName: courtDetails.courtName,
+                caseNumber: courtDetails.caseNumber,
+                nextHearingDate: courtDetails.nextHearingDate,
+                judgeName: courtDetails.judgeName,
+                status: courtDetails.status
+            };
+        }
+
+        // Add profile to case's profiles array with all details
+        case_.profiles.push(profileData);
+
+        // Prepare case data for profile
+        const caseData = {
+            case: case_._id,
+            role,
+            addedAt: new Date()
+        };
+
+        // Add the same details to the profile's case reference
+        if (details) caseData.details = details;
+        if (articles && articles.length > 0) caseData.articles = articles;
+        if (arrestDetails && arrestDetails.isArrested) {
+            caseData.arrestDetails = {
+                isArrested: true,
+                arrestDate: arrestDetails.arrestDate,
+                arrestLocation: {
+                    english: typeof arrestDetails.arrestLocation === 'string' 
+                        ? arrestDetails.arrestLocation 
+                        : arrestDetails.arrestLocation.english || '',
+                    hindi: typeof arrestDetails.arrestLocation === 'string'
+                        ? ''
+                        : arrestDetails.arrestLocation.hindi || ''
+                },
+                arrestingOfficer: arrestDetails.arrestingOfficer
+            };
+        }
+        if (courtDetails) {
+            caseData.courtDetails = {
+                courtName: courtDetails.courtName,
+                caseNumber: courtDetails.caseNumber,
+                nextHearingDate: courtDetails.nextHearingDate,
+                judgeName: courtDetails.judgeName,
+                status: courtDetails.status
+            };
+        }
+
+        // Link profile to case with all details
         await Profile.findByIdAndUpdate(profile._id, {
             $addToSet: {
-                cases: {
-                    case: case_._id,
-                    role,
-                    addedAt: new Date()
-                }
+                cases: caseData
             }
         });
 
