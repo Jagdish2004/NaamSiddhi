@@ -23,10 +23,44 @@
                     </div>
                     <div>
                         <label class="block text-gray-400 mb-2">Contact Number / संपर्क नंबर</label>
-                        <input type="tel" name="reporterContact"
-                               placeholder="Enter contact number / संपर्क नंबर दर्ज करें"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
-                               required>
+                        <div class="relative">
+                            <input type="tel" 
+                                   name="reporterContact"
+                                   id="reporterContact"
+                                   placeholder="Enter contact number / संपर्क नंबर दर्ज करें"
+                                   class="w-full bg-space-dark/50 border rounded-md px-4 py-2 focus:outline-none transition-all text-gray-100 peer"
+                                   pattern="[6-9]\d{9}"
+                                   title="Please enter a valid 10-digit mobile number starting with 6-9"
+                                   maxlength="10"
+                                   oninput="validateMobileNumber(this)"
+                                   required>
+                            <div class="hidden peer-invalid:block text-red-400 text-xs mt-1">
+                                Please enter a valid 10-digit mobile number starting with 6-9
+                            </div>
+                            <div class="hidden peer-valid:block text-green-400 text-xs mt-1">
+                                Valid mobile number format
+                            </div>
+                            <!-- Success Icon -->
+                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-400 hidden peer-valid:block" 
+                                 fill="none" 
+                                 stroke="currentColor" 
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" 
+                                      stroke-linejoin="round" 
+                                      stroke-width="2" 
+                                      d="M5 13l4 4L19 7" />
+                            </svg>
+                            <!-- Error Icon -->
+                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-400 hidden peer-invalid:peer-dirty:block" 
+                                 fill="none" 
+                                 stroke="currentColor" 
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" 
+                                      stroke-linejoin="round" 
+                                      stroke-width="2" 
+                                      d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-gray-400 mb-2">Email / ईमेल</label>
@@ -190,3 +224,40 @@
         </form>
     </div>
 </div> 
+
+<script>
+function validateMobileNumber(input) {
+    // Remove any non-numeric characters
+    input.value = input.value.replace(/[^0-9]/g, '').slice(0, 10);
+    
+    // Get the current value
+    const value = input.value;
+    
+    // Check if it's a valid mobile number
+    const isValid = /^[6-9]\d{9}$/.test(value);
+    
+    // Add or remove validation classes
+    if (value.length > 0) {
+        if (isValid) {
+            input.classList.remove('border-red-400/50');
+            input.classList.add('border-green-400/50');
+        } else {
+            input.classList.remove('border-green-400/50');
+            input.classList.add('border-red-400/50');
+        }
+    } else {
+        input.classList.remove('border-red-400/50', 'border-green-400/50');
+        input.classList.add('border-blue-400/30');
+    }
+}
+
+// Add event listener when document is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileInput = document.getElementById('reporterContact');
+    if (mobileInput) {
+        mobileInput.addEventListener('input', function() {
+            validateMobileNumber(this);
+        });
+    }
+});
+</script> 

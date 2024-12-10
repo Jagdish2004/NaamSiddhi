@@ -156,7 +156,13 @@ const caseSchema = new Schema({
         },
         contact: {
             type: String,
-            required: true
+            required: true,
+            validate: {
+                validator: function(v) {
+                    return /^[6-9]\d{9}$/.test(v);
+                },
+                message: props => `${props.value} is not a valid 10-digit mobile number! Number should start with 6-9.`
+            }
         },
         email: String,
         address: {

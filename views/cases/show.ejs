@@ -298,7 +298,7 @@ document.getElementById('profileSearch').addEventListener('input', async functio
                         <button onclick="toggleAdditionalDetails('${profile._id}')"
                                 id="toggle-details-${profile._id}"
                                 class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-md transition-all">
-                            Show Details
+                            Fill Details
                         </button>
                         <button onclick="validateAndLink('${profile._id}')"
                                 id="link-button-${profile._id}"
@@ -435,30 +435,49 @@ document.getElementById('profileSearch').addEventListener('input', async functio
 
 // Function to validate form fields
 function validateFields(profileId) {
-    const role = document.getElementById(`role-${profileId}`).value;
+    const role = document.getElementById(`role-${profileId}`);
     const detailsSection = document.getElementById(`additional-details-${profileId}`);
     const errors = [];
 
+    // Reset all validation styles
+    document.querySelectorAll(`[id$="-${profileId}"]`).forEach(element => {
+        if (element.tagName === 'INPUT' || element.tagName === 'SELECT' || element.tagName === 'TEXTAREA') {
+            element.classList.remove('border-red-400/50', 'border-green-400/50');
+            element.classList.add('border-blue-400/30');
+        }
+    });
+
     // Validate role
-    if (!role) {
+    if (!role.value) {
         errors.push('Role is required');
+        role.classList.remove('border-blue-400/30');
+        role.classList.add('border-red-400/50');
+    } else {
+        role.classList.remove('border-blue-400/30');
+        role.classList.add('border-green-400/50');
     }
 
     // Only validate additional fields if they are visible
     if (!detailsSection.classList.contains('hidden')) {
         // Validate case details
-        const details = document.getElementById(`details-${profileId}`).value;
-        if (!details.trim()) {
+        const details = document.getElementById(`details-${profileId}`);
+        if (!details.value.trim()) {
             errors.push('Case details are required');
+            details.classList.add('border-red-400/50');
+        } else {
+            details.classList.add('border-green-400/50');
         }
 
         // Validate articles
         const articles = document.getElementById(`articles-list-${profileId}`).children;
+        const articleInput = document.getElementById(`article-${profileId}`);
         if (articles.length === 0) {
             errors.push('At least one article/section is required');
             document.getElementById(`articles-error-${profileId}`).classList.remove('hidden');
+            articleInput.classList.add('border-red-400/50');
         } else {
             document.getElementById(`articles-error-${profileId}`).classList.add('hidden');
+            articleInput.classList.add('border-green-400/50');
         }
 
         // Validate court details
@@ -471,14 +490,18 @@ function validateFields(profileId) {
         ];
 
         courtFields.forEach(field => {
-            const value = document.getElementById(field.id).value;
+            const element = document.getElementById(field.id);
+            const value = element.value;
             if (!value) {
                 errors.push(`${field.label} is required`);
+                element.classList.add('border-red-400/50');
+            } else {
+                element.classList.add('border-green-400/50');
             }
         });
 
         // Validate arrest details for accused
-        if (role === 'accused') {
+        if (role.value === 'accused') {
             const isArrested = document.getElementById(`is-arrested-${profileId}`).checked;
             if (isArrested) {
                 const arrestFields = [
@@ -488,9 +511,13 @@ function validateFields(profileId) {
                 ];
 
                 arrestFields.forEach(field => {
-                    const value = document.getElementById(field.id).value;
+                    const element = document.getElementById(field.id);
+                    const value = element.value;
                     if (!value) {
                         errors.push(`${field.label} is required`);
+                        element.classList.add('border-red-400/50');
+                    } else {
+                        element.classList.add('border-green-400/50');
                     }
                 });
             }
@@ -499,6 +526,38 @@ function validateFields(profileId) {
 
     return errors;
 }
+
+// Add input event listeners for real-time validation
+function addInputValidationListeners(profileId) {
+    const inputs = document.querySelectorAll(`[id$="-${profileId}"]`);
+    inputs.forEach(input => {
+        if (input.tagName === 'INPUT' || input.tagName === 'SELECT' || input.tagName === 'TEXTAREA') {
+            input.addEventListener('input', function() {
+                if (this.hasAttribute('required')) {
+                    if (this.value.trim()) {
+                        this.classList.remove('border-red-400/50', 'border-blue-400/30');
+                        this.classList.add('border-green-400/50');
+                    } else {
+                        this.classList.remove('border-green-400/50', 'border-blue-400/30');
+                        this.classList.add('border-red-400/50');
+                    }
+                }
+            });
+        }
+    });
+}
+
+// Update the profile search event listener to add validation listeners
+document.getElementById('profileSearch').addEventListener('input', async function(e) {
+    // ... existing search code ...
+    
+    // After rendering the results, add validation listeners
+    const profileCards = document.querySelectorAll('[id^="role-"]');
+    profileCards.forEach(card => {
+        const profileId = card.id.split('-')[1];
+        addInputValidationListeners(profileId);
+    });
+});
 
 // Function to validate and link profile
 async function validateAndLink(profileId) {
@@ -522,7 +581,7 @@ function toggleAdditionalDetails(profileId) {
         toggleButton.textContent = 'Hide Details';
     } else {
         detailsSection.classList.add('hidden');
-        toggleButton.textContent = 'Show Details';
+        toggleButton.textContent = 'Fill Details';
     }
 }
 
