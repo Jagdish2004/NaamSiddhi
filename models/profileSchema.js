@@ -207,6 +207,9 @@ const profileSchema = new mongoose.Schema({
 // Apply auto-increment plugin
 profileSchema.plugin(autoIncrement, { inc_field: 'id' });
 
+// Add index for Aadhar number
+profileSchema.index({ aadharNumber: 1 });
+
 // Add indexes for better search performance
 profileSchema.index({ 'soundexCode.firstName': 1, 'soundexCode.lastName': 1 });
 profileSchema.index({ firstNameEnglish: 1, lastNameEnglish: 1 });

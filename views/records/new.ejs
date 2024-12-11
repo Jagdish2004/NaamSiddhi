@@ -83,13 +83,12 @@
                     <div class="space-y-2">
                         <div class="relative">
                             <input type="text" 
+                                   id="aadharNumber" 
                                    name="aadharNumber" 
-                                   id="aadharNumber"
                                    placeholder="Aadhar Number / आधार नंबर"
-                                   pattern="[0-9]{12}"
-                                   oninput="validateAadhar(this)"
+                                   maxlength="12"
                                    class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                            <p id="aadharFeedback" class="text-sm text-red-400 mt-1 hidden"></p>
+                            <div id="aadharFeedback" class="absolute mt-1 text-sm"></div>
                         </div>
                     </div>
                 </div>
@@ -400,4 +399,57 @@
             input.classList.add('border-green-400');
         }
     }
+
+    let aadharTimeout;
+
+    document.getElementById('aadharNumber').addEventListener('input', function(e) {
+        const aadharInput = e.target;
+        const feedback = document.getElementById('aadharFeedback');
+        
+        // Clear previous timeout
+        clearTimeout(aadharTimeout);
+        
+        // Clear feedback if input is empty
+        if (!aadharInput.value) {
+            feedback.textContent = '';
+            feedback.className = 'absolute mt-1 text-sm';
+            return;
+        }
+
+        // Validate format first
+        if (!/^\d*$/.test(aadharInput.value)) {
+            feedback.textContent = 'Only numbers are allowed';
+            feedback.className = 'absolute mt-1 text-sm text-red-400';
+            return;
+        }
+
+        // Check if length is 12
+        if (aadharInput.value.length === 12) {
+            // Set timeout for API call
+            aadharTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/api/profiles/check-aadhar?aadharNumber=${aadharInput.value}`);
+                    const data = await response.json();
+                    
+                    if (data.exists) {
+                        feedback.textContent = 'This Aadhar number is already registered';
+                        feedback.className = 'absolute mt-1 text-sm text-red-400';
+                        aadharInput.setCustomValidity('This Aadhar number is already registered');
+                    } else {
+                        feedback.textContent = 'Aadhar number is available';
+                        feedback.className = 'absolute mt-1 text-sm text-green-400';
+                        aadharInput.setCustomValidity('');
+                    }
+                } catch (error) {
+                    console.error('Error checking Aadhar:', error);
+                    feedback.textContent = 'Error checking Aadhar number';
+                    feedback.className = 'absolute mt-1 text-sm text-red-400';
+                }
+            }, 500); // 500ms delay to prevent too many requests
+        } else {
+            feedback.textContent = 'Aadhar number must be 12 digits';
+            feedback.className = 'absolute mt-1 text-sm text-yellow-400';
+            aadharInput.setCustomValidity('Aadhar number must be 12 digits');
+        }
+    });
 </script>
