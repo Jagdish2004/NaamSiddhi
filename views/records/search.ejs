@@ -184,13 +184,28 @@
                                         </p>
                                     </div>
                                     <span class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm">
-                                        <%= profile.matchPercentage %>% Match
+                                        score: <%= profile.matchPercentage %>
                                     </span>
                                 </div>
 
                                 <!-- Matching Attributes Tags -->
                                 <div class="flex flex-wrap gap-2 mt-3">
-                                   
+                                    <% if (profile.scores?.name?.firstName?.raw > 0) { %>
+                                        <span class="bg-green-500/10 text-green-400 text-xs px-2 py-1 rounded-full">
+                                            First Name: <%= profile.scores.name.firstName.raw.toFixed(1) %>%
+                                        </span>
+                                    <% } %>
+                                    <% if (profile.scores?.name?.middleName?.raw > 0) { %>
+                                        <span class="bg-green-500/10 text-green-400 text-xs px-2 py-1 rounded-full">
+                                            Middle Name: <%= profile.scores.name.middleName.raw.toFixed(1) %>%
+                                        </span>
+                                    <% } %>
+                                    <% if (profile.scores?.name?.lastName?.raw > 0) { %>
+                                        <span class="bg-green-500/10 text-green-400 text-xs px-2 py-1 rounded-full">
+                                            Last Name: <%= profile.scores.name.lastName.raw.toFixed(1) %>%
+                                        </span>
+                                    <% } %>
+                                    
                                     <% if (profile.scores?.personal?.dob > 0) { %>
                                         <span class="bg-blue-500/10 text-blue-400 text-xs px-2 py-1 rounded-full">
                                             DOB

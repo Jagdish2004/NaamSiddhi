@@ -12,7 +12,7 @@ module.exports.searchRecord = (req, res) => {
 
 module.exports.resultRecord = async (req, res) => {
     try {
-        const { firstName, middleName, lastName, dob, gender, role, address, appearance, mNumber, occupation, aadharNumber } = req.body;
+        const { firstName, middleName, lastName, dob, gender, address, appearance, mNumber, occupation, aadharNumber } = req.body;
         let conditions = [];
 
         // If Aadhar number is provided, it takes precedence as it's a unique identifier
@@ -113,34 +113,69 @@ module.exports.resultRecord = async (req, res) => {
             };
 
             // Name matching
+            const NAME_MATCH_THRESHOLD = 17; // 17% threshold for name matches
+
             if (firstName) {
-                const isHindiInput = detectHindiScript(firstName);
-                const fieldToCompare = isHindiInput ? 'firstNameHindi' : 'firstNameEnglish';
-                scores.name.firstName = calculateMatchPercentage(
+                // Match against both English and Hindi names
+                const englishScore = calculateMatchPercentage(
                     firstName.toLowerCase(),
-                    (profile[fieldToCompare] || '').toLowerCase()
-                ) * weights.name.firstName;
-                totalScore += scores.name.firstName || 0;
+                    (profile.firstNameEnglish || '').toLowerCase()
+                );
+                const hindiScore = calculateMatchPercentage(
+                    firstName.toLowerCase(),
+                    (profile.firstNameHindi || '').toLowerCase()
+                );
+                const rawScore = Math.max(englishScore, hindiScore);
+                // Apply threshold
+                const finalRawScore = rawScore >= NAME_MATCH_THRESHOLD ? rawScore : 0;
+                // Store both raw score and weighted score
+                scores.name.firstName = {
+                    raw: finalRawScore,
+                    weighted: finalRawScore * weights.name.firstName
+                };
+                totalScore += scores.name.firstName.weighted || 0;
             }
 
             if (middleName) {
-                const isHindiInput = detectHindiScript(middleName);
-                const fieldToCompare = isHindiInput ? 'middleNameHindi' : 'middleNameEnglish';
-                scores.name.middleName = calculateMatchPercentage(
+                // Match against both English and Hindi names
+                const englishScore = calculateMatchPercentage(
                     middleName.toLowerCase(),
-                    (profile[fieldToCompare] || '').toLowerCase()
-                ) * weights.name.middleName;
-                totalScore += scores.name.middleName || 0;
+                    (profile.middleNameEnglish || '').toLowerCase()
+                );
+                const hindiScore = calculateMatchPercentage(
+                    middleName.toLowerCase(),
+                    (profile.middleNameHindi || '').toLowerCase()
+                );
+                const rawScore = Math.max(englishScore, hindiScore);
+                // Apply threshold
+                const finalRawScore = rawScore >= NAME_MATCH_THRESHOLD ? rawScore : 0;
+                // Store both raw score and weighted score
+                scores.name.middleName = {
+                    raw: finalRawScore,
+                    weighted: finalRawScore * weights.name.middleName
+                };
+                totalScore += scores.name.middleName.weighted || 0;
             }
 
             if (lastName) {
-                const isHindiInput = detectHindiScript(lastName);
-                const fieldToCompare = isHindiInput ? 'lastNameHindi' : 'lastNameEnglish';
-                scores.name.lastName = calculateMatchPercentage(
+                // Match against both English and Hindi names
+                const englishScore = calculateMatchPercentage(
                     lastName.toLowerCase(),
-                    (profile[fieldToCompare] || '').toLowerCase()
-                ) * weights.name.lastName;
-                totalScore += scores.name.lastName || 0;
+                    (profile.lastNameEnglish || '').toLowerCase()
+                );
+                const hindiScore = calculateMatchPercentage(
+                    lastName.toLowerCase(),
+                    (profile.lastNameHindi || '').toLowerCase()
+                );
+                const rawScore = Math.max(englishScore, hindiScore);
+                // Apply threshold
+                const finalRawScore = rawScore >= NAME_MATCH_THRESHOLD ? rawScore : 0;
+                // Store both raw score and weighted score
+                scores.name.lastName = {
+                    raw: finalRawScore,
+                    weighted: finalRawScore * weights.name.lastName
+                };
+                totalScore += scores.name.lastName.weighted || 0;
             }
 
             // Personal information matching
@@ -233,9 +268,18 @@ module.exports.resultRecord = async (req, res) => {
             // Convert scores to percentages and round to 2 decimal places
             const roundedScores = {
                 name: {
-                    firstName: parseFloat((scores.name.firstName || 0).toFixed(2)),
-                    middleName: parseFloat((scores.name.middleName || 0).toFixed(2)),
-                    lastName: parseFloat((scores.name.lastName || 0).toFixed(2))
+                    firstName: {
+                        raw: parseFloat((scores.name.firstName?.raw || 0).toFixed(2)),
+                        weighted: parseFloat((scores.name.firstName?.weighted || 0).toFixed(2))
+                    },
+                    middleName: {
+                        raw: parseFloat((scores.name.middleName?.raw || 0).toFixed(2)),
+                        weighted: parseFloat((scores.name.middleName?.weighted || 0).toFixed(2))
+                    },
+                    lastName: {
+                        raw: parseFloat((scores.name.lastName?.raw || 0).toFixed(2)),
+                        weighted: parseFloat((scores.name.lastName?.weighted || 0).toFixed(2))
+                    }
                 },
                 personal: {
                     gender: parseFloat((scores.personal.gender || 0).toFixed(2)),
@@ -258,8 +302,8 @@ module.exports.resultRecord = async (req, res) => {
 
             return {
                 ...profile.toObject(),
-                matchPercentage: parseFloat(totalScore.toFixed(2)),
-                scores: roundedScores
+                scores: roundedScores,
+                matchPercentage: parseFloat(totalScore.toFixed(2))
             };
         });
 
