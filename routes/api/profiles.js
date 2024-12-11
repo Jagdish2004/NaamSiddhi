@@ -324,4 +324,21 @@ router.get('/search', async (req, res) => {
     }
 });
 
+// Add this route to check Aadhar number existence
+router.get('/check-aadhar', async (req, res) => {
+    try {
+        const { aadharNumber } = req.query;
+        
+        if (!aadharNumber || !/^\d{12}$/.test(aadharNumber)) {
+            return res.status(400).json({ error: 'Invalid Aadhar number format' });
+        }
+
+        const profile = await Profile.findOne({ aadharNumber });
+        res.json({ exists: !!profile });
+    } catch (error) {
+        console.error('Error checking Aadhar number:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 module.exports = router; 

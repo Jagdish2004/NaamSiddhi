@@ -85,14 +85,13 @@
                     </div>
                     <div class="relative">
                         <input type="text" 
-                               name="aadharNumber"
-                               id="aadharNumber"
+                               id="aadharNumber" 
+                               name="aadharNumber" 
+                               pattern="\d{12}"
+                               maxlength="12"
                                placeholder="Aadhar Number / आधार नंबर"
-                               pattern="[0-9]{12}"
-                               oninput="validateAadhar(this)"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all"
-                               value="<%= typeof searchParams !== 'undefined' ? searchParams.aadharNumber || '' : '' %>">
-                        <p id="aadharFeedback" class="text-sm text-red-400 mt-1 hidden"></p>
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                        <div id="aadharFeedback" class="absolute mt-1 text-sm"></div>
                     </div>
                 </div>
             </div>
@@ -451,6 +450,45 @@
                 behavior: 'smooth',
                 block: 'start'
             });
+        }
+    });
+
+    const aadharInput = document.getElementById('aadharNumber');
+    const aadharFeedback = document.getElementById('aadharFeedback');
+
+    let debounceTimer;
+
+    aadharInput.addEventListener('input', function(e) {
+        const aadharNumber = e.target.value.trim();
+        
+        // Clear previous feedback
+        aadharFeedback.textContent = '';
+        aadharFeedback.className = 'absolute mt-1 text-sm';
+
+        // Clear previous timer
+        clearTimeout(debounceTimer);
+
+        // Only check if we have exactly 12 digits
+        if (aadharNumber.length === 12 && /^\d{12}$/.test(aadharNumber)) {
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/api/profiles/check-aadhar?aadharNumber=${aadharNumber}`);
+                    const data = await response.json();
+
+                    if (data.exists) {
+                        aadharFeedback.textContent = 'Profile with this Aadhar number exists';
+                        aadharFeedback.className = 'absolute mt-1 text-sm text-green-400';
+                    } else {
+                        aadharFeedback.textContent = 'No profile found with this Aadhar number';
+                        aadharFeedback.className = 'absolute mt-1 text-sm text-red-400';
+                    }
+                } catch (error) {
+                    console.error('Error checking Aadhar:', error);
+                }
+            }, 300); // Debounce for 300ms
+        } else if (aadharNumber.length > 0) {
+            aadharFeedback.textContent = 'Please enter a valid 12-digit Aadhar number';
+            aadharFeedback.className = 'absolute mt-1 text-sm text-yellow-400';
         }
     });
 </script>
