@@ -46,7 +46,9 @@
                             style="display: none;"></ul>
                     </div>
                     <div class="relative">
+                        <label for="dob" class="block text-gray-400 mb-2">Date of Birth / जन्म तिथि</label>
                         <input type="date" 
+                               id="dob"
                                name="dob"
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 [&::-webkit-calendar-picker-indicator]:opacity-0"
                                onclick="this.nextElementSibling.click()"
@@ -111,7 +113,7 @@
                             class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all">
                         <option value="">Complexion / रंग</option>
                         <option value="fair" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.complexion === 'fair' ? 'selected' : '' %>>Fair / गरा</option>
-                        <option value="medium" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.complexion === 'medium' ? 'selected' : '' %>>Medium / साँ���</option>
+                        <option value="medium" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.complexion === 'medium' ? 'selected' : '' %>>Medium / साँ</option>
                         <option value="dark" <%= typeof searchParams !== 'undefined' && searchParams.appearance && searchParams.appearance.complexion === 'dark' ? 'selected' : '' %>>Dark / काला</option>
                     </select>
                     <select name="appearance[build]"

@@ -434,6 +434,57 @@
     </div>
 </div>
 
+<div class="modal fade" id="linkProfileModal" tabindex="-1" aria-labelledby="linkProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="linkProfileModalLabel">Link Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="linkProfileForm">
+                    <div class="mb-3">
+                        <label for="searchInput" class="form-label">Search by ID or Name</label>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Enter Profile ID or Name">
+                    </div>
+                    <div id="searchResults" class="list-group mb-3" style="max-height: 200px; overflow-y: auto;">
+                    </div>
+                    <div class="mb-3">
+                        <label for="roleSelect" class="form-label">Role*</label>
+                        <select class="form-control" id="roleSelect" required>
+                            <option value="">Select Role</option>
+                            <option value="victim">Victim</option>
+                            <option value="accused">Accused</option>
+                            <option value="witness">Witness</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dateOfBirth" class="form-label">Date of Birth / जन्म तिथि*</label>
+                        <div class="relative">
+                            <input type="date" 
+                                   id="dateOfBirth" 
+                                   name="dateOfBirth" 
+                                   class="form-control"
+                                   required>
+                            <div class="invalid-feedback">Please select date of birth</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="caseDescription" class="form-label">Case Description*</label>
+                        <textarea class="form-control" id="caseDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="mobileNumber" class="form-label">Mobile Number*</label>
+                        <input type="tel" class="form-control" id="mobileNumber" required pattern="[0-9]{10}">
+                        <div class="invalid-feedback">Please enter a valid 10-digit mobile number.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Link Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function showLinkCaseModal() {
     const modal = document.getElementById('linkCaseModal');
@@ -575,12 +626,27 @@ document.getElementById('caseNumberInput').addEventListener('input', async funct
         if (data.cases && data.cases.length > 0) {
             suggestionsContainer.innerHTML = data.cases.map(case_ => `
                 <div class="p-3 hover:bg-blue-400/10 cursor-pointer" 
-                     onclick="selectCase('${case_.caseNumber}')">
-                    <div class="flex justify-between">
-                        <span class="text-white">Case #${case_.caseNumber}</span>
-                        <span class="text-sm text-gray-400">${case_.status}</span>
+                     onclick="selectCase(${case_.caseNumber})">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="text-white font-nasa">#${case_.caseNumber}</div>
+                            <div class="text-sm text-gray-400">${case_.caseType} Case</div>
+                            <div class="text-xs text-gray-500 mt-1">
+                                ${case_.location?.district?.english || ''}, 
+                                ${case_.location?.state?.english || ''}
+                            </div>
+                        </div>
+                        <span class="text-sm px-2 py-1 rounded-full ${
+                            case_.status === 'active' ? 'bg-green-500/20 text-green-400' :
+                            case_.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                        }">
+                            ${case_.status.charAt(0).toUpperCase() + case_.status.slice(1)}
+                        </span>
                     </div>
-                    <p class="text-sm text-gray-400 truncate">${case_.description?.english || ''}</p>
+                    <div class="text-sm text-gray-400 mt-2 truncate">
+                        ${case_.description?.english || ''}
+                    </div>
                 </div>
             `).join('');
             suggestionsContainer.classList.remove('hidden');
@@ -634,6 +700,136 @@ document.getElementById('isArrested').addEventListener('change', function(e) {
         arrestFields.classList.remove('hidden');
     } else {
         arrestFields.classList.add('hidden');
+    }
+});
+
+let selectedProfileId = null;
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+const linkProfileForm = document.getElementById('linkProfileForm');
+const roleSelect = document.getElementById('roleSelect');
+const dateOfBirth = document.getElementById('dateOfBirth');
+const caseDescription = document.getElementById('caseDescription');
+const mobileNumber = document.getElementById('mobileNumber');
+
+// Debounce function
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Search profiles function
+const searchProfiles = debounce(async (query) => {
+    if (!query) {
+        searchResults.innerHTML = '';
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/profiles/search?q=${encodeURIComponent(query)}`);
+        const data = await response.json();
+
+        searchResults.innerHTML = '';
+        data.profiles.forEach(profile => {
+            const div = document.createElement('div');
+            div.className = 'list-group-item list-group-item-action';
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div>ID: ${profile.id}</div>
+                        <div>Name (English): ${profile.firstNameEnglish} ${profile.middleNameEnglish || ''} ${profile.lastNameEnglish}</div>
+                        <div>नाम (हिंदी): ${profile.firstNameHindi} ${profile.middleNameHindi || ''} ${profile.lastNameHindi}</div>
+                    </div>
+                </div>
+            `;
+            div.addEventListener('click', () => {
+                selectedProfileId = profile.id;
+                searchResults.querySelectorAll('.list-group-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                div.classList.add('active');
+            });
+            searchResults.appendChild(div);
+        });
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}, 300);
+
+// Add event listener for search input
+searchInput.addEventListener('input', (e) => {
+    searchProfiles(e.target.value);
+});
+
+// Add form validation and styling for empty fields
+const addValidationStyles = (element) => {
+    element.classList.add('is-invalid');
+    element.addEventListener('input', () => {
+        if (element.value.trim()) {
+            element.classList.remove('is-invalid');
+        } else {
+            element.classList.add('is-invalid');
+        }
+    });
+};
+
+// Form submission handler
+linkProfileForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!selectedProfileId) {
+        alert('Please select a profile first');
+        return;
+    }
+
+    // Validate required fields
+    let isValid = true;
+    [roleSelect, dateOfBirth, caseDescription, mobileNumber].forEach(element => {
+        if (!element.value.trim()) {
+            addValidationStyles(element);
+            isValid = false;
+        }
+    });
+
+    // Validate mobile number format
+    if (!mobileNumber.value.match(/^[0-9]{10}$/)) {
+        mobileNumber.classList.add('is-invalid');
+        isValid = false;
+    }
+
+    if (!isValid) return;
+
+    try {
+        const response = await fetch(`/records/<%= record.id %>/link-profile`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                profileId: selectedProfileId,
+                role: roleSelect.value,
+                dateOfBirth: dateOfBirth.value,
+                caseDescription: caseDescription.value,
+                mobileNumber: mobileNumber.value
+            })
+        });
+
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            const data = await response.json();
+            alert(data.error || 'Failed to link the profile');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to link the profile');
     }
 });
 </script> 

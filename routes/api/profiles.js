@@ -283,24 +283,38 @@ router.delete('/:profileId/cases/:caseId', async (req, res) => {
     }
 });
 
-// Add profile search route
+// Search profiles by name
 router.get('/search', async (req, res) => {
     try {
-        const { q: query } = req.query;
+        const { q } = req.query;
         
-        if (!query || query.length < 2) {
+        if (!q) {
             return res.json({ profiles: [] });
         }
 
+        // Check if query is a number (ID search)
+        if (/^\d+$/.test(q)) {
+            const profile = await Profile.findOne({ id: parseInt(q) })
+                .select('id firstNameEnglish middleNameEnglish lastNameEnglish firstNameHindi middleNameHindi lastNameHindi');
+            
+            return res.json({ 
+                profiles: profile ? [profile] : [] 
+            });
+        }
+
+        // Name search
+        const regex = new RegExp(q, 'i');
         const profiles = await Profile.find({
             $or: [
-                { firstNameEnglish: new RegExp(query, 'i') },
-                { lastNameEnglish: new RegExp(query, 'i') },
-                { firstNameHindi: new RegExp(query, 'i') },
-                { lastNameHindi: new RegExp(query, 'i') }
+                { firstNameEnglish: regex },
+                { middleNameEnglish: regex },
+                { lastNameEnglish: regex },
+                { firstNameHindi: regex },
+                { middleNameHindi: regex },
+                { lastNameHindi: regex }
             ]
         })
-        .select('_id id firstNameEnglish lastNameEnglish firstNameHindi lastNameHindi')
+        .select('id firstNameEnglish middleNameEnglish lastNameEnglish firstNameHindi middleNameHindi lastNameHindi')
         .limit(10);
 
         res.json({ profiles });
