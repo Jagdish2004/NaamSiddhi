@@ -18,7 +18,7 @@ function getSoundex(str, scale, mysql) {
     var keys = Object.keys(map).reverse();
 
     var build = split.map(function(letter, index) {
-        if (letter === 'W' && index > 0 && vowels.includes(split[index - 1])) {
+        if (letter === 'W'&& index > 0 && vowels.includes(split[index - 1])) {
             return 1; // Assign key 1 if W comes after a vowel
         }
 
