@@ -434,56 +434,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="linkProfileModal" tabindex="-1" aria-labelledby="linkProfileModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="linkProfileModalLabel">Link Profile</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="linkProfileForm">
-                    <div class="mb-3">
-                        <label for="searchInput" class="form-label">Search by ID or Name</label>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Enter Profile ID or Name">
-                    </div>
-                    <div id="searchResults" class="list-group mb-3" style="max-height: 200px; overflow-y: auto;">
-                    </div>
-                    <div class="mb-3">
-                        <label for="roleSelect" class="form-label">Role*</label>
-                        <select class="form-control" id="roleSelect" required>
-                            <option value="">Select Role</option>
-                            <option value="victim">Victim</option>
-                            <option value="accused">Accused</option>
-                            <option value="witness">Witness</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="dateOfBirth" class="form-label">Date of Birth / जन्म तिथि*</label>
-                        <div class="relative">
-                            <input type="date" 
-                                   id="dateOfBirth" 
-                                   name="dateOfBirth" 
-                                   class="form-control"
-                                   required>
-                            <div class="invalid-feedback">Please select date of birth</div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="caseDescription" class="form-label">Case Description*</label>
-                        <textarea class="form-control" id="caseDescription" rows="3" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="mobileNumber" class="form-label">Mobile Number*</label>
-                        <input type="tel" class="form-control" id="mobileNumber" required pattern="[0-9]{10}">
-                        <div class="invalid-feedback">Please enter a valid 10-digit mobile number.</div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Link Profile</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <script>
 function showLinkCaseModal() {

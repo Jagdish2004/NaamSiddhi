@@ -24,11 +24,86 @@
         background-clip: text;
         -webkit-text-fill-color: transparent;
     }
+    @keyframes micPulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.2); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    .mic-animation svg {
+        animation: micPulse 1.5s ease-in-out infinite;
+    }
+    #closeModalBtn {
+        transition: all 0.2s ease-in-out;
+    }
+    #closeModalBtn:hover {
+        transform: scale(1.1);
+    }
+    .voice-search-btn:hover svg {
+        transform: scale(1.1);
+    }
+    .voice-search-btn svg {
+        transition: transform 0.2s ease-in-out;
+    }
+    #globalLangToggleBtn {
+        transition: all 0.2s ease-in-out;
+    }
+    #globalLangToggleBtn:hover {
+        transform: scale(1.05);
+    }
+    #listeningIndicator {
+        transition: all 0.3s ease-in-out;
+    }
 </style>
 
 <div class="pt-20">
     <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto">
         <h1 class="text-3xl font-nasa text-center mb-8 text-blue-400">Create Profile</h1>
+
+        <!-- Global Language Selector -->
+        <div class="mb-6 flex justify-center">
+            <button type="button" id="globalLangToggleBtn" 
+                    class="flex items-center space-x-3 px-4 py-2 rounded-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                </svg>
+                <span id="globalCurrentLang">Input Language: हिंदी</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Floating Listening Indicator -->
+        <div id="listeningIndicator" class="fixed top-4 left-1/2 transform -translate-x-1/2 hidden z-50">
+            <div class="flex items-center space-x-3 bg-blue-500/20 backdrop-blur-md px-4 py-2 rounded-full border border-blue-400/30">
+                <div class="mic-animation">
+                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                </div>
+                <span class="text-blue-400 font-nasa" id="listeningStatus">Listening...</span>
+            </div>
+        </div>
+
+        <!-- Speech Recognition Modal -->
+        <div id="speechModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-40">
+            <div class="bg-space-dark/90 rounded-lg p-6 max-w-sm w-full mx-4 relative">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-nasa text-blue-400">Voice Input</h2>
+                    <button type="button"
+                            class="text-gray-400 hover:text-gray-200 p-2 rounded-full hover:bg-white/10 transition-all"
+                            id="closeModalBtn">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="text-center">
+                    <p class="text-gray-300" id="speechStatus">Speak now</p>
+                </div>
+            </div>
+        </div>
 
         <form action="/newrecord" method="POST" enctype="multipart/form-data" class="space-y-8">
             <div class="mb-6 text-sm text-red-400">
@@ -41,24 +116,54 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Name Fields -->
                     <div class="space-y-2">
-                        <input type="text" 
-                               name="firstName" 
-                               placeholder="First Name / पहला नाम *" 
-                               required
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                        <div class="flex items-center">
+                            <input type="text" 
+                                   id="firstNameInput"
+                                   name="firstName" 
+                                   placeholder="First Name / पहला नाम *" 
+                                   required
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                            <button type="button" 
+                                    class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                    data-target="firstNameInput">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-2">
-                        <input type="text" 
-                               name="middleName" 
-                               placeholder="Middle Name / मध्य नाम"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                        <div class="flex items-center">
+                            <input type="text" 
+                                   id="middleNameInput"
+                                   name="middleName" 
+                                   placeholder="Middle Name / मध्य नाम"
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <button type="button" 
+                                    class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                    data-target="middleNameInput">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-2">
-                        <input type="text" 
-                               name="lastName" 
-                               placeholder="Last Name / अंतिम नाम *" 
-                               required
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                        <div class="flex items-center">
+                            <input type="text" 
+                                   id="lastNameInput"
+                                   name="lastName" 
+                                   placeholder="Last Name / अंतिम नाम *" 
+                                   required
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                            <button type="button" 
+                                    class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                    data-target="lastNameInput">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Occupation & DOB -->
@@ -293,6 +398,7 @@
 </div>
 
 <script src="/js/suggestions.js"></script>
+<script src="/js/profileVoiceSearch.js"></script>
 <script>
     // Toggle sections
     document.getElementById('toggleFamilyDetails').addEventListener('click', function() {

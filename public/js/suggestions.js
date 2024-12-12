@@ -211,5 +211,210 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    // Track the currently focused input
+    let focusedInputId = null;
+
+    // Add focus event listeners to all input fields
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputFields = ['firstNameInput', 'middleNameInput', 'lastNameInput'];
+        inputFields.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('focus', function() {
+                    focusedInputId = this.id;
+                });
+                input.addEventListener('blur', function() {
+                    // Small delay to allow for button clicks
+                    setTimeout(() => {
+                        if (!document.getElementById('speechModal').contains(document.activeElement)) {
+                            focusedInputId = null;
+                        }
+                    }, 100);
+                });
+            }
+        });
+    });
+
+    // Voice Search Functions
+    let isListening = false;
+    let recognition = null;
+    const voiceButton = document.getElementById('voiceSearchButton');
+    const micStatus = document.getElementById('micStatus');
+    let focusedInputId = null;
+
+    // Add focus event listeners to all input fields
+    const inputFields = ['firstNameInput', 'middleNameInput', 'lastNameInput'];
+    const fieldLabels = {
+        'firstNameInput': 'First Name / पहला नाम',
+        'middleNameInput': 'Middle Name / मध्य नाम',
+        'lastNameInput': 'Last Name / उपनाम'
+    };
+
+    inputFields.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('focus', function() {
+                focusedInputId = this.id;
+                if (voiceButton) {
+                    voiceButton.classList.add('border-blue-400');
+                    voiceButton.classList.remove('border-gray-400/30');
+                }
+                updateMicStatus();
+            });
+            input.addEventListener('blur', function() {
+                setTimeout(() => {
+                    if (!document.getElementById('speechModal').contains(document.activeElement)) {
+                        focusedInputId = null;
+                        if (voiceButton && !isListening) {
+                            voiceButton.classList.remove('border-blue-400');
+                            voiceButton.classList.add('border-gray-400/30');
+                        }
+                        updateMicStatus();
+                    }
+                }, 100);
+            });
+        }
+    });
+
+    function updateMicStatus() {
+        if (micStatus) {
+            if (isListening) {
+                micStatus.classList.remove('hidden');
+                micStatus.textContent = `Listening for ${fieldLabels[focusedInputId] || '...'}`;
+            } else {
+                micStatus.classList.add('hidden');
+            }
+        }
+
+        const listeningField = document.getElementById('listeningField');
+        if (listeningField) {
+            listeningField.textContent = focusedInputId ? `Field: ${fieldLabels[focusedInputId]}` : '';
+        }
+    }
+
+    function startVoiceInput() {
+        if (!focusedInputId) {
+            showNotification('Please click on a name field first', 'error');
+            return;
+        }
+
+        if (isListening) {
+            stopVoiceInput();
+            return;
+        }
+
+        isListening = true;
+        const modal = document.getElementById('speechModal');
+        modal.style.display = 'flex';
+        
+        if (voiceButton) {
+            voiceButton.classList.add('bg-blue-500/40');
+            voiceButton.classList.add('text-blue-300');
+        }
+        
+        updateMicStatus();
+        startSpeechRecognition();
+    }
+
+    function stopVoiceInput() {
+        if (recognition) {
+            recognition.stop();
+        }
+        closeSpeechModal();
+    }
+
+    function closeSpeechModal() {
+        isListening = false;
+        const modal = document.getElementById('speechModal');
+        modal.style.display = 'none';
+        
+        if (voiceButton) {
+            voiceButton.classList.remove('bg-blue-500/40');
+            voiceButton.classList.remove('text-blue-300');
+        }
+        
+        updateMicStatus();
+    }
+
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+            type === 'error' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'
+        }`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
+
+    function startSpeechRecognition() {
+        if (!('webkitSpeechRecognition' in window)) {
+            showNotification('Speech recognition is not supported in your browser. Please use Chrome.', 'error');
+            closeSpeechModal();
+            return;
+        }
+
+        try {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'hi-IN'; // Default to Hindi
+
+            recognition.onstart = function() {
+                showNotification('Listening started');
+                updateMicStatus();
+            };
+
+            recognition.onresult = function(event) {
+                const result = event.results[0][0].transcript;
+                if (focusedInputId) {
+                    const input = document.getElementById(focusedInputId);
+                    input.value = result;
+                    input.dispatchEvent(new Event('input'));
+                    input.focus();
+                    showNotification('Voice input received');
+                }
+                closeSpeechModal();
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                showNotification(`Error: ${event.error}`, 'error');
+                closeSpeechModal();
+            };
+
+            recognition.onend = function() {
+                isListening = false;
+                updateMicStatus();
+                closeSpeechModal();
+            };
+
+            recognition.start();
+        } catch (error) {
+            console.error('Speech recognition initialization error:', error);
+            showNotification('Failed to start speech recognition', 'error');
+            closeSpeechModal();
+        }
+    }
+
+    // Add event listeners for closing modal
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && isListening) {
+            stopVoiceInput();
+        }
+    });
+
+    // Click outside modal to close
+    document.addEventListener('click', function(event) {
+        const modal = document.getElementById('speechModal');
+        if (event.target === modal) {
+            stopVoiceInput();
+        }
+    });
+
+    // Make functions globally available
+    window.startVoiceInput = startVoiceInput;
+    window.stopVoiceInput = stopVoiceInput;
+    window.closeSpeechModal = closeSpeechModal;
 });
   
