@@ -24,6 +24,7 @@ const recordRoutes = require('./routes/recordRoutes');
 const suggestionRoutes = require('./routes/suggestionRoutes');
 const caseRoutes = require('./routes/cases');
 const analyticsRoutes = require('./routes/analytics');
+const guidelinesRoutes = require('./routes/guidelines');
 
 // Security middleware
 app.use(helmet({
@@ -95,6 +96,7 @@ app.use("/newrecord", newRecord);
 app.use("/record", recordRoutes);
 app.use('/cases', caseRoutes);
 app.use('/analytics', analyticsRoutes);
+app.use('/guidelines', guidelinesRoutes);
 
 // 404 handler
 app.use((req, res) => {

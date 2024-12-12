@@ -168,10 +168,20 @@
 
                     <!-- Occupation & DOB -->
                     <div class="space-y-2">
-                        <input type="text" 
-                               name="occupation" 
-                               placeholder="Occupation / पेशा"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                        <div class="flex items-center">
+                            <input type="text" 
+                                   id="occupationInput"
+                                   name="occupation" 
+                                   placeholder="Occupation / पेशा"
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <button type="button" 
+                                    class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                    data-target="occupationInput">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-2 relative">
                         <input type="text" 
@@ -195,14 +205,46 @@
                         </select>
                     </div>
                     <div class="space-y-2">
-                        <input type="tel" 
-                               name="mNumber" 
-                               id="mobileNumber"
-                               placeholder="Phone Number / फ़ोन नंबर *"
-                               pattern="[0-9]{10}"
-                               required
-                               oninput="validateMobile(this)"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                        <div class="flex items-center">
+                            <input type="tel" 
+                                   name="mNumber" 
+                                   id="mobileNumber"
+                                   placeholder="Phone Number / फ़ोन नंबर *"
+                                   pattern="[0-9]{10}"
+                                   required
+                                   oninput="validateMobile(this)"
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                            <button type="button" 
+                                    class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                    data-target="mobileNumber">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="mobileFeedback" class="hidden text-sm"></div>
+                    </div>
+
+                    <!-- Aadhar Card -->
+                    <div class="space-y-2 col-span-2">
+                        <div class="flex items-center">
+                            <input type="text" 
+                                   name="aadharNumber" 
+                                   id="aadharNumber"
+                                   placeholder="Aadhar Card Number / आधार कार्ड नंबर *"
+                                   pattern="[0-9]{12}"
+                                   required
+                                   oninput="validateAadhar(this)"
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                            <button type="button" 
+                                    class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                    data-target="aadharNumber">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="aadharFeedback" class="hidden text-sm"></div>
                     </div>
                 </div>
             </div>
@@ -212,32 +254,72 @@
                 <h2 class="text-xl font-nasa text-blue-400/80">Address Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <input type="text" 
-                               name="address[location]" 
-                               placeholder="Location / स्थान *" 
-                               required
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                        <div class="flex items-center">
+                            <input type="text" 
+                                   id="locationInput"
+                                   name="address[location]" 
+                                   placeholder="Location / स्थान *" 
+                                   required
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                            <button type="button" 
+                                    class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                    data-target="locationInput">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-2">
-                        <input type="text" 
-                               name="address[city]" 
-                               placeholder="City / शहर *" 
-                               required
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                        <div class="flex items-center">
+                            <input type="text" 
+                                   id="cityInput"
+                                   name="address[city]" 
+                                   placeholder="City / शहर *" 
+                                   required
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                            <button type="button" 
+                                    class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                    data-target="cityInput">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-2">
-                        <input type="text" 
-                               name="address[district]" 
-                               placeholder="District / जिला *" 
-                               required
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                        <div class="flex items-center">
+                            <input type="text" 
+                                   id="districtInput"
+                                   name="address[district]" 
+                                   placeholder="District / जिला *" 
+                                   required
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                            <button type="button" 
+                                    class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                    data-target="districtInput">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-2">
-                        <input type="text" 
-                               name="address[state]" 
-                               placeholder="State / राज्य *" 
-                               required
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                        <div class="flex items-center">
+                            <input type="text" 
+                                   id="stateInput"
+                                   name="address[state]" 
+                                   placeholder="State / राज्य *" 
+                                   required
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
+                            <button type="button" 
+                                    class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                    data-target="stateInput">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -267,7 +349,7 @@
                 </div>
             </div>
 
-            <!-- Appearance Details / उपस्थिति विवरण -->
+            <!-- Appearance Details Section -->
             <div class="space-y-6">
                 <h2 class="text-xl font-nasa text-blue-400/80">Appearance Details / उपस्थिति विवरण</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -310,25 +392,65 @@
                     <div class="space-y-4">
                         <h3 class="text-lg font-nasa text-blue-400/60">Distinguishing Features / विशेष पहचान</h3>
                         <div class="space-y-4">
-                            <input type="text" 
-                                   name="appearance[facialFeatures]" 
-                                   placeholder="Facial Features / चेहरे की विशेषताएं"
-                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <div class="flex items-center">
+                                <input type="text" 
+                                       id="facialFeaturesInput"
+                                       name="appearance[facialFeatures]" 
+                                       placeholder="Facial Features / चेहरे की विशेषताएं"
+                                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                                <button type="button" 
+                                        class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                        data-target="facialFeaturesInput">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                    </svg>
+                                </button>
+                            </div>
 
-                            <input type="text" 
-                                   name="appearance[scars]" 
-                                   placeholder="Scars/Marks / निशान"
-                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <div class="flex items-center">
+                                <input type="text" 
+                                       id="scarsInput"
+                                       name="appearance[scars]" 
+                                       placeholder="Scars/Marks / निशान"
+                                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                                <button type="button" 
+                                        class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                        data-target="scarsInput">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                    </svg>
+                                </button>
+                            </div>
 
-                            <input type="text" 
-                                   name="appearance[tattoos]" 
-                                   placeholder="Tattoos / टैटू"
-                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <div class="flex items-center">
+                                <input type="text" 
+                                       id="tattoosInput"
+                                       name="appearance[tattoos]" 
+                                       placeholder="Tattoos / टैटू"
+                                       class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                                <button type="button" 
+                                        class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                        data-target="tattoosInput">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                    </svg>
+                                </button>
+                            </div>
 
-                            <textarea name="appearance[otherFeatures]" 
-                                    placeholder="Other Distinguishing Features / अन्य विशेष पहचान"
-                                    rows="2"
-                                    class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"></textarea>
+                            <div class="flex items-center">
+                                <textarea id="otherFeaturesInput"
+                                        name="appearance[otherFeatures]" 
+                                        placeholder="Other Distinguishing Features / अन्य विशेष पहचान"
+                                        rows="2"
+                                        class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"></textarea>
+                                <button type="button" 
+                                        class="ml-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-all voice-search-btn"
+                                        data-target="otherFeaturesInput">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
