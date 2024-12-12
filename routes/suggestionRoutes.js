@@ -16,9 +16,23 @@ router.get('/', async (req, res) => {
 
         if (type === 'caseNumber') {
             // Search for case numbers
-            results = await Case.find({ caseNumber: regex })
-                .select('caseNumber description location')
-                .limit(4);
+            results = await Case.find({ 
+                $or: [
+                    { caseNumber: regex },
+                    { 'description.english': regex },
+                    { 'description.hindi': regex }
+                ]
+            })
+            .select('caseNumber description location')
+            .limit(4);
+
+            // Format results for the frontend
+            results = results.map(case_ => ({
+                caseNumber: case_.caseNumber,
+                description: case_.description,
+                location: case_.location ? 
+                    `${case_.location.district?.english || ''}, ${case_.location.state?.english || ''}` : ''
+            }));
         } else {
             // Profile search
             let filter = {};

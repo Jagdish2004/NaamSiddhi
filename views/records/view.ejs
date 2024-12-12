@@ -571,32 +571,21 @@ document.getElementById('caseNumberInput').addEventListener('input', async funct
     }
 
     try {
-        const response = await fetch(`/api/cases/search?q=${encodeURIComponent(input)}`);
+        const response = await fetch(`/api/suggestions?type=caseNumber&query=${encodeURIComponent(input)}`);
         const data = await response.json();
 
-        if (data.cases && data.cases.length > 0) {
-            suggestionsContainer.innerHTML = data.cases.map(case_ => `
-                <div class="p-3 hover:bg-blue-400/10 cursor-pointer" 
-                     onclick="selectCase(${case_.caseNumber})">
+        if (data && data.length > 0) {
+            suggestionsContainer.innerHTML = data.map(case_ => `
+                <div class="p-3 hover:bg-blue-400/10 cursor-pointer transition-all" 
+                     onclick="selectCase('${case_.caseNumber}')">
                     <div class="flex justify-between items-start">
                         <div>
                             <div class="text-white font-nasa">#${case_.caseNumber}</div>
-                            <div class="text-sm text-gray-400">${case_.caseType} Case</div>
+                            <div class="text-sm text-gray-400">${case_.description?.english || 'No description'}</div>
                             <div class="text-xs text-gray-500 mt-1">
-                                ${case_.location?.district?.english || ''}, 
-                                ${case_.location?.state?.english || ''}
+                                ${case_.location || ''}
                             </div>
                         </div>
-                        <span class="text-sm px-2 py-1 rounded-full ${
-                            case_.status === 'active' ? 'bg-green-500/20 text-green-400' :
-                            case_.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
-                            'bg-red-500/20 text-red-400'
-                        }">
-                            ${case_.status.charAt(0).toUpperCase() + case_.status.slice(1)}
-                        </span>
-                    </div>
-                    <div class="text-sm text-gray-400 mt-2 truncate">
-                        ${case_.description?.english || ''}
                     </div>
                 </div>
             `).join('');
@@ -609,6 +598,10 @@ document.getElementById('caseNumberInput').addEventListener('input', async funct
         }
     } catch (error) {
         console.error('Error fetching suggestions:', error);
+        suggestionsContainer.innerHTML = `
+            <div class="p-3 text-red-400">Error fetching suggestions</div>
+        `;
+        suggestionsContainer.classList.remove('hidden');
     }
 });
 
@@ -616,6 +609,16 @@ function selectCase(caseNumber) {
     document.getElementById('caseNumberInput').value = caseNumber;
     document.getElementById('caseSuggestions').classList.add('hidden');
 }
+
+// Close suggestions when clicking outside
+document.addEventListener('click', function(e) {
+    const suggestionsContainer = document.getElementById('caseSuggestions');
+    const caseInput = document.getElementById('caseNumberInput');
+    
+    if (!caseInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+        suggestionsContainer.classList.add('hidden');
+    }
+});
 
 // Add these new functions for the enhanced form
 function addArticleField() {
