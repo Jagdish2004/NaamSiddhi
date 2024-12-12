@@ -10,25 +10,49 @@
         </div>
 
         <form action="/cases" method="POST" class="space-y-8">
+            <style>
+                .required-field::placeholder {
+                    background: linear-gradient(to right, 
+                        #9ca3af 0%, 
+                        #9ca3af calc(100% - 8px), 
+                        #ef4444 calc(100% - 8px), 
+                        #ef4444 100%);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+                .required-select {
+                    color: #9ca3af;
+                }
+                .required-select option:first-child {
+                    background: linear-gradient(to right, 
+                        #9ca3af 0%, 
+                        #9ca3af calc(100% - 8px), 
+                        #ef4444 calc(100% - 8px), 
+                        #ef4444 100%);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+            </style>
+
             <!-- Reporter Details Section -->
             <div class="space-y-6">
                 <h2 class="text-xl font-nasa text-blue-400/80">Reporter Details / रिपोर्टर का विवरण</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
-                        <label class="block text-gray-400 mb-2">Reporter Name / रिपोर्टर का नाम</label>
                         <input type="text" name="reporterName" 
-                               placeholder="Enter reporter name / रिपोर्टर का नाम दर्ज करें"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               placeholder="Enter reporter name / रिपोर्टर का नाम दर्ज करें *"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field"
                                required>
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-2">Contact Number / संपर्क नंबर</label>
                         <div class="relative">
                             <input type="tel" 
                                    name="reporterContact"
                                    id="reporterContact"
-                                   placeholder="Enter contact number / संपर्क नंबर दर्ज करें"
-                                   class="w-full bg-space-dark/50 border rounded-md px-4 py-2 focus:outline-none transition-all text-gray-100 peer"
+                                   placeholder="Enter contact number / संपर्क नंबर दर्ज करें *"
+                                   class="w-full bg-space-dark/50 border rounded-md px-4 py-2 focus:outline-none transition-all text-gray-100 peer required-field"
                                    pattern="[6-9]\d{9}"
                                    title="Please enter a valid 10-digit mobile number starting with 6-9"
                                    maxlength="10"
@@ -63,15 +87,14 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-2">Email / ईमेल</label>
                         <input type="email" name="reporterEmail"
                                placeholder="Enter email / ईमेल दर्ज करें"
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-2">ID Type</label>
                         <select name="reporterIdType"
                                 class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                            <option value="" disabled selected>Select ID Type / पहचान प्रकार चुनें</option>
                             <option value="aadhar">Aadhar Card</option>
                             <option value="pan">PAN Card</option>
                             <option value="voter">Voter ID</option>
@@ -80,37 +103,32 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-2">ID Number / पहचान संख्या</label>
                         <input type="text" name="reporterIdNumber"
                                placeholder="Enter ID number / पहचान संख्या दर्ज करें"
                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-gray-400 mb-2">Address / पता</label>
                         <input type="text" name="reporterAddress"
-                               placeholder="Enter address / पता दर्ज करें"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               placeholder="Enter address / पता दर्ज करें *"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field"
                                required>
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-2">City / शहर</label>
                         <input type="text" name="reporterCity"
-                               placeholder="Enter city / शहर दर्ज करें"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               placeholder="Enter city / शहर दर्ज करें *"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field"
                                required>
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-2">District / जिला</label>
                         <input type="text" name="reporterDistrict"
-                               placeholder="Enter district / जिला दर्ज करें"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               placeholder="Enter district / जिला दर्ज करें *"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field"
                                required>
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-2">State / राज्य</label>
                         <input type="text" name="reporterState"
-                               placeholder="Enter state / राज्य दर्ज करें"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               placeholder="Enter state / राज्य दर्ज करें *"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field"
                                required>
                     </div>
                 </div>
@@ -121,11 +139,10 @@
                 <h2 class="text-xl font-nasa text-blue-400/80">Case Information / केस की जानकारी</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="caseType" class="block text-gray-400 mb-2">Case Type / केस का प्रकार</label>
                         <select id="caseType" name="caseType" 
-                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-select"
                                 required>
-                            <option value="">Select Case Type / केस का प्रकार चुनें</option>
+                            <option value="" disabled selected>Select Case Type / केस का प्रकार चुनें *</option>
                             <option value="criminal">Criminal Case / आपराधिक मामला</option>
                             <option value="civil">Civil Case / दीवानी मामला</option>
                             <option value="domestic">Domestic Violence / घरेलू हिंसा</option>
@@ -134,10 +151,10 @@
                         </select>
                     </div>
                     <div>
-                        <label for="priority" class="block text-gray-400 mb-2">Priority Level / प्राथमिकता स्तर</label>
                         <select id="priority" name="priority" 
-                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                                class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-select"
                                 required>
+                            <option value="" disabled selected>Select Priority Level / प्राथमिकता स्तर चुनें *</option>
                             <option value="low">Low / कम</option>
                             <option value="medium">Medium / मध्यम</option>
                             <option value="high">High / उच्च</option>
@@ -152,29 +169,22 @@
                 <h2 class="text-xl font-nasa text-blue-400/80">Incident Details / घटना का विवरण</h2>
                 <div class="space-y-4">
                     <div>
-                        <label for="incidentDate" class="block text-gray-400 mb-2">Date of Incident</label>
                         <div class="relative">
                             <input type="date" 
                                    id="incidentDate" 
                                    name="incidentDate" 
-                                   placeholder="incidentDate"
-                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 [&::-webkit-calendar-picker-indicator]:opacity-0"
-                                   required
-                                   onclick="this.nextElementSibling.click()">
-                            <input type="button"
-                                   class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
-                                   onclick="this.previousElementSibling.showPicker()"
-                                   style="border:none; background:transparent;">
+                                   placeholder="Date of Incident / घटना की तिथि *"
+                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 [&::-webkit-calendar-picker-indicator]:opacity-0 required-field"
+                                   required>
                             <svg class="w-5 h-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                         </div>
                     </div>
                     <div>
-                        <label for="description" class="block text-gray-400 mb-2">Incident Description / घटना का विवरण</label>
                         <textarea id="description" name="description" rows="4" 
-                                  class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
-                                  placeholder="Provide detailed description of the incident / घटना का विस्तृत विवरण प्रदान करें" 
+                                  class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field"
+                                  placeholder="Provide detailed description of the incident / घटना का विस्तृत विवरण प्रदान करें *" 
                                   required></textarea>
                     </div>
                 </div>
@@ -185,31 +195,27 @@
                 <h2 class="text-xl font-nasa text-blue-400/80">Incident Location / घटना स्थल</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
-                        <label for="location" class="block text-gray-400 mb-2">Location Address / स्थान का पता</label>
                         <input type="text" id="location" name="location" 
-                               placeholder="Enter location address / स्थान का पता दर्ज करें"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               placeholder="Enter location address / स्थान का पता दर्ज करें *"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field"
                                required>
                     </div>
                     <div>
-                        <label for="city" class="block text-gray-400 mb-2">City / शहर</label>
                         <input type="text" id="city" name="city" 
-                               placeholder="Enter city / शहर दर्ज करें"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               placeholder="Enter city / शहर दर्ज करें *"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field"
                                required>
                     </div>
                     <div>
-                        <label for="district" class="block text-gray-400 mb-2">District / जिला</label>
                         <input type="text" id="district" name="district" 
-                               placeholder="Enter district / जिला दर्ज करें"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               placeholder="Enter district / जिला दर्ज करें *"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field"
                                required>
                     </div>
                     <div>
-                        <label for="state" class="block text-gray-400 mb-2">State / राज्य</label>
                         <input type="text" id="state" name="state" 
-                               placeholder="Enter state / राज्य दर्ज करें"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100"
+                               placeholder="Enter state / राज्य दर्ज करें *"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field"
                                required>
                     </div>
                 </div>

@@ -1,10 +1,40 @@
 <% layout('./layout/boilerplate') -%>
 
+<style>
+    .required-field::placeholder {
+        background: linear-gradient(to right, 
+            #9ca3af 0%, 
+            #9ca3af calc(100% - 8px), 
+            #ef4444 calc(100% - 8px), 
+            #ef4444 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .required-select {
+        color: #9ca3af;
+    }
+    .required-select option:first-child {
+        background: linear-gradient(to right, 
+            #9ca3af 0%, 
+            #9ca3af calc(100% - 8px), 
+            #ef4444 calc(100% - 8px), 
+            #ef4444 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+</style>
+
 <div class="pt-20">
     <div class="glass-effect rounded-lg p-8 max-w-4xl mx-auto">
         <h1 class="text-3xl font-nasa text-center mb-8 text-blue-400">Create Profile</h1>
 
         <form action="/newrecord" method="POST" enctype="multipart/form-data" class="space-y-8">
+            <div class="mb-6 text-sm text-red-400">
+                Fields marked with * are required
+            </div>
+
             <!-- Personal Information Section -->
             <div class="space-y-6">
                 <h2 class="text-xl font-nasa text-blue-400/80">Personal Information</h2>
@@ -13,9 +43,9 @@
                     <div class="space-y-2">
                         <input type="text" 
                                name="firstName" 
-                               placeholder="First Name / पहला नाम" 
+                               placeholder="First Name / पहला नाम *" 
                                required
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
                     </div>
                     <div class="space-y-2">
                         <input type="text" 
@@ -26,9 +56,9 @@
                     <div class="space-y-2">
                         <input type="text" 
                                name="lastName" 
-                               placeholder="Last Name / अंतिम नाम" 
+                               placeholder="Last Name / अंतिम नाम *" 
                                required
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
                     </div>
 
                     <!-- Occupation & DOB -->
@@ -41,56 +71,33 @@
                     <div class="space-y-2 relative">
                         <input type="text" 
                                name="dob" 
-                               placeholder="Date of Birth"
                                required
-                              
+                               placeholder="Date of Birth / जन्म तिथि *"
                                onfocus="(this.type='date');this.showPicker()"
                                onblur="if(!this.value) this.type='text'"
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 [&::-webkit-calendar-picker-indicator]:opacity-0"
-                               onclick="this.nextElementSibling.click()">
-                        <input type="button"
-                               class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
-                               onclick="this.previousElementSibling.showPicker()"
-                               style="border:none; background:transparent;">
-                        <svg class="w-5 h-5 text-gray-400 absolute right-3 top-1/3 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 [&::-webkit-calendar-picker-indicator]:opacity-0 required-field">
                     </div>
 
                     <!-- Gender & Phone -->
                     <div class="space-y-2">
                         <select name="gender" 
                                 required
-                                class="w-full h-[42px] bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                            <option value="" disabled selected>Select Gender / लिंग चुनें</option>
+                                class="w-full h-[42px] bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-select">
+                            <option value="" disabled selected>Select Gender / लिंग *</option>
                             <option value="male">Male / पुरुष</option>
                             <option value="female">Female / महिला</option>
                             <option value="other">Others / अन्य</option>
                         </select>
                     </div>
                     <div class="space-y-2">
-                        <div class="relative">
-                            <input type="tel" 
-                                   name="mNumber" 
-                                   id="mobileNumber"
-                                   placeholder="Phone Number / फ़ोन नंबर"
-                                   pattern="[0-9]{10}"
-                                   oninput="validateMobile(this)"
-                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                            <p id="mobileFeedback" class="text-sm text-red-400 mt-1 hidden"></p>
-                        </div>
-                    </div>
-                    <!-- Aadhar Number -->
-                    <div class="space-y-2">
-                        <div class="relative">
-                            <input type="text" 
-                                   id="aadharNumber" 
-                                   name="aadharNumber" 
-                                   placeholder="Aadhar Number / आधार नंबर"
-                                   maxlength="12"
-                                   class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
-                            <div id="aadharFeedback" class="absolute mt-1 text-sm"></div>
-                        </div>
+                        <input type="tel" 
+                               name="mNumber" 
+                               id="mobileNumber"
+                               placeholder="Phone Number / फ़ोन नंबर *"
+                               pattern="[0-9]{10}"
+                               required
+                               oninput="validateMobile(this)"
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
                     </div>
                 </div>
             </div>
@@ -102,30 +109,30 @@
                     <div class="space-y-2">
                         <input type="text" 
                                name="address[location]" 
-                               placeholder="Location / स्थान" 
+                               placeholder="Location / स्थान *" 
                                required
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
                     </div>
                     <div class="space-y-2">
                         <input type="text" 
                                name="address[city]" 
-                               placeholder="City / शहर" 
+                               placeholder="City / शहर *" 
                                required
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
                     </div>
                     <div class="space-y-2">
                         <input type="text" 
                                name="address[district]" 
-                               placeholder="District / जिला" 
+                               placeholder="District / जिला *" 
                                required
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
                     </div>
                     <div class="space-y-2">
                         <input type="text" 
                                name="address[state]" 
-                               placeholder="State / राज्य" 
+                               placeholder="State / राज्य *" 
                                required
-                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100">
+                               class="w-full bg-space-dark/50 border border-blue-400/30 rounded-md px-4 py-2 focus:outline-none focus:border-blue-400 transition-all text-gray-100 required-field">
                     </div>
                 </div>
             </div>
