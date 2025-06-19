@@ -5,6 +5,7 @@
 ---
 
 ## 📖 Overview
+![flow diagram](https://github.com/user-attachments/assets/6523a60b-4119-4985-98b0-517e1319ab0b)
 
 **Naam Siddhi** is an innovative platform designed to tackle challenges in name-based search mechanisms, particularly for Indian languages. We have developed a robust solution using hybrid algorithms that combine **modified Soundex for Indian languages** and **Levenshtein distance** to enable accurate string matching across both **Devanagari** and **Roman scripts**. 
 
